@@ -8,13 +8,10 @@
 
 #import "AppDelegate.h"
 #import <SensorsAnalyticsSDK.h>
-#import <SensorsABTest/SensorsABTest.h>
-
-
-static NSString* kSACqsServerURL = @"https://newsdktest.datasink.sensorsdata.cn/sa?project=chuqiangsheng&token=5a394d2405c147ca";
+#import <SensorsABTest.h>
 
 /// 测试环境，获取试验地址
-static NSString* kSABResultsServerURL = @"http://abtesting-online.saas.debugbox.sensorsdata.cn/api/v2/abtest/online/results?project-key=0a551836f92dc3292be545c748f3f462e2d43bc9";
+static NSString* kSABResultsServerURL = @"http://abtesting.saas.debugbox.sensorsdata.cn/api/v2/abtest/online/results?project-key=0a551836f92dc3292be545c748f3f462e2d43bc9";
 
 // 测试环境，数据接收地址
 static NSString* kSABTestServerURL = @"http://10.120.152.3:8106/sa?project=default";

@@ -26,8 +26,6 @@
 
 - (IBAction)fetchCacheAction:(UIButton *)sender {
 
-//    [[SensorsABTest sharedInstance] handleOpenURL:[NSURL URLWithString:@"sae8ff9352://abtest?sensors_abtest_url=http://abtesting.debugbox.sensorsdata.cn/api/v2/sa/abtest/experiments/distinct_id&feature_code=16023053434&account_id=2"]];
-
    id result = [[SensorsABTest sharedInstance] fetchCacheABTestWithExperimentId:@"233" defaultValue:@(123)];
     NSLog(@"fetchCacheABTest，experimentId：%@ - result:%@\n",@"233", result);
 

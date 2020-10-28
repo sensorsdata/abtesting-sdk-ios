@@ -1,6 +1,0 @@
-framework module SensorsABTest {
-  umbrella header "SensorsABTest.h"
-
-  export *
-  module * { export * }
-}

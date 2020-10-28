@@ -1,0 +1,627 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		4D15CF4324EE83B1003D2748 /* SensorsABTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D15CF3924EE83B1003D2748 /* SensorsABTest.framework */; };
+		4D15CF4824EE83B1003D2748 /* SensorsABTestTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D15CF4724EE83B1003D2748 /* SensorsABTestTests.m */; };
+		4D2A4A1125345083000B7150 /* SABManagerTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2A4A1025345083000B7150 /* SABManagerTest.m */; };
+		4D2A4A19253453B9000B7150 /* SABExperimentResultTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2A4A18253453B9000B7150 /* SABExperimentResultTest.m */; };
+		4D6ED41225303900002ACB41 /* SABUtilsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6ED41125303900002ACB41 /* SABUtilsTest.m */; };
+		4D73D61C254BC6110020E711 /* SABNetwork.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D73D5FA254BC6100020E711 /* SABNetwork.m */; };
+		4D73D61D254BC6110020E711 /* SABNetwork.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D73D5FB254BC6100020E711 /* SABNetwork.h */; };
+		4D73D61E254BC6110020E711 /* SensorsABTest.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D73D5FC254BC6100020E711 /* SensorsABTest.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4D73D61F254BC6110020E711 /* SABRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D73D5FD254BC6100020E711 /* SABRequest.h */; };
+		4D73D620254BC6110020E711 /* SABRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D73D5FE254BC6100020E711 /* SABRequest.m */; };
+		4D73D621254BC6110020E711 /* SABManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D73D5FF254BC6100020E711 /* SABManager.h */; };
+		4D73D622254BC6110020E711 /* SABFileStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D73D601254BC6100020E711 /* SABFileStore.m */; };
+		4D73D623254BC6110020E711 /* SABExperimentDataManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D73D602254BC6100020E711 /* SABExperimentDataManager.h */; };
+		4D73D624254BC6110020E711 /* SABFetchResultResponse.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D73D603254BC6100020E711 /* SABFetchResultResponse.h */; };
+		4D73D625254BC6110020E711 /* SABFileStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D73D604254BC6100020E711 /* SABFileStore.h */; };
+		4D73D626254BC6110020E711 /* SABFetchResultResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D73D605254BC6100020E711 /* SABFetchResultResponse.m */; };
+		4D73D627254BC6110020E711 /* SABExperimentDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D73D606254BC6110020E711 /* SABExperimentDataManager.m */; };
+		4D73D628254BC6110020E711 /* SensorsABTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D73D607254BC6110020E711 /* SensorsABTest.m */; };
+		4D73D629254BC6110020E711 /* SABConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D73D608254BC6110020E711 /* SABConstants.m */; };
+		4D73D62A254BC6110020E711 /* SABLogBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D73D60A254BC6110020E711 /* SABLogBridge.m */; };
+		4D73D62B254BC6110020E711 /* SABBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D73D60B254BC6110020E711 /* SABBridge.m */; };
+		4D73D62C254BC6110020E711 /* SABBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D73D60C254BC6110020E711 /* SABBridge.h */; };
+		4D73D62D254BC6110020E711 /* SABLogBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D73D60D254BC6110020E711 /* SABLogBridge.h */; };
+		4D73D62E254BC6110020E711 /* SensorsABTestConfigOptions.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D73D60E254BC6110020E711 /* SensorsABTestConfigOptions.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4D73D62F254BC6110020E711 /* SABConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D73D60F254BC6110020E711 /* SABConstants.h */; };
+		4D73D630254BC6110020E711 /* SABManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D73D610254BC6110020E711 /* SABManager.m */; };
+		4D73D631254BC6110020E711 /* SensorsABTestConfigOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D73D611254BC6110020E711 /* SensorsABTestConfigOptions.m */; };
+		4D73D632254BC6110020E711 /* SensorsABTestConfigOptions+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D73D612254BC6110020E711 /* SensorsABTestConfigOptions+Private.h */; };
+		4D73D633254BC6110020E711 /* SABValidUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D73D614254BC6110020E711 /* SABValidUtils.m */; };
+		4D73D634254BC6110020E711 /* NSString+SABHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D73D615254BC6110020E711 /* NSString+SABHelper.h */; };
+		4D73D635254BC6110020E711 /* SABURLUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D73D616254BC6110020E711 /* SABURLUtils.h */; };
+		4D73D636254BC6110020E711 /* SABJSONUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D73D617254BC6110020E711 /* SABJSONUtils.h */; };
+		4D73D637254BC6110020E711 /* SABValidUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D73D618254BC6110020E711 /* SABValidUtils.h */; };
+		4D73D638254BC6110020E711 /* SABURLUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D73D619254BC6110020E711 /* SABURLUtils.m */; };
+		4D73D639254BC6110020E711 /* NSString+SABHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D73D61A254BC6110020E711 /* NSString+SABHelper.m */; };
+		4D73D63A254BC6110020E711 /* SABJSONUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D73D61B254BC6110020E711 /* SABJSONUtils.m */; };
+		4D9E708A2539793900DE11D6 /* 数据格式说明.md in Resources */ = {isa = PBXBuildFile; fileRef = 4D9E70892539793900DE11D6 /* 数据格式说明.md */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		4D15CF4424EE83B1003D2748 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4D15CF3024EE83B1003D2748 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4D15CF3824EE83B1003D2748;
+			remoteInfo = SensorsABTest;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		4D15CF3924EE83B1003D2748 /* SensorsABTest.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SensorsABTest.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		4D15CF4224EE83B1003D2748 /* SensorsABTestTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SensorsABTestTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4D15CF4724EE83B1003D2748 /* SensorsABTestTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SensorsABTestTests.m; sourceTree = "<group>"; };
+		4D15CF4924EE83B1003D2748 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4D2A4A1025345083000B7150 /* SABManagerTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SABManagerTest.m; sourceTree = "<group>"; };
+		4D2A4A18253453B9000B7150 /* SABExperimentResultTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SABExperimentResultTest.m; sourceTree = "<group>"; };
+		4D6ED41125303900002ACB41 /* SABUtilsTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SABUtilsTest.m; sourceTree = "<group>"; };
+		4D73D5FA254BC6100020E711 /* SABNetwork.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SABNetwork.m; sourceTree = "<group>"; };
+		4D73D5FB254BC6100020E711 /* SABNetwork.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SABNetwork.h; sourceTree = "<group>"; };
+		4D73D5FC254BC6100020E711 /* SensorsABTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SensorsABTest.h; sourceTree = "<group>"; };
+		4D73D5FD254BC6100020E711 /* SABRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SABRequest.h; sourceTree = "<group>"; };
+		4D73D5FE254BC6100020E711 /* SABRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SABRequest.m; sourceTree = "<group>"; };
+		4D73D5FF254BC6100020E711 /* SABManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SABManager.h; sourceTree = "<group>"; };
+		4D73D601254BC6100020E711 /* SABFileStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SABFileStore.m; sourceTree = "<group>"; };
+		4D73D602254BC6100020E711 /* SABExperimentDataManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SABExperimentDataManager.h; sourceTree = "<group>"; };
+		4D73D603254BC6100020E711 /* SABFetchResultResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SABFetchResultResponse.h; sourceTree = "<group>"; };
+		4D73D604254BC6100020E711 /* SABFileStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SABFileStore.h; sourceTree = "<group>"; };
+		4D73D605254BC6100020E711 /* SABFetchResultResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SABFetchResultResponse.m; sourceTree = "<group>"; };
+		4D73D606254BC6110020E711 /* SABExperimentDataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SABExperimentDataManager.m; sourceTree = "<group>"; };
+		4D73D607254BC6110020E711 /* SensorsABTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SensorsABTest.m; sourceTree = "<group>"; };
+		4D73D608254BC6110020E711 /* SABConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SABConstants.m; sourceTree = "<group>"; };
+		4D73D60A254BC6110020E711 /* SABLogBridge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SABLogBridge.m; sourceTree = "<group>"; };
+		4D73D60B254BC6110020E711 /* SABBridge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SABBridge.m; sourceTree = "<group>"; };
+		4D73D60C254BC6110020E711 /* SABBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SABBridge.h; sourceTree = "<group>"; };
+		4D73D60D254BC6110020E711 /* SABLogBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SABLogBridge.h; sourceTree = "<group>"; };
+		4D73D60E254BC6110020E711 /* SensorsABTestConfigOptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SensorsABTestConfigOptions.h; sourceTree = "<group>"; };
+		4D73D60F254BC6110020E711 /* SABConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SABConstants.h; sourceTree = "<group>"; };
+		4D73D610254BC6110020E711 /* SABManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SABManager.m; sourceTree = "<group>"; };
+		4D73D611254BC6110020E711 /* SensorsABTestConfigOptions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SensorsABTestConfigOptions.m; sourceTree = "<group>"; };
+		4D73D612254BC6110020E711 /* SensorsABTestConfigOptions+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SensorsABTestConfigOptions+Private.h"; sourceTree = "<group>"; };
+		4D73D614254BC6110020E711 /* SABValidUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SABValidUtils.m; sourceTree = "<group>"; };
+		4D73D615254BC6110020E711 /* NSString+SABHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+SABHelper.h"; sourceTree = "<group>"; };
+		4D73D616254BC6110020E711 /* SABURLUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SABURLUtils.h; sourceTree = "<group>"; };
+		4D73D617254BC6110020E711 /* SABJSONUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SABJSONUtils.h; sourceTree = "<group>"; };
+		4D73D618254BC6110020E711 /* SABValidUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SABValidUtils.h; sourceTree = "<group>"; };
+		4D73D619254BC6110020E711 /* SABURLUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SABURLUtils.m; sourceTree = "<group>"; };
+		4D73D61A254BC6110020E711 /* NSString+SABHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+SABHelper.m"; sourceTree = "<group>"; };
+		4D73D61B254BC6110020E711 /* SABJSONUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SABJSONUtils.m; sourceTree = "<group>"; };
+		4D9E70892539793900DE11D6 /* 数据格式说明.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "数据格式说明.md"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		4D15CF3624EE83B1003D2748 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4D15CF3F24EE83B1003D2748 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4D15CF4324EE83B1003D2748 /* SensorsABTest.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		4D15CF2F24EE83B1003D2748 = {
+			isa = PBXGroup;
+			children = (
+				4D15CF3B24EE83B1003D2748 /* SensorsABTest */,
+				4D15CF4624EE83B1003D2748 /* SensorsABTestTests */,
+				4D15CF3A24EE83B1003D2748 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		4D15CF3A24EE83B1003D2748 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4D15CF3924EE83B1003D2748 /* SensorsABTest.framework */,
+				4D15CF4224EE83B1003D2748 /* SensorsABTestTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4D15CF3B24EE83B1003D2748 /* SensorsABTest */ = {
+			isa = PBXGroup;
+			children = (
+				4D73D5FC254BC6100020E711 /* SensorsABTest.h */,
+				4D73D607254BC6110020E711 /* SensorsABTest.m */,
+				4D73D60E254BC6110020E711 /* SensorsABTestConfigOptions.h */,
+				4D73D611254BC6110020E711 /* SensorsABTestConfigOptions.m */,
+				4D73D612254BC6110020E711 /* SensorsABTestConfigOptions+Private.h */,
+				4D73D60F254BC6110020E711 /* SABConstants.h */,
+				4D73D608254BC6110020E711 /* SABConstants.m */,
+				4D73D5FF254BC6100020E711 /* SABManager.h */,
+				4D73D610254BC6110020E711 /* SABManager.m */,
+				4D73D600254BC6100020E711 /* DataManger */,
+				4D73D5F9254BC6100020E711 /* Network */,
+				4D73D609254BC6110020E711 /* SABridge */,
+				4D73D613254BC6110020E711 /* Utils */,
+			);
+			path = SensorsABTest;
+			sourceTree = "<group>";
+		};
+		4D15CF4624EE83B1003D2748 /* SensorsABTestTests */ = {
+			isa = PBXGroup;
+			children = (
+				4D9E70892539793900DE11D6 /* 数据格式说明.md */,
+				4D15CF4724EE83B1003D2748 /* SensorsABTestTests.m */,
+				4D2A4A1025345083000B7150 /* SABManagerTest.m */,
+				4D2A4A18253453B9000B7150 /* SABExperimentResultTest.m */,
+				4D6ED41125303900002ACB41 /* SABUtilsTest.m */,
+				4D15CF4924EE83B1003D2748 /* Info.plist */,
+			);
+			path = SensorsABTestTests;
+			sourceTree = "<group>";
+		};
+		4D73D5F9254BC6100020E711 /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				4D73D5FB254BC6100020E711 /* SABNetwork.h */,
+				4D73D5FA254BC6100020E711 /* SABNetwork.m */,
+				4D73D5FD254BC6100020E711 /* SABRequest.h */,
+				4D73D5FE254BC6100020E711 /* SABRequest.m */,
+			);
+			path = Network;
+			sourceTree = "<group>";
+		};
+		4D73D600254BC6100020E711 /* DataManger */ = {
+			isa = PBXGroup;
+			children = (
+				4D73D604254BC6100020E711 /* SABFileStore.h */,
+				4D73D601254BC6100020E711 /* SABFileStore.m */,
+				4D73D603254BC6100020E711 /* SABFetchResultResponse.h */,
+				4D73D605254BC6100020E711 /* SABFetchResultResponse.m */,
+				4D73D602254BC6100020E711 /* SABExperimentDataManager.h */,
+				4D73D606254BC6110020E711 /* SABExperimentDataManager.m */,
+			);
+			path = DataManger;
+			sourceTree = "<group>";
+		};
+		4D73D609254BC6110020E711 /* SABridge */ = {
+			isa = PBXGroup;
+			children = (
+				4D73D60C254BC6110020E711 /* SABBridge.h */,
+				4D73D60B254BC6110020E711 /* SABBridge.m */,
+				4D73D60D254BC6110020E711 /* SABLogBridge.h */,
+				4D73D60A254BC6110020E711 /* SABLogBridge.m */,
+			);
+			path = SABridge;
+			sourceTree = "<group>";
+		};
+		4D73D613254BC6110020E711 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				4D73D618254BC6110020E711 /* SABValidUtils.h */,
+				4D73D614254BC6110020E711 /* SABValidUtils.m */,
+				4D73D616254BC6110020E711 /* SABURLUtils.h */,
+				4D73D619254BC6110020E711 /* SABURLUtils.m */,
+				4D73D617254BC6110020E711 /* SABJSONUtils.h */,
+				4D73D61B254BC6110020E711 /* SABJSONUtils.m */,
+				4D73D615254BC6110020E711 /* NSString+SABHelper.h */,
+				4D73D61A254BC6110020E711 /* NSString+SABHelper.m */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		4D15CF3424EE83B1003D2748 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4D73D62D254BC6110020E711 /* SABLogBridge.h in Headers */,
+				4D73D624254BC6110020E711 /* SABFetchResultResponse.h in Headers */,
+				4D73D632254BC6110020E711 /* SensorsABTestConfigOptions+Private.h in Headers */,
+				4D73D61F254BC6110020E711 /* SABRequest.h in Headers */,
+				4D73D634254BC6110020E711 /* NSString+SABHelper.h in Headers */,
+				4D73D635254BC6110020E711 /* SABURLUtils.h in Headers */,
+				4D73D61D254BC6110020E711 /* SABNetwork.h in Headers */,
+				4D73D62E254BC6110020E711 /* SensorsABTestConfigOptions.h in Headers */,
+				4D73D62F254BC6110020E711 /* SABConstants.h in Headers */,
+				4D73D61E254BC6110020E711 /* SensorsABTest.h in Headers */,
+				4D73D62C254BC6110020E711 /* SABBridge.h in Headers */,
+				4D73D623254BC6110020E711 /* SABExperimentDataManager.h in Headers */,
+				4D73D637254BC6110020E711 /* SABValidUtils.h in Headers */,
+				4D73D625254BC6110020E711 /* SABFileStore.h in Headers */,
+				4D73D621254BC6110020E711 /* SABManager.h in Headers */,
+				4D73D636254BC6110020E711 /* SABJSONUtils.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		4D15CF3824EE83B1003D2748 /* SensorsABTest */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4D15CF4D24EE83B1003D2748 /* Build configuration list for PBXNativeTarget "SensorsABTest" */;
+			buildPhases = (
+				4D15CF3424EE83B1003D2748 /* Headers */,
+				4D15CF3524EE83B1003D2748 /* Sources */,
+				4D15CF3624EE83B1003D2748 /* Frameworks */,
+				4D15CF3724EE83B1003D2748 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SensorsABTest;
+			productName = SensorsABTest;
+			productReference = 4D15CF3924EE83B1003D2748 /* SensorsABTest.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		4D15CF4124EE83B1003D2748 /* SensorsABTestTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4D15CF5024EE83B1003D2748 /* Build configuration list for PBXNativeTarget "SensorsABTestTests" */;
+			buildPhases = (
+				4D15CF3E24EE83B1003D2748 /* Sources */,
+				4D15CF3F24EE83B1003D2748 /* Frameworks */,
+				4D15CF4024EE83B1003D2748 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4D15CF4524EE83B1003D2748 /* PBXTargetDependency */,
+			);
+			name = SensorsABTestTests;
+			productName = SensorsABTestTests;
+			productReference = 4D15CF4224EE83B1003D2748 /* SensorsABTestTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		4D15CF3024EE83B1003D2748 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1160;
+				ORGANIZATIONNAME = "Sensors Data Inc.";
+				TargetAttributes = {
+					4D15CF3824EE83B1003D2748 = {
+						CreatedOnToolsVersion = 11.6;
+					};
+					4D15CF4124EE83B1003D2748 = {
+						CreatedOnToolsVersion = 11.6;
+					};
+				};
+			};
+			buildConfigurationList = 4D15CF3324EE83B1003D2748 /* Build configuration list for PBXProject "SensorsABTest" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 4D15CF2F24EE83B1003D2748;
+			productRefGroup = 4D15CF3A24EE83B1003D2748 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4D15CF3824EE83B1003D2748 /* SensorsABTest */,
+				4D15CF4124EE83B1003D2748 /* SensorsABTestTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		4D15CF3724EE83B1003D2748 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4D15CF4024EE83B1003D2748 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4D9E708A2539793900DE11D6 /* 数据格式说明.md in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4D15CF3524EE83B1003D2748 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4D73D622254BC6110020E711 /* SABFileStore.m in Sources */,
+				4D73D629254BC6110020E711 /* SABConstants.m in Sources */,
+				4D73D639254BC6110020E711 /* NSString+SABHelper.m in Sources */,
+				4D73D62B254BC6110020E711 /* SABBridge.m in Sources */,
+				4D73D626254BC6110020E711 /* SABFetchResultResponse.m in Sources */,
+				4D73D631254BC6110020E711 /* SensorsABTestConfigOptions.m in Sources */,
+				4D73D633254BC6110020E711 /* SABValidUtils.m in Sources */,
+				4D73D638254BC6110020E711 /* SABURLUtils.m in Sources */,
+				4D73D630254BC6110020E711 /* SABManager.m in Sources */,
+				4D73D63A254BC6110020E711 /* SABJSONUtils.m in Sources */,
+				4D73D628254BC6110020E711 /* SensorsABTest.m in Sources */,
+				4D73D620254BC6110020E711 /* SABRequest.m in Sources */,
+				4D73D627254BC6110020E711 /* SABExperimentDataManager.m in Sources */,
+				4D73D62A254BC6110020E711 /* SABLogBridge.m in Sources */,
+				4D73D61C254BC6110020E711 /* SABNetwork.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4D15CF3E24EE83B1003D2748 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4D2A4A1125345083000B7150 /* SABManagerTest.m in Sources */,
+				4D2A4A19253453B9000B7150 /* SABExperimentResultTest.m in Sources */,
+				4D6ED41225303900002ACB41 /* SABUtilsTest.m in Sources */,
+				4D15CF4824EE83B1003D2748 /* SensorsABTestTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		4D15CF4524EE83B1003D2748 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4D15CF3824EE83B1003D2748 /* SensorsABTest */;
+			targetProxy = 4D15CF4424EE83B1003D2748 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		4D15CF4B24EE83B1003D2748 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		4D15CF4C24EE83B1003D2748 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		4D15CF4E24EE83B1003D2748 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
+				CODE_SIGN_STYLE = Automatic;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 75FYWDWHL5;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
+				INFOPLIST_FILE = "$(SRCROOT)/SupportingFiles/SensorsABTest-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACH_O_TYPE = mh_dylib;
+				MARKETING_VERSION = 0.1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = cn.sensorsdata.SensorsABTest;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		4D15CF4F24EE83B1003D2748 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
+				CODE_SIGN_STYLE = Automatic;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 75FYWDWHL5;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				EXCLUDED_ARCHS = "";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
+				INFOPLIST_FILE = "$(SRCROOT)/SupportingFiles/SensorsABTest-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACH_O_TYPE = mh_dylib;
+				MARKETING_VERSION = 0.1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = cn.sensorsdata.SensorsABTest;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		4D15CF5124EE83B1003D2748 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 75FYWDWHL5;
+				INFOPLIST_FILE = SensorsABTestTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = cn.sensorsdata.SensorsABTestTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		4D15CF5224EE83B1003D2748 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 75FYWDWHL5;
+				INFOPLIST_FILE = SensorsABTestTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = cn.sensorsdata.SensorsABTestTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4D15CF3324EE83B1003D2748 /* Build configuration list for PBXProject "SensorsABTest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4D15CF4B24EE83B1003D2748 /* Debug */,
+				4D15CF4C24EE83B1003D2748 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4D15CF4D24EE83B1003D2748 /* Build configuration list for PBXNativeTarget "SensorsABTest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4D15CF4E24EE83B1003D2748 /* Debug */,
+				4D15CF4F24EE83B1003D2748 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4D15CF5024EE83B1003D2748 /* Build configuration list for PBXNativeTarget "SensorsABTestTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4D15CF5124EE83B1003D2748 /* Debug */,
+				4D15CF5224EE83B1003D2748 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 4D15CF3024EE83B1003D2748 /* Project object */;
+}

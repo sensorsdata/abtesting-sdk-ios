@@ -1,0 +1,326 @@
+//
+//  SABManager.m
+//  SensorsABTest
+//
+//  Created by 储强盛 on 2020/9/29.
+//  Copyright © 2020 Sensors Data Inc. All rights reserved.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+//
+
+#if ! __has_feature(objc_arc)
+#error This file must be compiled with ARC. Either turn on ARC for the project or use -fobjc-arc flag on this file.
+#endif
+
+#import <UIKit/UIApplication.h>
+#import <WebKit/WebKit.h>
+#import "SABManager.h"
+#import "SABLogBridge.h"
+#import "SABBridge.h"
+#import "NSString+SABHelper.h"
+#import "SABConstants.h"
+#import "SABFetchResultResponse.h"
+#import "SABExperimentDataManager.h"
+#import "SABValidUtils.h"
+#import "SensorsABTestConfigOptions+Private.h"
+#import "SABRequest.h"
+#import "SABJSONUtils.h"
+
+/// 调用 js 方法名
+static NSString * const kSABAppCallJSMethodName = @"window.sensorsdata_app_call_js";
+
+/// 最大请求次数，失败进行重试
+static NSInteger const kSABAsyncFetchExperimentMaxTimes = 3;
+
+/// 重试请求时间间隔，单位 秒
+static NSTimeInterval const kSABAsyncFetchExperimentRetryIntervalTime = 30;
+
+@interface SABManager()
+
+// 初始化配置
+@property (nonatomic, strong) SensorsABTestConfigOptions *configOptions;
+
+@property (nonatomic, strong) SABExperimentDataManager *dataManager;
+
+@property (nonatomic, strong) NSTimer *timer;
+// 暂停时刻时间
+@property (nonatomic, strong) NSDate *pauseStartTime;
+// 上次执行时间
+@property (nonatomic, strong) NSDate *previousFireTime;
+@end
+
+@implementation SABManager
+
+#pragma mark - initialize
+- (instancetype)initWithConfigOptions:(nonnull SensorsABTestConfigOptions *)configOptions {
+    self = [super init];
+    if (self) {
+        _configOptions = [configOptions copy];
+        
+        // 数据存储和解析
+        _dataManager = [[SABExperimentDataManager alloc] init];
+        
+        // 注册监听
+        [self setupListeners];
+        
+        // 获取所有最新试验结果
+        [self fetchAllABTestResultWithTimes:kSABAsyncFetchExperimentMaxTimes];
+    }
+    return self;
+};
+
+- (void)setupListeners {
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    [notificationCenter addObserver:self selector:@selector(applicationDidBecomeActive) name:UIApplicationDidBecomeActiveNotification object:nil];
+    [notificationCenter addObserver:self selector:@selector(applicationDidEnterBackground) name:UIApplicationDidEnterBackgroundNotification object:nil];
+    
+    [notificationCenter addObserver:self selector:@selector(registerSAJSBridge:) name:kSABRegisterSAJSBridgeNotification object:nil];
+    [notificationCenter addObserver:self selector:@selector(messageFromH5:) name:kSABMessageFromH5Notification object:nil];
+}
+
+#pragma mark - notification Action
+- (void)applicationDidBecomeActive {
+    // 开启定时更新计时
+    [self startReloadTimer];
+}
+
+- (void)applicationDidEnterBackground {
+    // 关闭定时更新计时
+    [self stopReloadTimer];
+}
+
+/// 注入 App 与 H5 打通标识
+- (void)registerSAJSBridge:(NSNotification *)notification {
+    WKWebView *webView = notification.object;
+    if (![webView isKindOfClass:WKWebView.class]) {
+        SABLogError(@"notification object is invalid webView from SensorsAnalyticsSDK");
+        return;
+    }
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        // 注入 sensorsdata_abtest_module 标记，表示当前已集成 A/B Test iOS SDK
+        NSString *javaScriptSource = @"window.SensorsData_iOS_JS_Bridge.sensorsdata_abtest_module = true;";
+        WKUserScript *userScript = [[WKUserScript alloc] initWithSource:javaScriptSource injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:NO];
+        [webView.configuration.userContentController addUserScript:userScript];
+    });
+}
+
+/// js 发送的请求数据
+- (void)messageFromH5:(NSNotification *)notification {
+    WKScriptMessage *message = notification.object;
+    WKWebView *webView = message.webView;
+    if (![webView isKindOfClass:WKWebView.class]) {
+        SABLogError(@"Message webview is invalid from SensorsAnalyticsSDK");
+        return;
+    }
+
+    NSDictionary *messageDic = [SABJSONUtils JSONObjectWithString:message.body];
+    if (![messageDic isKindOfClass:[NSDictionary class]]) {
+        SABLogError(@"Message body is formatted failure from JS SDK");
+        return;
+    }
+
+    BOOL isCallType = [messageDic[@"callType"] isEqualToString:@"abtest"];
+    if (!isCallType) {
+        return;
+    }
+    NSDictionary *dataDic = messageDic[@"data"];
+    if (![dataDic isKindOfClass:NSDictionary.class]) {
+        SABLogError(@"Message data is invalid from JS SDK");
+        return;
+    }
+
+    /* 拼接回传 js 的数据结构
+     sensorsdata_app_call_js('abtest',"{
+     "message_id":1598947194957,   //唯一标识，H5 发起的请求信息中获取
+     "properties":{},           //App 端 A/B Testing 特定的属性，一期不做暂为
+     "data":{}                 //分流请求响应数据
+     }")
+     */
+    SABExperimentRequest *requestData = [[SABExperimentRequest alloc] initWithBaseURL:self.configOptions.baseURL projectKey:self.configOptions.projectKey];
+    requestData.timeoutInterval = [dataDic[@"timeout"] integerValue] / 1000.0;
+    [self.dataManager asyncFetchAllExperimentWithRequest:requestData.request completionHandler:^(SABFetchResultResponse * _Nullable responseData, NSError * _Nullable error) {
+        
+        // JS 数据拼接
+        NSMutableDictionary *callJSDataDic = [NSMutableDictionary dictionary];
+        callJSDataDic[@"message_id"] = dataDic[@"message_id"];
+        if (responseData.responseObject) {
+            callJSDataDic[@"data"] = responseData.responseObject;
+        }
+        NSData *callJSData = [SABJSONUtils JSONSerializeObject:callJSDataDic];
+        NSString *callJSJsonString = [[NSString alloc] initWithData:callJSData encoding:NSUTF8StringEncoding];
+        
+        // 请求结果，直接发到 js
+        NSMutableString *javaScriptSource = [NSMutableString stringWithString:kSABAppCallJSMethodName];
+        [javaScriptSource appendFormat:@"('abtest', '%@')", callJSJsonString];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [webView evaluateJavaScript:javaScriptSource completionHandler:^(id _Nullable response, NSError *_Nullable error) {
+                if (error) {
+                    // 可能方法不存在；
+                    SABLogError(@"window.sensorsdata_app_call_js abtest error：%@", error);
+                }
+            }];
+        });
+    }];
+}
+
+#pragma mark - fetch ABTest Action
+- (void)fetchABTestWithModeType:(SABFetchABTestModeType)type experimentId:(NSString *)experimentId defaultValue:(id)defaultValue timeoutInterval:(NSTimeInterval)timeoutInterval completionHandler:(void (^)(id _Nullable result))completionHandler {
+    if (!completionHandler) {
+        SABLogWarn(@"Please use a valid completionHandler");
+        return;
+    }
+    if (![SABValidUtils isValidString:experimentId]) {
+        completionHandler(defaultValue);
+        SABLogError(@"experimentId:：%@ error，experimentId must be a valid string!", experimentId);
+        return;
+    }
+
+    switch (type) {
+        case SABFetchABTestModeTypeCache: {
+            // 从缓存读取
+            id cacheValue = [self fetchCacheABTestWithExperimentId:experimentId defaultValue:defaultValue];
+            return completionHandler(cacheValue ? : defaultValue);
+        }
+        case SABFetchABTestModeTypeFast: {
+            id cacheValue = [self fetchCacheABTestWithExperimentId:experimentId defaultValue:defaultValue];
+            if (cacheValue) {
+                return completionHandler(cacheValue);
+            }
+            [self fetchAsyncABTestWithExperimentId:experimentId defaultValue:defaultValue timeoutInterval:timeoutInterval completionHandler:completionHandler];
+            break;
+        }
+        case SABFetchABTestModeTypeAsync: {
+            // 异步请求
+            [self fetchAsyncABTestWithExperimentId:experimentId defaultValue:defaultValue timeoutInterval:timeoutInterval completionHandler:completionHandler];
+        }
+        break;
+        default:
+            break;
+    }
+}
+
+/// 获取缓存试验
+- (nullable id)fetchCacheABTestWithExperimentId:(NSString *)experimentId defaultValue:(id)defaultValue {
+
+    if (![SABValidUtils isValidString:experimentId]) {
+        SABLogError(@"experimentId:：%@ error，experimentId must be a valid string!", experimentId);
+        return nil;
+    }
+    SABExperimentResult *resultData = [self.dataManager cachedExperimentResultWithExperimentId:experimentId];
+    // 判断和默认值类型是否一致
+    if (!resultData || ![resultData isSameTypeWithDefaultValue:defaultValue]) {
+        SABLogWarn(@"The experiment result type is inconsistent with the defaultValue type of the interface setting，experiment_id：%@，experiment result：%@，defaultValue：%@", experimentId, resultData.config.value, defaultValue);
+        return nil;
+    }
+
+    if (!resultData.isWhiteList) {
+        // 埋点
+        [self trackABTestWithData:resultData];
+    }
+    return resultData.config.value;
+}
+
+/// 异步请求获取试验
+- (void)fetchAsyncABTestWithExperimentId:(NSString *)experimentId defaultValue:(id)defaultValue timeoutInterval:(NSTimeInterval)timeoutInterval completionHandler:(void (^)(id _Nullable result))completionHandler {
+    // 异步请求
+    SABExperimentRequest *requestData = [[SABExperimentRequest alloc] initWithBaseURL:self.configOptions.baseURL projectKey:self.configOptions.projectKey];
+    requestData.timeoutInterval = timeoutInterval;
+    [self.dataManager asyncFetchAllExperimentWithRequest:requestData.request completionHandler:^(SABFetchResultResponse *_Nullable responseData, NSError *_Nullable error) {
+        if (error || !responseData) {
+            SABLogError(@"fetchAllABTestResult failure，error: %@", error);
+            completionHandler(defaultValue);
+            return;
+        }
+        id cacheValue = [self fetchCacheABTestWithExperimentId:experimentId defaultValue:defaultValue];
+        completionHandler(cacheValue ?: defaultValue);
+    }];
+}
+
+/// 获取所有试验结果
+- (void)fetchAllABTestResult {
+    [self fetchAllABTestResultWithTimes:1];
+}
+
+/// 获取所有试验结果
+/// @param times 最大次数
+- (void)fetchAllABTestResultWithTimes:(NSInteger)times {
+    NSInteger fetchIndex = times - 1;
+    
+    SABExperimentRequest *requestData = [[SABExperimentRequest alloc] initWithBaseURL:self.configOptions.baseURL projectKey:self.configOptions.projectKey];
+    [self.dataManager asyncFetchAllExperimentWithRequest:requestData.request completionHandler:^(SABFetchResultResponse * _Nullable responseData, NSError * _Nullable error) {
+        
+        if (fetchIndex <= 0 || !error) {
+            return;
+        }
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(kSABAsyncFetchExperimentRetryIntervalTime * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self fetchAllABTestResultWithTimes:fetchIndex];
+        });
+    }];
+}
+
+
+#pragma mark - action
+/// track $ABTestTrigger
+- (void)trackABTestWithData:(SABExperimentResult *)resultData {
+    if (!resultData) {
+        return;
+    }
+    
+    NSMutableDictionary *properties = [NSMutableDictionary dictionary];
+    properties[kSABTriggerExperimentId] = resultData.experimentId;
+    properties[kSABTriggerExperimentGroupId] = resultData.experimentGroupId;
+    [SABBridge track:kSABTriggerEventName properties:properties];
+}
+
+/// 开始更新计时
+- (void)startReloadTimer {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        // 在启动弹框中 applicationDidBecomeActive 可能重复调用
+        if (self.timer.isValid && !self.pauseStartTime) {
+            return;
+        }
+
+        SABLogDebug(@"start reload timer.");
+        if (self.timer.isValid) {
+            // 恢复
+            float pauseTime = -1 * [self.pauseStartTime  timeIntervalSinceNow];
+            [self.timer setFireDate:[NSDate dateWithTimeInterval:pauseTime sinceDate:self.previousFireTime]];
+            self.pauseStartTime = nil;
+            self.previousFireTime = nil;
+            return;
+        }
+
+        // 默认 10 分钟更新数据
+        NSTimeInterval interval = 10 * 60;
+        self.timer = [NSTimer scheduledTimerWithTimeInterval:interval target:self selector:@selector(fetchAllABTestResult) userInfo:nil repeats:YES];
+        [[NSRunLoop currentRunLoop] addTimer:self.timer forMode:NSRunLoopCommonModes];
+    });
+}
+
+/// 暂停更新计时
+- (void)stopReloadTimer {
+    SABLogDebug(@"stop reload timer.");
+    dispatch_async(dispatch_get_main_queue(), ^{
+        // 暂停计时
+        self.pauseStartTime = [NSDate dateWithTimeIntervalSinceNow:0];
+        self.previousFireTime = [self.timer fireDate];
+        [self.timer setFireDate:[NSDate distantFuture]];
+    });
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+@end

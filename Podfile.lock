@@ -1,5 +1,5 @@
 PODS:
-  - SensorsABTesting (0.0.1):
+  - SensorsABTesting (0.1.1):
     - SensorsAnalyticsSDK (>= 2.1.14)
   - SensorsAnalyticsSDK (2.1.14):
     - SensorsAnalyticsSDK/Core (= 2.1.14)
@@ -17,7 +17,7 @@ EXTERNAL SOURCES:
     :path: "./"
 
 SPEC CHECKSUMS:
-  SensorsABTesting: 7fabcdec0d39866b94e2711b70f217d57c4b4a9c
+  SensorsABTesting: 2cfe791099a8fb17f4211968857626f986ac8632
   SensorsAnalyticsSDK: 511e184ee022efc0b0c61afbe6935595e5d03d8d
 
 PODFILE CHECKSUM: 1b7a0cbf6060fbd70740be2419c32c7c419e2660

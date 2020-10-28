@@ -26,7 +26,7 @@
 //    NSString *path = [[[NSBundle mainBundle] bundlePath]  stringByAppendingPathComponent:@"JSCallOC.html"];
 //    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL fileURLWithPath:path]];
 
-    // js 测试页面 http://ls869359954.gitee.io/sa-sdk-abtest/
+    // js 测试页面
     NSString *httpStr = @"http://ls869359954.gitee.io/sa-sdk-abtest/";
     NSURL *httpUrl = [NSURL URLWithString:httpStr];
     NSURLRequest *request = [NSURLRequest requestWithURL:httpUrl];
