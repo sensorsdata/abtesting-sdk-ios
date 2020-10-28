@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="Jhi-XN-IOm">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17125"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Navigation Controller-->
+        <scene sceneID="xk3-Md-3hK">
+            <objects>
+                <navigationController id="Jhi-XN-IOm" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="LY8-Rx-xHF">
+                        <rect key="frame" x="0.0" y="44" width="414" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="HgX-s6-hK5"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="xX5-WX-V9t" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-684" y="46"/>
+        </scene>
+        <!--View Controller-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController id="BYZ-38-t0r" customClass="ViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="GQ1-5H-jo2"/>
+                        <viewControllerLayoutGuide type="bottom" id="vmD-lF-mhP"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ve2-iG-BL6">
+                                <rect key="frame" x="100" y="131" width="214" height="50"/>
+                                <color key="backgroundColor" systemColor="systemIndigoColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="214" id="dNm-Da-cyP"/>
+                                    <constraint firstAttribute="height" constant="50" id="rwa-ek-5YD"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
+                                <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <state key="normal" title="fetchCacheABTest">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <connections>
+                                    <action selector="fetchCacheAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="X5E-ht-ErZ"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9Cf-eg-iIL">
+                                <rect key="frame" x="100" y="216" width="214" height="50"/>
+                                <color key="backgroundColor" systemColor="systemIndigoColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="50" id="aHx-ws-wgt"/>
+                                    <constraint firstAttribute="width" constant="214" id="yBv-kl-D4c"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
+                                <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <state key="normal" title="asyncFetchABTest">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <connections>
+                                    <action selector="asyncFetch:" destination="BYZ-38-t0r" eventType="touchUpInside" id="3px-pu-qAh"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Q3k-xP-o78">
+                                <rect key="frame" x="100" y="301" width="214" height="50"/>
+                                <color key="backgroundColor" systemColor="systemIndigoColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="50" id="729-Mn-eFA"/>
+                                    <constraint firstAttribute="width" constant="214" id="K3a-Rw-r1g"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
+                                <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <state key="normal" title="fastFetchABTest">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <connections>
+                                    <action selector="fastFetch:" destination="BYZ-38-t0r" eventType="touchUpInside" id="ep1-Vc-8bM"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="d70-6A-Npa">
+                                <rect key="frame" x="100" y="386" width="214" height="50"/>
+                                <color key="backgroundColor" systemColor="systemIndigoColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="50" id="cX9-Vq-Px1"/>
+                                    <constraint firstAttribute="width" constant="214" id="yoO-ya-znk"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
+                                <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <state key="normal" title="WKWebView">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <connections>
+                                    <action selector="gotoWKWebView:" destination="BYZ-38-t0r" eventType="touchUpInside" id="9A1-pY-Kxe"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="d70-6A-Npa" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="6iR-5r-IL4"/>
+                            <constraint firstItem="9Cf-eg-iIL" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="IWY-eE-Bkp"/>
+                            <constraint firstItem="ve2-iG-BL6" firstAttribute="top" secondItem="GQ1-5H-jo2" secondAttribute="bottom" constant="43" id="IdT-dM-j0L"/>
+                            <constraint firstItem="d70-6A-Npa" firstAttribute="top" secondItem="Q3k-xP-o78" secondAttribute="bottom" constant="35" id="Wmq-9i-lwQ"/>
+                            <constraint firstItem="Q3k-xP-o78" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="bko-b1-5l0"/>
+                            <constraint firstItem="9Cf-eg-iIL" firstAttribute="top" secondItem="ve2-iG-BL6" secondAttribute="bottom" constant="35" id="nBY-h9-C0R"/>
+                            <constraint firstItem="ve2-iG-BL6" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="oEr-fR-sMq"/>
+                            <constraint firstItem="Q3k-xP-o78" firstAttribute="top" secondItem="9Cf-eg-iIL" secondAttribute="bottom" constant="35" id="vMT-eO-rMr"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="HCh-DP-hxi"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="147.82608695652175" y="45.535714285714285"/>
+        </scene>
+    </scenes>
+    <resources>
+        <systemColor name="systemIndigoColor">
+            <color red="0.34509803921568627" green="0.33725490196078434" blue="0.83921568627450982" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
+</document>
