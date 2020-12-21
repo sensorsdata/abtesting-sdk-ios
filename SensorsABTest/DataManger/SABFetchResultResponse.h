@@ -27,14 +27,14 @@
  *
  * @discussion
  * 试验结果类型枚举
- *   SABExperimentResultTypeInvalid 类型无效
+ *   SABExperimentResultTypeInvalid 类型无效，可能为 nil
  *   SABExperimentResultTypeInt - INTEGER 类型结果
  *   SABExperimentResultTypeString - STRING 类型结果
  *   SABExperimentResultTypeBool - BOOLEAN 类型结果
  *   SABExperimentResultTypeJSON - JSON 类型结果
  */
-typedef NS_OPTIONS(NSInteger, SABExperimentResultType) {
-    SABExperimentResultTypeInvalid,
+typedef NS_ENUM(NSInteger, SABExperimentResultType) {
+    SABExperimentResultTypeInvalid = 0,
     SABExperimentResultTypeInt,
     SABExperimentResultTypeString,
     SABExperimentResultTypeBool,
@@ -50,20 +50,22 @@ typedef NS_OPTIONS(NSInteger, SABExperimentResultType) {
  *   SABFetchResultResponseStatusSuccess - 拉取试验成功
  *   SABFetchResultResponseStatusFailed - 拉取试验失败
  */
-typedef NS_OPTIONS(NSInteger, SABFetchResultResponseStatus) {
+typedef NS_ENUM(NSInteger, SABFetchResultResponseStatus) {
     SABFetchResultResponseStatusSuccess,
     SABFetchResultResponseStatusFailed
 };
 
 /// 试验值
-@interface SABExperimentResultConfig : NSObject<NSCopying, NSCoding>
+@interface SABExperimentResultVariable : NSObject<NSCopying, NSCoding>
+
+/// 试验参数名
+@property (nonatomic, copy) NSString *paramName;
 
 /// 试验结果类型
 @property (nonatomic, assign) SABExperimentResultType type;
 
 /// 解析后的试验结果
 @property (nonatomic) id value;
-
 @end
 
 /// 试验结果数据
@@ -81,11 +83,17 @@ typedef NS_OPTIONS(NSInteger, SABFetchResultResponseStatus) {
 /// 是否为白名单
 @property (nonatomic, assign, getter = isWhiteList) BOOL whiteList;
 
-/// 试验结果配置模型
-@property (nonatomic, strong) SABExperimentResultConfig *config;
+/// 试验结果配置
+@property (nonatomic, strong) SABExperimentResultVariable *variable;
 
 /// 试验结果和默认值是否相同类型
 - (BOOL)isSameTypeWithDefaultValue:(id)defaultValue;
+
+/// 解析默认值类型
++ (SABExperimentResultType)experimentResultTypeWithValue:(id)value;
+
+/// 描述试验类型
++ (NSString *)descriptionWithExperimentResultType:(SABExperimentResultType)type;
 
 @end
 
@@ -101,6 +109,10 @@ typedef NS_OPTIONS(NSInteger, SABFetchResultResponseStatus) {
 /// 错误描述信息，请求结果为 Failed 时返回
 @property (nonatomic, copy) NSString *errorMessage;
 
+/*
+key: paramName 参数名
+value: result 试验结果
+ */
 /// 试验结果
 @property (nonatomic, copy) NSDictionary <NSString *, SABExperimentResult *> *results;
 

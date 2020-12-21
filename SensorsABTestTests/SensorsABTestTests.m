@@ -59,23 +59,23 @@
 }
 
 #pragma mark - public API
-#pragma mark invalid experimentId
+#pragma mark invalid paramName
 /* 测试无效试验 Id 获取缓存试验，预期返回默认值 */
 
 /// fetchCacheABTest
-- (void)testFetchCacheABTestWithInvalidExperimentId {
+- (void)testFetchCacheABTestWithInvalidParamName {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wnonnull"
 #pragma clang diagnostic ignored "-Wincompatible-pointer-types"
 
     NSString *defaultValue = @"测试默认结果";
-    NSObject *value1 =  [[SensorsABTest sharedInstance] fetchCacheABTestWithExperimentId:@(23435) defaultValue:defaultValue];
+    NSObject *value1 =  [[SensorsABTest sharedInstance] fetchCacheABTestWithParamName:@(23435) defaultValue:defaultValue];
     XCTAssertEqual(value1.hash, defaultValue.hash);
 
-    NSObject *value2 =  [[SensorsABTest sharedInstance] fetchCacheABTestWithExperimentId:nil defaultValue:defaultValue];
+    NSObject *value2 =  [[SensorsABTest sharedInstance] fetchCacheABTestWithParamName:nil defaultValue:defaultValue];
     XCTAssertEqual(value2.hash, defaultValue.hash);
 
-    NSObject *value3 =  [[SensorsABTest sharedInstance] fetchCacheABTestWithExperimentId:[NSNull null] defaultValue:defaultValue];
+    NSObject *value3 =  [[SensorsABTest sharedInstance] fetchCacheABTestWithParamName:[NSNull null] defaultValue:defaultValue];
     XCTAssertEqual(value3.hash, defaultValue.hash);
 
 #pragma clang diagnostic pop

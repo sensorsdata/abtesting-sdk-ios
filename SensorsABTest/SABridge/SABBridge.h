@@ -26,22 +26,22 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SABBridge : NSObject
 
 /// 获取 SensorsAnalyticsSDK 单例
-@property (nonatomic, class, strong, readonly) id sensorsAnalyticsInstance;
+@property (class, nonatomic, strong, readonly) id sensorsAnalyticsInstance;
 
 /// 匿名 Id
-@property (nonatomic, class, copy, readonly) NSString *anonymousId;
+@property (class, nonatomic, copy, readonly) NSString *anonymousId;
 
 /// 登录 Id
-@property (nonatomic, class, copy, readonly) NSString *loginId;
+@property (class, nonatomic, copy, readonly) NSString *loginId;
 
 /// 用户的唯标识 Id
-@property (nonatomic, class, copy, readonly) NSString *distinctId;
+@property (class, nonatomic, copy, readonly) NSString *distinctId;
 
 /// 需要的预置属性
-@property (nonatomic, class, copy, readonly) NSDictionary <NSString *, id>*presetProperties;
+@property (class, nonatomic, copy, readonly) NSDictionary <NSString *, id>*presetProperties;
 
 /// SA SDK 版本
-@property (nonatomic, class, copy, readonly) NSString *libVersion;
+@property (class, nonatomic, copy, readonly) NSString *libVersion;
 
 /// 调用 track 接口，追踪一个带有属性的 event
 /// @param eventName 事件名称

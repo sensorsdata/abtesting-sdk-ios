@@ -4,6 +4,8 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>SensorsABTestExample</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -25,7 +27,7 @@
 			<string>abtest</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>saf740df55</string>
+				<string>sac69330c5</string>
 			</array>
 		</dict>
 	</array>
@@ -38,12 +40,12 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
-	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>申请定位</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>申请定位</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>申请定位</string>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
 	<key>UIRequiredDeviceCapabilities</key>

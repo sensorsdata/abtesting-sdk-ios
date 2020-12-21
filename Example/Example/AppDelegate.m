@@ -13,8 +13,10 @@
 /// 测试环境，获取试验地址
 static NSString* kSABResultsServerURL = @"http://abtesting.saas.debugbox.sensorsdata.cn/api/v2/abtest/online/results?project-key=0a551836f92dc3292be545c748f3f462e2d43bc9";
 
+static NSString* kSABResultsTestServerURL = @"http://abtesting.saas.debugbox.sensorsdata.cn/api/v2/abtest/online/results?project-key=9868E3674EAF7697D779D8CE5F79D789BE40CFD4";
+
 // 测试环境，数据接收地址
-static NSString* kSABTestServerURL = @"http://10.120.152.3:8106/sa?project=default";
+static NSString* kSABTestServerURL = @"http://10.120.239.245:8106/sa?project=default";
 
 @interface AppDelegate ()
 
@@ -27,7 +29,8 @@ static NSString* kSABTestServerURL = @"http://10.120.152.3:8106/sa?project=defau
     // Override point for customization after application launch.
 
     SAConfigOptions *options = [[SAConfigOptions alloc] initWithServerURL:kSABTestServerURL launchOptions:launchOptions];
-    options.autoTrackEventType = SensorsAnalyticsEventTypeAppStart | SensorsAnalyticsEventTypeAppEnd | SensorsAnalyticsEventTypeAppClick | SensorsAnalyticsEventTypeAppViewScreen;
+//    options.autoTrackEventType = SensorsAnalyticsEventTypeAppStart | SensorsAnalyticsEventTypeAppEnd | SensorsAnalyticsEventTypeAppClick | SensorsAnalyticsEventTypeAppViewScreen;
+    options.autoTrackEventType = SensorsAnalyticsEventTypeAppStart | SensorsAnalyticsEventTypeAppEnd;
     options.enableTrackAppCrash = YES;
 
     options.enableHeatMap = YES;
@@ -37,9 +40,9 @@ static NSString* kSABTestServerURL = @"http://10.120.152.3:8106/sa?project=defau
     [SensorsAnalyticsSDK startWithConfigOptions:options];
     
 
-    [[SensorsAnalyticsSDK sharedInstance] setFlushNetworkPolicy:SensorsAnalyticsNetworkTypeNONE];
+    [[SensorsAnalyticsSDK sharedInstance] setFlushNetworkPolicy:SensorsAnalyticsNetworkTypeALL];
 
-    SensorsABTestConfigOptions *abtestConfigOptions = [[SensorsABTestConfigOptions alloc] initWithURL:kSABResultsServerURL];
+    SensorsABTestConfigOptions *abtestConfigOptions = [[SensorsABTestConfigOptions alloc] initWithURL:kSABResultsTestServerURL];
     [SensorsABTest startWithConfigOptions:abtestConfigOptions];
     
     return YES;

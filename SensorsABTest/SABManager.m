@@ -52,6 +52,8 @@ static NSTimeInterval const kSABAsyncFetchExperimentRetryIntervalTime = 30;
 
 @property (nonatomic, strong) SABExperimentDataManager *dataManager;
 
+@property (nonatomic, strong) NSMutableDictionary<NSString *,NSMutableArray <NSString *> *> *trackedUserExperimentIds;
+
 @property (nonatomic, strong) NSTimer *timer;
 // 暂停时刻时间
 @property (nonatomic, strong) NSDate *pauseStartTime;
@@ -66,6 +68,7 @@ static NSTimeInterval const kSABAsyncFetchExperimentRetryIntervalTime = 30;
     self = [super init];
     if (self) {
         _configOptions = [configOptions copy];
+        _trackedUserExperimentIds = [NSMutableDictionary dictionary];
         
         // 数据存储和解析
         _dataManager = [[SABExperimentDataManager alloc] init];
@@ -81,11 +84,20 @@ static NSTimeInterval const kSABAsyncFetchExperimentRetryIntervalTime = 30;
 
 - (void)setupListeners {
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+
+    // 前后台切换
     [notificationCenter addObserver:self selector:@selector(applicationDidBecomeActive) name:UIApplicationDidBecomeActiveNotification object:nil];
     [notificationCenter addObserver:self selector:@selector(applicationDidEnterBackground) name:UIApplicationDidEnterBackgroundNotification object:nil];
-    
+
+    // App 与 H5 打通相关通知
     [notificationCenter addObserver:self selector:@selector(registerSAJSBridge:) name:kSABRegisterSAJSBridgeNotification object:nil];
     [notificationCenter addObserver:self selector:@selector(messageFromH5:) name:kSABMessageFromH5Notification object:nil];
+
+    // 用户 id 变化相关通知
+    [notificationCenter addObserver:self selector:@selector(reloadAllABTestResult:) name:kSABSALoginNotification object:nil];
+    [notificationCenter addObserver:self selector:@selector(reloadAllABTestResult:) name:kSABSALogoutNotification object:nil];
+    [notificationCenter addObserver:self selector:@selector(reloadAllABTestResult:) name:kSABSAIdentifyNotification object:nil];
+    [notificationCenter addObserver:self selector:@selector(reloadAllABTestResult:) name:kSABSAResetAnonymousIdNotification object:nil];
 }
 
 #pragma mark - notification Action
@@ -158,8 +170,10 @@ static NSTimeInterval const kSABAsyncFetchExperimentRetryIntervalTime = 30;
             callJSDataDic[@"data"] = responseData.responseObject;
         }
         NSData *callJSData = [SABJSONUtils JSONSerializeObject:callJSDataDic];
-        NSString *callJSJsonString = [[NSString alloc] initWithData:callJSData encoding:NSUTF8StringEncoding];
-        
+
+        // base64 编码，避免转义字符丢失的问题
+        NSString *callJSJsonString = [callJSData base64EncodedStringWithOptions:NSDataBase64EncodingEndLineWithCarriageReturn];
+
         // 请求结果，直接发到 js
         NSMutableString *javaScriptSource = [NSMutableString stringWithString:kSABAppCallJSMethodName];
         [javaScriptSource appendFormat:@"('abtest', '%@')", callJSJsonString];
@@ -174,35 +188,40 @@ static NSTimeInterval const kSABAsyncFetchExperimentRetryIntervalTime = 30;
     }];
 }
 
+- (void)reloadAllABTestResult:(NSNotification *)notification {
+    SABLogDebug(@"Receive notification: %@ and reload ABTest results", notification.name);
+    [self fetchAllABTestResult];
+}
+
 #pragma mark - fetch ABTest Action
-- (void)fetchABTestWithModeType:(SABFetchABTestModeType)type experimentId:(NSString *)experimentId defaultValue:(id)defaultValue timeoutInterval:(NSTimeInterval)timeoutInterval completionHandler:(void (^)(id _Nullable result))completionHandler {
+- (void)fetchABTestWithModeType:(SABFetchABTestModeType)type paramName:(NSString *)paramName defaultValue:(id)defaultValue timeoutInterval:(NSTimeInterval)timeoutInterval completionHandler:(void (^)(id _Nullable result))completionHandler {
     if (!completionHandler) {
         SABLogWarn(@"Please use a valid completionHandler");
         return;
     }
-    if (![SABValidUtils isValidString:experimentId]) {
+    if (![SABValidUtils isValidString:paramName]) {
         completionHandler(defaultValue);
-        SABLogError(@"experimentId:：%@ error，experimentId must be a valid string!", experimentId);
+        SABLogError(@"paramName: %@ error，paramName must be a valid string!", paramName);
         return;
     }
 
     switch (type) {
         case SABFetchABTestModeTypeCache: {
             // 从缓存读取
-            id cacheValue = [self fetchCacheABTestWithExperimentId:experimentId defaultValue:defaultValue];
+            id cacheValue = [self fetchCacheABTestWithParamName:paramName defaultValue:defaultValue];
             return completionHandler(cacheValue ? : defaultValue);
         }
         case SABFetchABTestModeTypeFast: {
-            id cacheValue = [self fetchCacheABTestWithExperimentId:experimentId defaultValue:defaultValue];
+            id cacheValue = [self fetchCacheABTestWithParamName:paramName defaultValue:defaultValue];
             if (cacheValue) {
                 return completionHandler(cacheValue);
             }
-            [self fetchAsyncABTestWithExperimentId:experimentId defaultValue:defaultValue timeoutInterval:timeoutInterval completionHandler:completionHandler];
+            [self fetchAsyncABTestWithParamName:paramName defaultValue:defaultValue timeoutInterval:timeoutInterval completionHandler:completionHandler];
             break;
         }
         case SABFetchABTestModeTypeAsync: {
             // 异步请求
-            [self fetchAsyncABTestWithExperimentId:experimentId defaultValue:defaultValue timeoutInterval:timeoutInterval completionHandler:completionHandler];
+            [self fetchAsyncABTestWithParamName:paramName defaultValue:defaultValue timeoutInterval:timeoutInterval completionHandler:completionHandler];
         }
         break;
         default:
@@ -211,16 +230,18 @@ static NSTimeInterval const kSABAsyncFetchExperimentRetryIntervalTime = 30;
 }
 
 /// 获取缓存试验
-- (nullable id)fetchCacheABTestWithExperimentId:(NSString *)experimentId defaultValue:(id)defaultValue {
+- (nullable id)fetchCacheABTestWithParamName:(NSString *)paramName defaultValue:(id)defaultValue {
 
-    if (![SABValidUtils isValidString:experimentId]) {
-        SABLogError(@"experimentId:：%@ error，experimentId must be a valid string!", experimentId);
+    if (![SABValidUtils isValidString:paramName]) {
+        SABLogError(@"paramName:：%@ error，paramName must be a valid string!", paramName);
         return nil;
     }
-    SABExperimentResult *resultData = [self.dataManager cachedExperimentResultWithExperimentId:experimentId];
+    SABExperimentResult *resultData = [self.dataManager cachedExperimentResultWithParamName:paramName];
     // 判断和默认值类型是否一致
     if (!resultData || ![resultData isSameTypeWithDefaultValue:defaultValue]) {
-        SABLogWarn(@"The experiment result type is inconsistent with the defaultValue type of the interface setting，experiment_id：%@，experiment result：%@，defaultValue：%@", experimentId, resultData.config.value, defaultValue);
+        NSString *resulTypeString = [SABExperimentResult descriptionWithExperimentResultType:resultData.variable.type];
+        NSString *defaultValueTypeString = [SABExperimentResult descriptionWithExperimentResultType:[SABExperimentResult experimentResultTypeWithValue:defaultValue]];
+        SABLogWarn(@"The experiment result type is inconsistent with the defaultValue type of the interface setting，paramName: %@，experiment result type: %@，defaultValue type: %@", paramName, resulTypeString, defaultValueTypeString);
         return nil;
     }
 
@@ -228,21 +249,21 @@ static NSTimeInterval const kSABAsyncFetchExperimentRetryIntervalTime = 30;
         // 埋点
         [self trackABTestWithData:resultData];
     }
-    return resultData.config.value;
+    return resultData.variable.value;
 }
 
 /// 异步请求获取试验
-- (void)fetchAsyncABTestWithExperimentId:(NSString *)experimentId defaultValue:(id)defaultValue timeoutInterval:(NSTimeInterval)timeoutInterval completionHandler:(void (^)(id _Nullable result))completionHandler {
+- (void)fetchAsyncABTestWithParamName:(NSString *)paramName defaultValue:(id)defaultValue timeoutInterval:(NSTimeInterval)timeoutInterval completionHandler:(void (^)(id _Nullable result))completionHandler {
     // 异步请求
     SABExperimentRequest *requestData = [[SABExperimentRequest alloc] initWithBaseURL:self.configOptions.baseURL projectKey:self.configOptions.projectKey];
     requestData.timeoutInterval = timeoutInterval;
     [self.dataManager asyncFetchAllExperimentWithRequest:requestData.request completionHandler:^(SABFetchResultResponse *_Nullable responseData, NSError *_Nullable error) {
         if (error || !responseData) {
-            SABLogError(@"fetchAllABTestResult failure，error: %@", error);
+            SABLogError(@"asyncFetchAllExperimentWithRequest failure，error: %@", error);
             completionHandler(defaultValue);
             return;
         }
-        id cacheValue = [self fetchCacheABTestWithExperimentId:experimentId defaultValue:defaultValue];
+        id cacheValue = [self fetchCacheABTestWithParamName:paramName defaultValue:defaultValue];
         completionHandler(cacheValue ?: defaultValue);
     }];
 }
@@ -276,10 +297,33 @@ static NSTimeInterval const kSABAsyncFetchExperimentRetryIntervalTime = 30;
     if (!resultData) {
         return;
     }
-    
+
     NSMutableDictionary *properties = [NSMutableDictionary dictionary];
+
+    // 判断当前用户是否触发过该试验
+    NSString *distinctId = [SABBridge distinctId];
+    NSMutableArray <NSString *> *experimentIds = self.trackedUserExperimentIds[distinctId];
+    if ([experimentIds containsObject:resultData.experimentId]) {
+        return;
+    }
+
+    if (!experimentIds) {
+        experimentIds = [NSMutableArray array];
+        self.trackedUserExperimentIds[distinctId] = experimentIds;
+    }
+    // 记录当前试验
+    [experimentIds addObject:resultData.experimentId];
+
     properties[kSABTriggerExperimentId] = resultData.experimentId;
     properties[kSABTriggerExperimentGroupId] = resultData.experimentGroupId;
+
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        // 首次触发事件，添加版本号
+        NSString *libVersion = [NSString stringWithFormat:@"%@:%@", kSABIOSLibPrefix, kSABLibVersion];
+        properties[kSABLibPluginVersion] = @[libVersion];
+    });
+
     [SABBridge track:kSABTriggerEventName properties:properties];
 }
 

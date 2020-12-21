@@ -1,5 +1,5 @@
 //
-//  SABManagerTest.m
+//  SABManagerTests.m
 //  SensorsABTestTests
 //
 //  Created by 储强盛 on 2020/10/12.
@@ -27,11 +27,11 @@
 #import "SensorsABTestConfigOptions.h"
 
 /// SABManager 测试
-@interface SABManagerTest : XCTestCase
+@interface SABManagerTests : XCTestCase
 @property (nonatomic, strong) SABManager *manager;
 @end
 
-@implementation SABManagerTest
+@implementation SABManagerTests
 
 - (void)setUp {
     // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -48,30 +48,30 @@
 }
 
 #pragma mark - public API
-#pragma mark invalid experimentId
+#pragma mark invalid paramName
 /* 测试无效试验 Id 获取缓存试验，预期返回默认值 */
 
 /// fetchCacheABTest
-- (void)testFetchCacheABTestWithInvalidExperimentId {
+- (void)testFetchCacheABTestWithInvalidParamName {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wnonnull"
 #pragma clang diagnostic ignored "-Wincompatible-pointer-types"
 
     NSString *defaultValue = @"测试默认结果";
     __block NSObject *value1 = nil;
-    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeCache experimentId:@(23435) defaultValue:defaultValue timeoutInterval:30 completionHandler:^(id _Nullable result) {
+    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeCache paramName:@(23435) defaultValue:defaultValue timeoutInterval:30 completionHandler:^(id _Nullable result) {
         value1 = result;
     }];
     XCTAssertEqual(value1.hash, defaultValue.hash);
 
     __block NSObject *value2 = nil;
-    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeCache experimentId:nil defaultValue:defaultValue timeoutInterval:30 completionHandler:^(id _Nullable result) {
+    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeCache paramName:nil defaultValue:defaultValue timeoutInterval:30 completionHandler:^(id _Nullable result) {
         value2 = result;
     }];
     XCTAssertEqual(value2.hash, defaultValue.hash);
 
     __block NSObject *value3 = nil;
-    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeCache experimentId:[NSNull null] defaultValue:defaultValue timeoutInterval:30 completionHandler:^(id _Nullable result) {
+    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeCache paramName:[NSNull null] defaultValue:defaultValue timeoutInterval:30 completionHandler:^(id _Nullable result) {
         value3 = result;
     }];
     XCTAssertEqual(value2.hash, defaultValue.hash);
@@ -80,7 +80,7 @@
 }
 
 /// asyncFetchABTest
-- (void)testAsyncFetchABTestWithInvalidExperimentId {
+- (void)testAsyncFetchABTestWithInvalidParamName {
     XCTestExpectation *expect1 = [self expectationWithDescription:@"异步操作 1 超时 timeout！"];
     XCTestExpectation *expect2 = [self expectationWithDescription:@"异步操作 2 超时 timeout！"];
     XCTestExpectation *expect3 = [self expectationWithDescription:@"异步操作 3 超时 timeout！"];
@@ -89,19 +89,19 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wnonnull"
 #pragma clang diagnostic ignored "-Wincompatible-pointer-types"
-    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeAsync experimentId:@(23435) defaultValue:defaultValue timeoutInterval:30 completionHandler:^(id _Nullable result) {
+    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeAsync paramName:@(23435) defaultValue:defaultValue timeoutInterval:30 completionHandler:^(id _Nullable result) {
         NSObject *resultValue = result;
         XCTAssertEqual(resultValue.hash, defaultValue.hash);
         [expect1 fulfill];
     }];
 
-    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeAsync experimentId:nil defaultValue:defaultValue timeoutInterval:30 completionHandler:^(id _Nullable result) {
+    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeAsync paramName:nil defaultValue:defaultValue timeoutInterval:30 completionHandler:^(id _Nullable result) {
         NSObject *resultValue = result;
         XCTAssertEqual(resultValue.hash, defaultValue.hash);
         [expect2 fulfill];
     }];
 
-    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeAsync experimentId:[NSNull null] defaultValue:defaultValue timeoutInterval:30 completionHandler:^(id _Nullable result) {
+    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeAsync paramName:[NSNull null] defaultValue:defaultValue timeoutInterval:30 completionHandler:^(id _Nullable result) {
         NSObject *resultValue = result;
         XCTAssertEqual(resultValue.hash, defaultValue.hash);
         [expect3 fulfill];
@@ -114,7 +114,7 @@
 }
 
 /// fastFetchABTest
-- (void)testFastFetchABTestWithInvalidExperimentId {
+- (void)testFastFetchABTestWithInvalidParamName {
     XCTestExpectation *expect1 = [self expectationWithDescription:@"异步操作 1 超时 timeout！"];
     XCTestExpectation *expect2 = [self expectationWithDescription:@"异步操作 2 超时 timeout！"];
     XCTestExpectation *expect3 = [self expectationWithDescription:@"异步操作 3 超时 timeout！"];
@@ -123,19 +123,19 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wnonnull"
 #pragma clang diagnostic ignored "-Wincompatible-pointer-types"
-    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeFast experimentId:@(23435) defaultValue:defaultValue timeoutInterval:30 completionHandler:^(id _Nullable result) {
+    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeFast paramName:@(23435) defaultValue:defaultValue timeoutInterval:30 completionHandler:^(id _Nullable result) {
         NSObject *resultValue = result;
         XCTAssertEqual(resultValue.hash, defaultValue.hash);
         [expect1 fulfill];
     }];
 
-    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeFast experimentId:nil defaultValue:defaultValue timeoutInterval:30 completionHandler:^(id _Nullable result) {
+    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeFast paramName:nil defaultValue:defaultValue timeoutInterval:30 completionHandler:^(id _Nullable result) {
         NSObject *resultValue = result;
         XCTAssertEqual(resultValue.hash, defaultValue.hash);
         [expect2 fulfill];
     }];
 
-    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeFast experimentId:[NSNull null] defaultValue:defaultValue timeoutInterval:30 completionHandler:^(id _Nullable result) {
+    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeFast paramName:[NSNull null] defaultValue:defaultValue timeoutInterval:30 completionHandler:^(id _Nullable result) {
         NSObject *resultValue = result;
         XCTAssertEqual(resultValue.hash, defaultValue.hash);
         [expect3 fulfill];
@@ -160,26 +160,26 @@
 #pragma clang diagnostic ignored "-Wnonnull"
 
     __block NSObject *value1 =  nil;
-    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeCache experimentId:nil defaultValue:@(integerValue) timeoutInterval:30 completionHandler:^(id _Nullable result) {
+    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeCache paramName:nil defaultValue:@(integerValue) timeoutInterval:30 completionHandler:^(id _Nullable result) {
         value1 = result;
     }];
     XCTAssertEqual(value1.hash, @(integerValue).hash);
 
 
     __block NSObject *value2 =  nil;
-    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeCache experimentId:nil defaultValue:@(boolValue) timeoutInterval:30 completionHandler:^(id _Nullable result) {
+    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeCache paramName:nil defaultValue:@(boolValue) timeoutInterval:30 completionHandler:^(id _Nullable result) {
         value2 = result;
     }];
     XCTAssertEqual(value2.hash, @(boolValue).hash);
 
     __block NSObject *value3 =  nil;
-    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeCache experimentId:nil defaultValue:stringValue timeoutInterval:30 completionHandler:^(id _Nullable result) {
+    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeCache paramName:nil defaultValue:stringValue timeoutInterval:30 completionHandler:^(id _Nullable result) {
         value3 = result;
     }];
     XCTAssertEqual(value3.hash, stringValue.hash);
 
     __block NSObject *value4 =  nil;
-    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeCache experimentId:nil defaultValue:jsonValue timeoutInterval:30 completionHandler:^(id _Nullable result) {
+    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeCache paramName:nil defaultValue:jsonValue timeoutInterval:30 completionHandler:^(id _Nullable result) {
         value4 = result;
     }];
     XCTAssertEqual(value4.hash, jsonValue.hash);
@@ -202,25 +202,25 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wnonnull"
 
-    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeFast experimentId:nil defaultValue:@(integerValue) timeoutInterval:30 completionHandler:^(id _Nullable result) {
+    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeFast paramName:nil defaultValue:@(integerValue) timeoutInterval:30 completionHandler:^(id _Nullable result) {
         NSObject *resultValue = result;
         XCTAssertEqual(resultValue.hash, @(integerValue).hash);
         [expect1 fulfill];
     }];
 
-    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeFast experimentId:nil defaultValue:@(boolValue) timeoutInterval:30 completionHandler:^(id _Nullable result) {
+    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeFast paramName:nil defaultValue:@(boolValue) timeoutInterval:30 completionHandler:^(id _Nullable result) {
         NSObject *resultValue = result;
         XCTAssertEqual(resultValue.hash, @(boolValue).hash);
         [expect2 fulfill];
     }];
 
-    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeFast experimentId:nil defaultValue:stringValue timeoutInterval:30 completionHandler:^(id _Nullable result) {
+    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeFast paramName:nil defaultValue:stringValue timeoutInterval:30 completionHandler:^(id _Nullable result) {
         NSObject *resultValue = result;
         XCTAssertEqual(resultValue.hash, stringValue.hash);
         [expect3 fulfill];
     }];
 
-    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeFast experimentId:nil defaultValue:jsonValue timeoutInterval:30 completionHandler:^(id _Nullable result) {
+    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeFast paramName:nil defaultValue:jsonValue timeoutInterval:30 completionHandler:^(id _Nullable result) {
         NSObject *resultValue = result;
         XCTAssertEqual(resultValue.hash, jsonValue.hash);
         [expect4 fulfill];
@@ -247,25 +247,25 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wnonnull"
 
-    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeAsync experimentId:nil defaultValue:@(integerValue) timeoutInterval:30 completionHandler:^(id _Nullable result) {
+    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeAsync paramName:nil defaultValue:@(integerValue) timeoutInterval:30 completionHandler:^(id _Nullable result) {
         NSObject *resultValue = result;
         XCTAssertEqual(resultValue.hash, @(integerValue).hash);
         [expect1 fulfill];
     }];
 
-    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeAsync experimentId:nil defaultValue:@(boolValue) timeoutInterval:30 completionHandler:^(id _Nullable result) {
+    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeAsync paramName:nil defaultValue:@(boolValue) timeoutInterval:30 completionHandler:^(id _Nullable result) {
         NSObject *resultValue = result;
         XCTAssertEqual(resultValue.hash, @(boolValue).hash);
         [expect2 fulfill];
     }];
 
-    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeAsync experimentId:nil defaultValue:stringValue timeoutInterval:30 completionHandler:^(id _Nullable result) {
+    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeAsync paramName:nil defaultValue:stringValue timeoutInterval:30 completionHandler:^(id _Nullable result) {
         NSObject *resultValue = result;
         XCTAssertEqual(resultValue.hash, stringValue.hash);
         [expect3 fulfill];
     }];
 
-    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeAsync experimentId:nil defaultValue:jsonValue timeoutInterval:30 completionHandler:^(id _Nullable result) {
+    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeAsync paramName:nil defaultValue:jsonValue timeoutInterval:30 completionHandler:^(id _Nullable result) {
         NSObject *resultValue = result;
         XCTAssertEqual(resultValue.hash, jsonValue.hash);
         [expect4 fulfill];

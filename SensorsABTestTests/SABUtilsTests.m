@@ -1,5 +1,5 @@
 //
-//  SABUtilsTest.m
+//  SABUtilsTests.m
 //  SensorsABTestTests
 //
 //  Created by 储强盛 on 2020/10/9.
@@ -30,11 +30,11 @@
 #import "SABFileStore.h"
 #import "NSString+SABHelper.h"
 
-@interface SABUtilsTest : XCTestCase
+@interface SABUtilsTests : XCTestCase
 
 @end
 
-@implementation SABUtilsTest
+@implementation SABUtilsTests
 
 - (void)setUp {
     // Put setup code here. This method is called before the invocation of each test method in the class.

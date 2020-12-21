@@ -34,7 +34,7 @@
 #import "SensorsABTestConfigOptions+Private.h"
 #import "SABRequest.h"
 
-static SensorsABTest *sharedInstance = nil;
+static SensorsABTest *sharedABTest = nil;
 
 @interface SensorsABTest()
 @property (nonatomic, strong) SABManager *manager;
@@ -46,7 +46,7 @@ static SensorsABTest *sharedInstance = nil;
 /// @param configOptions 参数配置
 + (void)startWithConfigOptions:(SensorsABTestConfigOptions *)configOptions {
 
-    if (sharedInstance) {
+    if (sharedABTest) {
         SABLogWarn(@"A/B Testing SDK repeat initialization! Only the first initialization valid!");
         return;
     }
@@ -68,15 +68,15 @@ static SensorsABTest *sharedInstance = nil;
 
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        sharedInstance = [[SensorsABTest alloc] initWithConfigOptions:configOptions];
+        sharedABTest = [[SensorsABTest alloc] initWithConfigOptions:configOptions];
     });
     SABLogInfo(@"start SensorsABTest success");
 }
 
 /// 返回 神策 A/B Testing SDK 单例
 + (SensorsABTest *)sharedInstance {
-    NSAssert(sharedInstance, @"请先使用 startWithConfigOptions: 初始化 SDK");
-    return sharedInstance;
+    NSAssert(sharedABTest, @"请先使用 startWithConfigOptions: 初始化 SDK");
+    return sharedABTest;
 }
 
 #pragma mark - initialize
@@ -89,28 +89,28 @@ static SensorsABTest *sharedInstance = nil;
 }
 
 #pragma mark - fetch ABTest API
-- (nullable id)fetchCacheABTestWithExperimentId:(NSString *)experimentId defaultValue:(id)defaultValue {
+- (nullable id)fetchCacheABTestWithParamName:(NSString *)paramName defaultValue:(id)defaultValue {
     __block id resultValue = defaultValue;
-    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeCache experimentId:experimentId defaultValue:defaultValue timeoutInterval:30 completionHandler:^(id  _Nullable result) {
+    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeCache paramName:paramName defaultValue:defaultValue timeoutInterval:kSABFetchABTestResultDefaultTimeoutInterval completionHandler:^(id  _Nullable result) {
         resultValue = result;
     }];
     return resultValue;
 }
 
-- (void)asyncFetchABTestWithExperimentId:(NSString *)experimentId defaultValue:(id)defaultValue completionHandler:(void (^)(id _Nullable result))completionHandler {
-    [self asyncFetchABTestWithExperimentId:experimentId defaultValue:defaultValue timeoutInterval:30 completionHandler:completionHandler];
+- (void)asyncFetchABTestWithParamName:(NSString *)paramName defaultValue:(id)defaultValue completionHandler:(void (^)(id _Nullable result))completionHandler {
+    [self asyncFetchABTestWithParamName:paramName defaultValue:defaultValue timeoutInterval:kSABFetchABTestResultDefaultTimeoutInterval completionHandler:completionHandler];
 }
 
-- (void)asyncFetchABTestWithExperimentId:(NSString *)experimentId defaultValue:(id)defaultValue timeoutInterval:(NSTimeInterval)timeoutInterval completionHandler:(void (^)(id _Nullable result))completionHandler {
-    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeAsync experimentId:experimentId defaultValue:defaultValue timeoutInterval:timeoutInterval completionHandler:completionHandler];
+- (void)asyncFetchABTestWithParamName:(NSString *)paramName defaultValue:(id)defaultValue timeoutInterval:(NSTimeInterval)timeoutInterval completionHandler:(void (^)(id _Nullable result))completionHandler {
+    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeAsync paramName:paramName defaultValue:defaultValue timeoutInterval:timeoutInterval completionHandler:completionHandler];
 }
 
-- (void)fastFetchABTestWithExperimentId:(NSString *)experimentId defaultValue:(id)defaultValue completionHandler:(void (^)(id _Nullable result))completionHandler {
-    [self fastFetchABTestWithExperimentId:experimentId defaultValue:defaultValue timeoutInterval:30 completionHandler:completionHandler];
+- (void)fastFetchABTestWithParamName:(NSString *)paramName defaultValue:(id)defaultValue completionHandler:(void (^)(id _Nullable result))completionHandler {
+    [self fastFetchABTestWithParamName:paramName defaultValue:defaultValue timeoutInterval:kSABFetchABTestResultDefaultTimeoutInterval completionHandler:completionHandler];
 }
 
-- (void)fastFetchABTestWithExperimentId:(NSString *)experimentId defaultValue:(id)defaultValue timeoutInterval:(NSTimeInterval)timeoutInterval completionHandler:(void (^)(id _Nullable result))completionHandler {
-    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeFast experimentId:experimentId defaultValue:defaultValue timeoutInterval:timeoutInterval completionHandler:completionHandler];
+- (void)fastFetchABTestWithParamName:(NSString *)paramName defaultValue:(id)defaultValue timeoutInterval:(NSTimeInterval)timeoutInterval completionHandler:(void (^)(id _Nullable result))completionHandler {
+    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeFast paramName:paramName defaultValue:defaultValue timeoutInterval:timeoutInterval completionHandler:completionHandler];
 }
 
 #pragma mark action

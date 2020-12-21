@@ -24,7 +24,10 @@
 
 #import "SABConstants.h"
 
-// min SA SDK version required
+// 当前版本号
+NSString *const kSABLibVersion = @"0.0.1";
+
+// SA 最低支持版本
 NSString *const kSABMinSupportedSALibVersion = @"2.1.14";
 
 #pragma mark eventName
@@ -37,13 +40,36 @@ NSString *const kSABTriggerExperimentId = @"$abtest_experiment_id";
 // A/B 试验组 ID
 NSString *const kSABTriggerExperimentGroupId = @"$abtest_experiment_group_id";
 
+// 采集插件版本号
+NSString *const kSABLibPluginVersion = @"$lib_plugin_version";
+
+// abtesting 具体版本号
+NSString *const kSABIOSLibPrefix = @"ios_abtesting";
+
+#pragma mark value
+NSTimeInterval const kSABFetchABTestResultDefaultTimeoutInterval = 30;
+
 #pragma mark - fileName
-NSString *const kSABExperimentResultFileName = @"SensorsABTestExperimentResultFileName";
+NSString *const kSABExperimentResultFileName = @"SensorsABTestExperimentResuls";
 
 #pragma mark - NSNotificationName
+#pragma mark H5 打通相关
 /// SA 注入 H5 打通 Bridge
 NSNotificationName const kSABRegisterSAJSBridgeNotification = @"SensorsAnalyticsRegisterJavaScriptBridgeNotification";
 
 /// H5 发送 abtest 消息
 NSNotificationName const kSABMessageFromH5Notification = @"SensorsAnalyticsMessageFromH5Notification";
+
+#pragma mark 用户 id 变化
+// login
+NSNotificationName const kSABSALoginNotification = @"SensorsAnalyticsTrackLoginNotification";
+
+// logout
+NSNotificationName const kSABSALogoutNotification = @"SensorsAnalyticsTrackLogoutNotification";
+
+// identify
+NSNotificationName const kSABSAIdentifyNotification = @"SensorsAnalyticsTrackIdentifyNotification";
+
+// resetAnonymousId
+NSNotificationName const kSABSAResetAnonymousIdNotification = @"SensorsAnalyticsTrackResetAnonymousIdNotification";
 

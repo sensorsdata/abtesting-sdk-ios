@@ -93,9 +93,6 @@
 
 /// 写入本地缓存
 - (void)archiveExperimentResult:(NSDictionary <NSString *, SABExperimentResult *> *)result {
-    if (!result) {
-        result = @{};
-    }
     // 存储到本地
     dispatch_async(self.serialQueue, ^{
         NSData *data = [NSKeyedArchiver archivedDataWithRootObject:result];
@@ -105,12 +102,12 @@
 
 
 /// 获取缓存试验结果
-/// @param experimentId 试验 Id
-- (SABExperimentResult *)cachedExperimentResultWithExperimentId:(NSString *)experimentId {
-    if (![SABValidUtils isValidString:experimentId]) {
+/// @param paramName 试验参数名
+- (SABExperimentResult *)cachedExperimentResultWithParamName:(NSString *)paramName {
+    if (![SABValidUtils isValidString:paramName]) {
         return nil;
     }
-    return self.experimentResults[experimentId];
+    return self.experimentResults[paramName];
 }
 
 @end

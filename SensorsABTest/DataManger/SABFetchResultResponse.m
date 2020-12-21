@@ -35,7 +35,7 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
     return (value && ![value isKindOfClass:NSNull.class]) ? value : nil;
 }
 
-@implementation SABExperimentResultConfig
+@implementation SABExperimentResultVariable
 
 - (instancetype)initWithDictionary:(NSDictionary *)configDic {
     self = [super init];
@@ -43,9 +43,10 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
         if (![configDic isKindOfClass:NSDictionary.class]) {
             return nil;
         }
-        NSString* variables = dictionaryValueForKey(configDic, @"variables");
+        NSString* valueString = dictionaryValueForKey(configDic, @"value");
         _type = [self experimentResultTypeTransformWithString:dictionaryValueForKey(configDic, @"type")];
-        _value = [self analysisExperimentResultValueWithResultVariables:variables type:_type];
+        _value = [self analysisExperimentResultValueWithResultVariables:valueString type:_type];
+        _paramName = dictionaryValueForKey(configDic, @"name");
     }
     return self;
 }
@@ -94,9 +95,10 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
 
 #pragma mark NSCopying
 - (id)copyWithZone:(nullable NSZone *)zone {
-    SABExperimentResultConfig *resultConfig = [[[self class] allocWithZone:zone] init];
+    SABExperimentResultVariable *resultConfig = [[[self class] allocWithZone:zone] init];
     resultConfig.type = self.type;
     resultConfig.value = self.value;
+    resultConfig.paramName = self.paramName;
     return resultConfig;
 }
 
@@ -104,6 +106,7 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
 - (void)encodeWithCoder:(NSCoder *)coder {
     [coder encodeInteger:self.type forKey:@"type"];
     [coder encodeObject:self.value forKey:@"value"];
+    [coder encodeObject:self.paramName forKey:@"paramName"];
 }
 
 - (instancetype)initWithCoder:(NSCoder *)coder {
@@ -111,6 +114,7 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
     if (self) {
         self.type = [coder decodeIntegerForKey:@"type"];
         self.value = [coder decodeObjectForKey:@"value"];
+        self.paramName = [coder decodeObjectForKey:@"paramName"];
     }
     return self;
 }
@@ -130,17 +134,18 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
          "abtest_experiment_group_id": 888,
          "is_control_group": true,
          "is_white_list": false,
-         "config": {
-             "variables": "1",
-             "type": "INTEGER"
-         }
-
+         "variables": [
+             {
+                 "name": "color1",
+                 "value": "1",       // 变量值
+                 "type": "INTEGER"    // 变量类型 INTEGER
+             }
+         ]
          */
         _experimentId = dictionaryValueForKey(resultDic, @"abtest_experiment_id");
         _experimentGroupId = dictionaryValueForKey(resultDic, @"abtest_experiment_group_id");
         _controlGroup = [dictionaryValueForKey(resultDic, @"is_control_group") boolValue];
         _whiteList = [dictionaryValueForKey(resultDic, @"is_white_list") boolValue];
-        _config = [[SABExperimentResultConfig alloc] initWithDictionary:dictionaryValueForKey(resultDic, @"config")];
     }
     return self;
 }
@@ -150,11 +155,11 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
         return YES;
     }
 
-    SABExperimentResultType defaultType = [self experimentResultTypeWithValue:defaultValue];
-    return defaultType == self.config.type;
+    SABExperimentResultType defaultType = [self.class experimentResultTypeWithValue:defaultValue];
+    return defaultType == self.variable.type;
 }
 
-- (SABExperimentResultType)experimentResultTypeWithValue:(id)value {
++ (SABExperimentResultType)experimentResultTypeWithValue:(id)value {
     if (!value) {
         return SABExperimentResultTypeInvalid;
     }
@@ -176,6 +181,23 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
     }
 }
 
++ (NSString *)descriptionWithExperimentResultType:(SABExperimentResultType)type {
+    switch (type) {
+        case SABExperimentResultTypeInvalid:
+            return @"Invalid";
+        case SABExperimentResultTypeInt:
+            return @"INTEGER";
+        case SABExperimentResultTypeString:
+            return @"STRING";
+        case SABExperimentResultTypeBool:
+            return @"BOOLEAN";
+        case SABExperimentResultTypeJSON:
+            return @"JSON";
+        default:
+            return @"Invalid";
+    }
+}
+
 #pragma mark NSCopying
 - (id)copyWithZone:(nullable NSZone *)zone {
     SABExperimentResult *resultData = [[[self class] allocWithZone:zone] init];
@@ -183,7 +205,7 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
     resultData.experimentGroupId = self.experimentGroupId;
     resultData.controlGroup = self.controlGroup;
     resultData.whiteList = self.whiteList;
-    resultData.config = self.config;
+    resultData.variable = self.variable;
     return resultData;
 }
 
@@ -193,7 +215,7 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
     [coder encodeObject:self.experimentGroupId forKey:@"experimentGroupId"];
     [coder encodeBool:self.controlGroup forKey:@"controlGroup"];
     [coder encodeBool:self.whiteList forKey:@"whiteList"];
-    [coder encodeObject:self.config forKey:@"config"];
+    [coder encodeObject:self.variable forKey:@"variable"];
 }
 
 - (instancetype)initWithCoder:(NSCoder *)coder {
@@ -203,7 +225,7 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
         self.whiteList = [coder decodeBoolForKey:@"whiteList"];
         self.experimentId = [coder decodeObjectForKey:@"experimentId"];
         self.experimentGroupId = [coder decodeObjectForKey:@"experimentGroupId"];
-        self.config = [coder decodeObjectForKey:@"config"];
+        self.variable = [coder decodeObjectForKey:@"variable"];
     }
     return self;
 }
@@ -221,7 +243,7 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
              "status": "SUCCESS", 查询结果标志（SUCCESS:进行试验；FAILED:不进入试验）
              "error_type": "",  错误类型，请求结果为 FAILED 时返回
              "error": "",  错误描述信息
-             "results": [{   用户命中的所有试验结果
+             "results": [{ 用户命中的所有试验结果
              }]
          }
          */
@@ -236,10 +258,23 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
         NSArray <NSDictionary *> *results = dictionaryValueForKey(responseDic, @"results");
         if (results.count > 0) {
             // 构造试验数据
-            NSMutableDictionary <NSString *, SABExperimentResult *> *resultsDic = [NSMutableDictionary dictionaryWithCapacity:results.count];
+            NSMutableDictionary <NSString *, SABExperimentResult *> *resultsDic = [NSMutableDictionary dictionary];
+            // 遍历所有试验
             for (NSDictionary *resultDic in results) {
-                SABExperimentResult *resultData = [[SABExperimentResult alloc] initWithDictionary:resultDic];
-                resultsDic[resultData.experimentId] = resultData;
+                SABExperimentResult *result = [[SABExperimentResult alloc] initWithDictionary:resultDic];
+                NSArray <NSDictionary *> *variables = dictionaryValueForKey(resultDic, @"variables");
+                // 遍历每个试验下所有试验参数
+                for (NSDictionary *variableDic in variables) {
+                    SABExperimentResultVariable *variable = [[SABExperimentResultVariable alloc] initWithDictionary:variableDic];
+                    // 后端已按照更新时间做排序，相同 paramName 只取第一个即为最新试验
+                    if (resultsDic[variable.paramName]) {
+                        continue;
+                    }
+                    SABExperimentResult *newResult = [result copy];
+                    newResult.variable = variable;
+                    resultsDic[variable.paramName] = newResult;
+                }
+
             }
             _results = [resultsDic copy];
         }

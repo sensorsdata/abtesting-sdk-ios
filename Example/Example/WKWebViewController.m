@@ -31,6 +31,9 @@
     NSURL *httpUrl = [NSURL URLWithString:httpStr];
     NSURLRequest *request = [NSURLRequest requestWithURL:httpUrl];
 
+//    NSString *path = [[[NSBundle mainBundle] bundlePath]  stringByAppendingPathComponent:@"index.html"];
+//    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL fileURLWithPath:path]];
+
     [self.webView loadRequest:request];
 }
 

@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SABExperimentDataManager : NSObject
 
 /// 获取缓存试验结果
-- (nullable SABExperimentResult *)cachedExperimentResultWithExperimentId:(NSString *)experimentId;
+- (nullable SABExperimentResult *)cachedExperimentResultWithParamName:(NSString *)paramName;
 
 /// 异步请求所有试验
 - (void)asyncFetchAllExperimentWithRequest:(NSURLRequest *)request completionHandler:(SABFetchResultResponseCompletionHandler)completionHandler;

@@ -1,0 +1,68 @@
+{
+	"status": "SUCCESS",
+	"results": [{
+		"abtest_experiment_id": "100",
+		"abtest_experiment_group_id": "0",
+		"is_control_group": true,
+		"is_white_list": false,
+		"variables": [{
+			"name": "color1",
+			"value": "1",
+			"type": "INTEGER"
+		}, {
+			"name": "color2",
+			"value": "sensorsdata_abtes",
+			"type": "STRING"
+		}, {
+			"name": "color3",
+			"value": "true",
+			"type": "BOOLEAN"
+		}, {
+			"name": "color4",
+			"value": "{\"experiment_id\":\"100\",\"name\":\"color4\"}",
+			"type": "JSON"
+		}]
+	}, {
+		"abtest_experiment_id": "101",
+		"abtest_experiment_group_id": "2",
+		"is_control_group": true,
+		"is_white_list": false,
+		"variables": [{
+			"name": "101",
+			"value": "1",
+			"type": "INTEGER"
+		}]
+	},{
+        "abtest_experiment_id": "102",
+        "abtest_experiment_group_id": "3",
+        "is_control_group": true,
+        "is_white_list": true,
+        "variables": [{
+            "name": "color1",
+            "value": "10",
+            "type": "INTEGER"
+        }, {
+            "name": "color2",
+            "value": "sensorsdata_abtest_color2",
+            "type": "STRING"
+        }, {
+            "name": "enableclick",
+            "value": "false",
+            "type": "BOOLEAN"
+        }, {
+            "name": "contentmessage",
+            "value": "{\"experiment_id\":\"102\",\"name\":\"contentmessage\"}",
+            "type": "JSON"
+        }]
+    }, {
+        "abtest_experiment_id": "103",
+        "abtest_experiment_group_id": "1",
+        "is_control_group": false,
+        "is_white_list": true,
+        "variables": [{
+            "name": "103",
+            "value": "100",
+            "type": "INTEGER"
+        }]
+    }]
+}

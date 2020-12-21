@@ -26,6 +26,10 @@
 #import "SABURLUtils.h"
 #import "SABBridge.h"
 #import "SABJSONUtils.h"
+#import "SABConstants.h"
+
+/// timeoutInterval 最小值保护
+static NSTimeInterval kFetchABTestResultMinTimeoutInterval = 1;
 
 @implementation SABExperimentRequest
 
@@ -34,12 +38,14 @@
     if (self) {
         _baseURL = url;
         _projectKey = key;
-        _timeoutInterval = 30;
+        _timeoutInterval = kSABFetchABTestResultDefaultTimeoutInterval;
 
         NSMutableDictionary *parametersBody = [NSMutableDictionary dictionary];
         parametersBody[@"platform"] = @"iOS";
         parametersBody[@"login_id"] = [SABBridge loginId];
         parametersBody[@"anonymous_id"] = [SABBridge anonymousId];
+        // abtest sdk 版本号
+        parametersBody[@"abtest_lib_version"] = kSABLibVersion;
 
         NSDictionary *presetProperties = [SABBridge presetProperties];
         if (presetProperties) {
@@ -65,10 +71,10 @@
     // timeoutInterval 合法性校验
     if (timeoutInterval <= 0) {
         SABLogWarn(@"setup timeoutInterval invalid，%f", timeoutInterval);
-        _timeoutInterval = 30;
-    } else if (timeoutInterval < 0.1) {
+        _timeoutInterval = kSABFetchABTestResultDefaultTimeoutInterval;
+    } else if (timeoutInterval < kFetchABTestResultMinTimeoutInterval) {
         SABLogWarn(@"setup timeoutInterval invalid，%f", timeoutInterval);
-        _timeoutInterval = 0.1;
+        _timeoutInterval = kFetchABTestResultMinTimeoutInterval;
     } else {
         _timeoutInterval = timeoutInterval;
     }

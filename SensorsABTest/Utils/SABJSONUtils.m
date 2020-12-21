@@ -37,7 +37,7 @@
     NSError *jsonError = nil;
     id jsonObject = nil;
     @try {
-        jsonObject = [NSJSONSerialization JSONObjectWithData:data options:(NSJSONReadingOptions)0 error:&jsonError];
+        jsonObject = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
     } @catch (NSException *exception) {
         SABLogError(@"%@", exception);
     } @finally {

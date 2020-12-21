@@ -29,9 +29,9 @@
  * 获取试验结果方式类型
  *   SABFetchABTestModeType - 从缓存获取
  *   SABFetchABTestModeTypeAsync - 异步请求获取
- *   SABFetchABTestModeTypeFast - 快速获取
+ *   SABFetchABTestModeTypeFast - 快速获取（优先读缓存，无缓存再异步请求）
  */
-typedef NS_OPTIONS(NSInteger, SABFetchABTestModeType) {
+typedef NS_ENUM(NSInteger, SABFetchABTestModeType) {
     SABFetchABTestModeTypeCache,
     SABFetchABTestModeTypeAsync,
     SABFetchABTestModeTypeFast
@@ -52,11 +52,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// 获取试验结果
 /// @param type 获取试验结果方式
-/// @param experimentId 试验 Id
+/// @param paramName 试验参数名
 /// @param defaultValue 默认结果
 /// @param timeoutInterval 超时时间，单位为秒
 /// @param completionHandler 回调返回试验结果
-- (void)fetchABTestWithModeType:(SABFetchABTestModeType)type experimentId:(NSString *)experimentId defaultValue:(id)defaultValue timeoutInterval:(NSTimeInterval)timeoutInterval completionHandler:(void (^)(id _Nullable result))completionHandler;
+- (void)fetchABTestWithModeType:(SABFetchABTestModeType)type paramName:(NSString *)paramName defaultValue:(id)defaultValue timeoutInterval:(NSTimeInterval)timeoutInterval completionHandler:(void (^)(id _Nullable result))completionHandler;
 
 @end
 
