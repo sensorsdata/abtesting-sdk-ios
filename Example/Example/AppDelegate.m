@@ -11,12 +11,10 @@
 #import <SensorsABTest.h>
 
 /// 测试环境，获取试验地址
-static NSString* kSABResultsServerURL = @"http://abtesting.saas.debugbox.sensorsdata.cn/api/v2/abtest/online/results?project-key=0a551836f92dc3292be545c748f3f462e2d43bc9";
-
-static NSString* kSABResultsTestServerURL = @"http://abtesting.saas.debugbox.sensorsdata.cn/api/v2/abtest/online/results?project-key=9868E3674EAF7697D779D8CE5F79D789BE40CFD4";
+static NSString* kSABResultsTestServerURL = @"http://abtesting.saas.debugbox.sensorsdata.cn/api/v2/abtest/online/results?project-key=1C77D685FC5441F52550B4F5973B340EB693EBB4";
 
 // 测试环境，数据接收地址
-static NSString* kSABTestServerURL = @"http://10.120.239.245:8106/sa?project=default";
+static NSString* kSABTestServerURL = @"http://10.120.173.133:8106/sa?project=default";
 
 @interface AppDelegate ()
 

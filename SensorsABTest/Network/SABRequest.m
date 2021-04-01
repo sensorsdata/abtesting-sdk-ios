@@ -123,6 +123,10 @@ static NSTimeInterval kFetchABTestResultMinTimeoutInterval = 1;
     request.timeoutInterval = _timeoutInterval;
     [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
 
+    /* 关闭 Keep-Alive，
+     此处设置关闭 Keep-Alive，防止频繁连续扫码，后端 TCP 连接可能断开，并且扫码打开 App 此时尚未完全进入前台，NSURLSession 没有自动重试，导致扫码上传白名单可能失败
+     */
+    [request setValue:@"close" forHTTPHeaderField:@"Connection"];
     request.HTTPBody = [SABJSONUtils JSONSerializeObject:self.body];
     
     return request;

@@ -118,9 +118,9 @@ static SensorsABTest *sharedABTest = nil;
     if (![url isKindOfClass:NSURL.class] || ![url.host isEqualToString:@"abtest"]) {
         return NO;
     }
-
     SABWhiteListRequest *requestData = [[SABWhiteListRequest alloc] initWithOpenURL:url];
     [SABNetwork dataTaskWithRequest:requestData.request completionHandler:^(id  _Nullable jsonObject, NSError * _Nullable error) {
+        
         if (error) {
             SABLogWarn(@"upload distinctId failure，error:%@", error);
         } else {
