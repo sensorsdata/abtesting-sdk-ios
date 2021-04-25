@@ -69,6 +69,23 @@
     return unarchivedData;
 }
 
+#pragma mark deleteFile
++ (BOOL)deleteFileWithFileName:(NSString *)fileName {
+    if (!fileName) {
+        SABLogError(@"key should not be nil for file store");
+        return NO;
+    }
+
+    NSString *filePath = [SABFileStore filePath:fileName];
+    @try {
+        BOOL isDelete = [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
+        return isDelete;
+    } @catch (NSException *exception) {
+        SABLogError(@"%@ unable to delete data in %@, starting fresh", self, filePath);
+    }
+    return NO;
+}
+
 #pragma mark - file path
 + (NSString *)filePath:(NSString *)key {
     NSString *filename = [NSString stringWithFormat:@"sensorsanalytics-abtest-%@.plist", key];

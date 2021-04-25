@@ -38,6 +38,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy) NSDictionary *body;
 
+/// 更新用户标识信息
+- (void)refreshUserIdenty;
+
 - (instancetype)initWithBaseURL:(NSURL *)url projectKey:(NSString *)key;
 
 @end

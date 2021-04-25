@@ -27,11 +27,12 @@
 #import "SABLogBridge.h"
 #import "SABValidUtils.h"
 #import "SABFileStore.h"
+#import "SABBridge.h"
 
 @interface SABExperimentDataManager()
 
 /// 试验结果
-@property (atomic, copy) NSDictionary<NSString *, SABExperimentResult *> *experimentResults;
+@property (atomic, strong) SABFetchResultResponse *resultResponse;
 @property (nonatomic, strong) dispatch_queue_t serialQueue;
 @end
 
@@ -48,9 +49,10 @@
     return self;
 }
 
-- (void)asyncFetchAllExperimentWithRequest:(NSURLRequest *)request completionHandler:(SABFetchResultResponseCompletionHandler)completionHandler {
-    
-    [SABNetwork dataTaskWithRequest:request completionHandler:^(id _Nullable jsonObject, NSError *_Nullable error) {
+- (void)asyncFetchAllExperimentWithRequest:(SABExperimentRequest *)requestData completionHandler:(SABFetchResultResponseCompletionHandler)completionHandler {
+
+    NSString *requestDistinctId = [SABBridge distinctId];
+    [SABNetwork dataTaskWithRequest:requestData.request completionHandler:^(id _Nullable jsonObject, NSError *_Nullable error) {
         if (error) {
             SABLogError(@"asyncFetchAllABTest failure, error: %@, jsonObject: %@", error, jsonObject);
             completionHandler(nil, error);
@@ -64,17 +66,35 @@
             return;
         }
 
+        // 判断 distinctId 是否变化
+        NSString *currentDistinctId = [SABBridge distinctId];
+        if (![currentDistinctId isEqualToString:requestDistinctId]) {
+            SABLogWarn(@"distinctId has been changed, requestDistinctId is %@, currentDistinctId is %@, Retry to asyncFetchAllABTest", requestDistinctId, currentDistinctId);
+
+            // 刷新用户标识
+            [requestData refreshUserIdenty];
+
+            // 重试请求
+            [self asyncFetchAllExperimentWithRequest:requestData completionHandler:^(SABFetchResultResponse * _Nullable responseData, NSError * _Nullable error) {
+                completionHandler(responseData, error);
+            }];
+            return;
+        }
+
         // 数据解析
         SABFetchResultResponse *responseData = [[SABFetchResultResponse alloc] initWithDictionary:jsonObject];
 
         // 获取试验成功，更新缓存
         if (responseData.status == SABFetchResultResponseStatusSuccess) {
             SABLogInfo(@"asyncFetchAllExperiment success jsonObject %@", jsonObject);
-            self.experimentResults = responseData.results;
+            
+            // 缓存请求时刻的 distinctId
+            responseData.distinctId = requestDistinctId;
+            self.resultResponse = responseData;
             // 存储到本地
-            [self archiveExperimentResult:responseData.results];
+            [self archiveExperimentResult:responseData];
         } else {
-            SABLogWarn(@"asyncFetchAllExperiment fail，request： %@，jsonObject %@", request, jsonObject);
+            SABLogWarn(@"asyncFetchAllExperiment fail，request： %@，jsonObject %@", requestData.request, jsonObject);
         }
         completionHandler(responseData, nil);
     }];
@@ -84,18 +104,37 @@
 - (void)unarchiveExperimentResult {
     dispatch_async(self.serialQueue, ^{
         NSData *data = [SABFileStore unarchiveWithFileName:kSABExperimentResultFileName];
-        NSDictionary <NSString *, SABExperimentResult *> *result = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-        if ([result isKindOfClass:NSDictionary.class] && result.count > 0) {
-            self.experimentResults = [result copy];
+        id result = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+
+        // 解析缓存
+        if ([result isKindOfClass:SABFetchResultResponse.class]) {
+            SABFetchResultResponse *resultResponse = (SABFetchResultResponse *)result;
+            NSString *distinctId = [SABBridge distinctId];
+            // 校验缓存试验的 distinctId
+            if ([resultResponse.distinctId isEqualToString:distinctId] && resultResponse.results.count > 0) {
+                self.resultResponse = resultResponse;
+
+                SABLogInfo(@"unarchiveExperimentResult success jsonObject %@", resultResponse.responseObject);
+            }
+
+            // TODO: v0.0.3 添加，尝试删除一次老版缓存，下个版本移除
+        } else {
+            // 首次安装，删除老版缓存
+            BOOL isDelete = [SABFileStore deleteFileWithFileName:kSABExperimentResultOldFileName];
+            if (isDelete) {
+                SABLogInfo(@"delete old version experimentResult success");
+            } else {
+                SABLogWarn(@"delete old version experimentResult fail");
+            }
         }
     });
 }
 
 /// 写入本地缓存
-- (void)archiveExperimentResult:(NSDictionary <NSString *, SABExperimentResult *> *)result {
+- (void)archiveExperimentResult:(SABFetchResultResponse *)resultResponse {
     // 存储到本地
     dispatch_async(self.serialQueue, ^{
-        NSData *data = [NSKeyedArchiver archivedDataWithRootObject:result];
+        NSData *data = [NSKeyedArchiver archivedDataWithRootObject:resultResponse];
         [SABFileStore archiveWithFileName:kSABExperimentResultFileName value:data];
     });
 }
@@ -107,7 +146,12 @@
     if (![SABValidUtils isValidString:paramName]) {
         return nil;
     }
-    return self.experimentResults[paramName];
+    return self.resultResponse.results[paramName];
+}
+
+- (void)validateExperiment {
+    // TODO: v0.0.3 添加，因为 SA 的问题，这里或 distinctId 可能不是最新，直接清除缓存即可，待 SA 通知逻辑更新后，改成判断 distinctId 是否一致来清除缓存
+    self.resultResponse = nil;
 }
 
 @end

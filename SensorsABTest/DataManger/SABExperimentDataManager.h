@@ -33,7 +33,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable SABExperimentResult *)cachedExperimentResultWithParamName:(NSString *)paramName;
 
 /// 异步请求所有试验
-- (void)asyncFetchAllExperimentWithRequest:(NSURLRequest *)request completionHandler:(SABFetchResultResponseCompletionHandler)completionHandler;
+- (void)asyncFetchAllExperimentWithRequest:(SABExperimentRequest *)requestData completionHandler:(SABFetchResultResponseCompletionHandler)completionHandler;
+
+/// 校验当前缓存试验，如果 distinctId 不一致则删除
+- (void)validateExperiment;
 
 @end
 

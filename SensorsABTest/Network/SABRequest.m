@@ -67,6 +67,13 @@ static NSTimeInterval kFetchABTestResultMinTimeoutInterval = 1;
     return self;
 }
 
+- (void)refreshUserIdenty {
+    NSMutableDictionary *newBody = [self.body mutableCopy];
+    newBody[@"login_id"] = [SABBridge loginId];
+    newBody[@"anonymous_id"] = [SABBridge anonymousId];
+    self.body = [newBody copy];
+}
+
 - (void)setTimeoutInterval:(NSTimeInterval)timeoutInterval {
     // timeoutInterval 合法性校验
     if (timeoutInterval <= 0) {

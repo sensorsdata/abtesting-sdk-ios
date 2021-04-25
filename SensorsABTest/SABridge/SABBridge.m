@@ -37,11 +37,16 @@ typedef void (*SATrackEventMethod)(id, SEL, NSString *, NSDictionary *);
         SABLogError(@"Get SensorsAnalyticsSDK class failed");
         return nil;
     }
-    SEL sharedInstanceSEL = NSSelectorFromString(@"sharedInstance");
-    id (*sharedInstance)(id, SEL) = (id (*)(id, SEL))[saClass methodForSelector:sharedInstanceSEL];
 
-    id sa = sharedInstance(saClass, sharedInstanceSEL);
-    return sa;
+    @try {
+        SEL sharedInstanceSEL = NSSelectorFromString(@"sharedInstance");
+        id (*sharedInstance)(id, SEL) = (id (*)(id, SEL))[saClass methodForSelector:sharedInstanceSEL];
+
+        id sa = sharedInstance(saClass, sharedInstanceSEL);
+        return sa;
+    } @catch (NSException *exception) {
+        SABLogWarn(@"SABBridge sensorsAnalyticsInstance error: %@", exception);
+    }
 }
 
 #pragma mark get properties
@@ -65,6 +70,11 @@ typedef void (*SATrackEventMethod)(id, SEL, NSString *, NSDictionary *);
     return [self propertyWithName:@"getPresetProperties"];
 }
 
++ (dispatch_queue_t)saSerialQueue {
+    dispatch_queue_t serialQueue = [self propertyWithName:@"serialQueue"];
+    return serialQueue;
+}
+
 /// 根据方法名获取属性
 /// @param name 名称
 + (instancetype)propertyWithName:(NSString *)name {
@@ -73,9 +83,13 @@ typedef void (*SATrackEventMethod)(id, SEL, NSString *, NSDictionary *);
         SABLogWarn(@"Get SensorsAnalyticsSDK.sharedIntance failed");
         return nil;
     }
-    SEL propertySel = NSSelectorFromString(name);
-    SAGetPresetPropertiesMethod method = (SAGetPresetPropertiesMethod)[sa methodForSelector:propertySel];
-    return method(sa, propertySel);
+    @try {
+        SEL propertySel = NSSelectorFromString(name);
+        SAGetPresetPropertiesMethod method = (SAGetPresetPropertiesMethod)[sa methodForSelector:propertySel];
+        return method(sa, propertySel);
+    } @catch (NSException *exception) {
+        return nil;
+    }
 }
 
 #pragma mark track
@@ -85,8 +99,14 @@ typedef void (*SATrackEventMethod)(id, SEL, NSString *, NSDictionary *);
         SABLogWarn(@"Get SensorsAnalyticsSDK.sharedIntance failed");
         return;
     }
-    SEL trackSel = NSSelectorFromString(@"track:withProperties:");
-    SATrackEventMethod track = (SATrackEventMethod)[sa methodForSelector:trackSel];
-    track(sa, trackSel, eventName, properties);
+    
+    @try {
+        SEL trackSel = NSSelectorFromString(@"track:withProperties:");
+        SATrackEventMethod track = (SATrackEventMethod)[sa methodForSelector:trackSel];
+        track(sa, trackSel, eventName, properties);
+    } @catch (NSException *exception) {
+        SABLogWarn(@"SABBridge track error: %@", exception);
+    }
 }
+
 @end

@@ -27,7 +27,7 @@
  *
  * @discussion
  * 试验结果类型枚举
- *   SABExperimentResultTypeInvalid 类型无效，可能为 nil
+ *   SABExperimentResultTypeInvalid 类型无效，一般为 nil
  *   SABExperimentResultTypeInt - INTEGER 类型结果
  *   SABExperimentResultTypeString - STRING 类型结果
  *   SABExperimentResultTypeBool - BOOLEAN 类型结果
@@ -98,7 +98,7 @@ typedef NS_ENUM(NSInteger, SABFetchResultResponseStatus) {
 @end
 
 /// 网络回调完整数据结构
-@interface SABFetchResultResponse : NSObject
+@interface SABFetchResultResponse : NSObject<NSCoding>
 
 /// 获取试验状态
 @property (nonatomic, assign) SABFetchResultResponseStatus status;
@@ -118,6 +118,9 @@ value: result 试验结果
 
 /// 原始数据
 @property (nonatomic, copy) NSDictionary *responseObject;
+
+/// 保存 distinctId，校验试验
+@property (nonatomic, copy) NSString *distinctId;
 
 - (instancetype)initWithDictionary:(NSDictionary *)responseDic;
 

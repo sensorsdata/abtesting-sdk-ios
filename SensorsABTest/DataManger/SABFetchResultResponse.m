@@ -25,6 +25,8 @@
 #import "SABFetchResultResponse.h"
 #import "SABJSONUtils.h"
 #import "SABValidUtils.h"
+#import "SABLogBridge.h"
+#import "SABBridge.h"
 
 static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
     if (![SABValidUtils isValidDictionary:dic]) {
@@ -54,6 +56,7 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
 /// 试验结果类型解析
 - (SABExperimentResultType)experimentResultTypeTransformWithString:(NSString *)typeString {
     if (![SABValidUtils isValidString:typeString]) {
+        SABLogWarn(@"experimentResult type error: %@" ,typeString);
         return SABExperimentResultTypeInvalid;
     }
 
@@ -66,6 +69,7 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
     } else if ([typeString isEqualToString:@"JSON"]) {
         return SABExperimentResultTypeJSON;
     } else {
+        SABLogWarn(@"experimentResult type error: %@" ,typeString);
         return SABExperimentResultTypeInvalid;
     }
 }
@@ -240,11 +244,11 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
         }
         /*
          {
-             "status": "SUCCESS", 查询结果标志（SUCCESS:进行试验；FAILED:不进入试验）
-             "error_type": "",  错误类型，请求结果为 FAILED 时返回
-             "error": "",  错误描述信息
-             "results": [{ 用户命中的所有试验结果
-             }]
+         "status": "SUCCESS", 查询结果标志（SUCCESS:进行试验；FAILED:不进入试验）
+         "error_type": "",  错误类型，请求结果为 FAILED 时返回
+         "error": "",  错误描述信息
+         "results": [{ 用户命中的所有试验结果
+         }]
          }
          */
         if ([dictionaryValueForKey(responseDic, @"status") isEqualToString:@"SUCCESS"]) {
@@ -254,7 +258,7 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
         }
         _errorType = dictionaryValueForKey(responseDic, @"error_type");
         _errorMessage = dictionaryValueForKey(responseDic, @"error");
-
+        
         NSArray <NSDictionary *> *results = dictionaryValueForKey(responseDic, @"results");
         if (results.count > 0) {
             // 构造试验数据
@@ -274,12 +278,35 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
                     newResult.variable = variable;
                     resultsDic[variable.paramName] = newResult;
                 }
-
+                
             }
             _results = [resultsDic copy];
         }
-
+        
         _responseObject = [responseDic copy];
+    }
+    return self;
+}
+
+#pragma mark NSCoding
+- (void)encodeWithCoder:(NSCoder *)coder {
+    [coder encodeInteger:self.status forKey:@"status"];
+    [coder encodeObject:self.errorType forKey:@"errorType"];
+    [coder encodeObject:self.errorMessage forKey:@"errorMessage"];
+    [coder encodeObject:self.results forKey:@"results"];
+    [coder encodeObject:self.responseObject forKey:@"responseObject"];
+    [coder encodeObject:self.distinctId forKey:@"distinctId"];
+}
+
+- (instancetype)initWithCoder:(NSCoder *)coder {
+    self = [super init];
+    if (self) {
+        self.status = [coder decodeIntegerForKey:@"status"];
+        self.errorType = [coder decodeObjectForKey:@"errorType"];
+        self.errorMessage = [coder decodeObjectForKey:@"errorMessage"];
+        self.results = [coder decodeObjectForKey:@"results"];
+        self.responseObject = [coder decodeObjectForKey:@"responseObject"];
+        self.distinctId = [coder decodeObjectForKey:@"distinctId"];
     }
     return self;
 }

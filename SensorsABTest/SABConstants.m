@@ -25,7 +25,7 @@
 #import "SABConstants.h"
 
 // 当前版本号
-NSString *const kSABLibVersion = @"0.0.2";
+NSString *const kSABLibVersion = @"0.0.3";
 
 // SA 最低支持版本
 NSString *const kSABMinSupportedSALibVersion = @"2.1.14";
@@ -50,7 +50,10 @@ NSString *const kSABIOSLibPrefix = @"ios_abtesting";
 NSTimeInterval const kSABFetchABTestResultDefaultTimeoutInterval = 30;
 
 #pragma mark - fileName
-NSString *const kSABExperimentResultFileName = @"SensorsABTestExperimentResuls";
+// TODO: v0.0.3 添加，老版本本地缓存文件名，下个版本移除
+NSString *const kSABExperimentResultOldFileName = @"SensorsABTestExperimentResuls";
+
+NSString *const kSABExperimentResultFileName = @"SensorsABTestExperimentResultResponse";
 
 #pragma mark - NSNotificationName
 #pragma mark H5 打通相关

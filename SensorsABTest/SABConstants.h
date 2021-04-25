@@ -50,6 +50,9 @@ extern NSString *const kSABIOSLibPrefix;
 extern NSTimeInterval const kSABFetchABTestResultDefaultTimeoutInterval;
 
 #pragma mark - fileName
+/// 0.0.2 及之前版本试验缓存文件名
+extern NSString *const kSABExperimentResultOldFileName;
+
 /// 试验缓存文件名
 extern NSString *const kSABExperimentResultFileName;
 

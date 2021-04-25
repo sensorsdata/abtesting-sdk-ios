@@ -35,10 +35,10 @@ NS_ASSUME_NONNULL_BEGIN
 /// @return 缓存数据
 + (nullable id)unarchiveWithFileName:(NSString *)fileName;
 
-/// 获取文件路径
+/// 删除文件
 /// @param fileName 文件名
-/// @return 文件路径
-+ (NSString *)filePath:(NSString *)fileName;
+/// @return YES/NO 是否删除成功
++ (BOOL)deleteFileWithFileName:(NSString *)fileName;
 
 @end
 
