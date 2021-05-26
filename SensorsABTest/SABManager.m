@@ -192,8 +192,8 @@ static NSTimeInterval const kSABAsyncFetchExperimentRetryIntervalTime = 30;
 - (void)reloadAllABTestResult:(NSNotification *)notification {
     SABLogDebug(@"Receive notification: %@ and reload ABTest results", notification.name);
 
-    // 检查当前缓存试验
-    [self.dataManager validateExperiment];
+    // 切换用户，清除试验缓存
+    [self.dataManager clearExperiment];
 
     // 重新请求试验
     [self fetchAllABTestResult];
@@ -332,8 +332,12 @@ static NSTimeInterval const kSABAsyncFetchExperimentRetryIntervalTime = 30;
 
     NSMutableDictionary *properties = [NSMutableDictionary dictionary];
 
-    // 判断当前用户是否触发过该试验
-    NSString *distinctId = [SABBridge distinctId];
+    // 获取 userIdenty，判断当前用户是否触发过该试验
+    SABUserIdenty *userIdenty = resultData.userIdenty;
+    NSString *distinctId = userIdenty.distinctId;
+    if (!distinctId) {
+        return;
+    }
     NSMutableArray <NSString *> *experimentIds = self.trackedUserExperimentIds[distinctId];
     if ([experimentIds containsObject:resultData.experimentId]) {
         return;
@@ -349,6 +353,11 @@ static NSTimeInterval const kSABAsyncFetchExperimentRetryIntervalTime = 30;
     properties[kSABTriggerExperimentId] = resultData.experimentId;
     properties[kSABTriggerExperimentGroupId] = resultData.experimentGroupId;
 
+    // 记录用户信息
+    properties[kSABLoginId] = userIdenty.loginId;
+    properties[kSABDistinctId] = userIdenty.distinctId;
+    properties[kSABAnonymousId] = userIdenty.anonymousId;
+    
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         // 首次触发事件，添加版本号

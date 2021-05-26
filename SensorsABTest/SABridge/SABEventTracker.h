@@ -1,8 +1,8 @@
 //
-//  SABExperimentDataManager.h
-//  SensorsABTest
+//  SABEventTracker.h
+//  SensorsABTesting
 //
-//  Created by 储强盛 on 2020/10/11.
+//  Created by 储强盛 on 2021/5/11.
 //  Copyright © 2020 Sensors Data Inc. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,24 +19,13 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SABFetchResultResponse.h"
-#import "SABRequest.h"
-
-typedef void(^SABFetchResultResponseCompletionHandler)(SABFetchResultResponse *_Nullable responseData, NSError * _Nullable error);
 
 NS_ASSUME_NONNULL_BEGIN
 
-/// 数据存储和解析
-@interface SABExperimentDataManager : NSObject
+@interface SABEventTracker : NSObject
 
-/// 获取缓存试验结果
-- (nullable SABExperimentResult *)cachedExperimentResultWithParamName:(NSString *)paramName;
-
-/// 异步请求所有试验
-- (void)asyncFetchAllExperimentWithRequest:(SABExperimentRequest *)requestData completionHandler:(SABFetchResultResponseCompletionHandler)completionHandler;
-
-/// 切换用户，清空缓存
-- (void)clearExperiment;
+/// hook SAEventTracker 对应方法，修改 distinct_id 等字段
+- (void)sensorsabtest_trackEvent:(NSMutableDictionary *)event isSignUp:(BOOL)isSignUp;
 
 @end
 

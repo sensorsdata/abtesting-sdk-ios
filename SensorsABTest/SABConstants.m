@@ -25,7 +25,7 @@
 #import "SABConstants.h"
 
 // 当前版本号
-NSString *const kSABLibVersion = @"0.0.3";
+NSString *const kSABLibVersion = @"0.0.4";
 
 // SA 最低支持版本
 NSString *const kSABMinSupportedSALibVersion = @"2.1.14";
@@ -46,13 +46,18 @@ NSString *const kSABLibPluginVersion = @"$lib_plugin_version";
 // abtesting 具体版本号
 NSString *const kSABIOSLibPrefix = @"ios_abtesting";
 
+#pragma mark userId
+NSString *const kSABLoginId = @"sab_loginId";
+
+NSString *const kSABDistinctId = @"sab_distinctId";
+
+NSString *const kSABAnonymousId = @"sab_anonymousId";
+
+
 #pragma mark value
 NSTimeInterval const kSABFetchABTestResultDefaultTimeoutInterval = 30;
 
 #pragma mark - fileName
-// TODO: v0.0.3 添加，老版本本地缓存文件名，下个版本移除
-NSString *const kSABExperimentResultOldFileName = @"SensorsABTestExperimentResuls";
-
 NSString *const kSABExperimentResultFileName = @"SensorsABTestExperimentResultResponse";
 
 #pragma mark - NSNotificationName

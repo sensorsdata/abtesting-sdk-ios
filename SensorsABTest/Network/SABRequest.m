@@ -40,10 +40,16 @@ static NSTimeInterval kFetchABTestResultMinTimeoutInterval = 1;
         _projectKey = key;
         _timeoutInterval = kSABFetchABTestResultDefaultTimeoutInterval;
 
+        NSString *distinctId = [SABBridge distinctId];
+        NSString *loginId = [SABBridge loginId];
+        NSString *anonymousId = [SABBridge anonymousId];
+        SABUserIdenty *userIdenty = [[SABUserIdenty alloc] initWithDistinctId:distinctId loginId:loginId anonymousId:anonymousId];
+        _userIdenty = userIdenty;
+
         NSMutableDictionary *parametersBody = [NSMutableDictionary dictionary];
         parametersBody[@"platform"] = @"iOS";
-        parametersBody[@"login_id"] = [SABBridge loginId];
-        parametersBody[@"anonymous_id"] = [SABBridge anonymousId];
+        parametersBody[@"login_id"] = loginId;
+        parametersBody[@"anonymous_id"] = anonymousId;
         // abtest sdk 版本号
         parametersBody[@"abtest_lib_version"] = kSABLibVersion;
 
@@ -65,13 +71,6 @@ static NSTimeInterval kFetchABTestResultMinTimeoutInterval = 1;
         _body = [parametersBody copy];
     }
     return self;
-}
-
-- (void)refreshUserIdenty {
-    NSMutableDictionary *newBody = [self.body mutableCopy];
-    newBody[@"login_id"] = [SABBridge loginId];
-    newBody[@"anonymous_id"] = [SABBridge anonymousId];
-    self.body = [newBody copy];
 }
 
 - (void)setTimeoutInterval:(NSTimeInterval)timeoutInterval {

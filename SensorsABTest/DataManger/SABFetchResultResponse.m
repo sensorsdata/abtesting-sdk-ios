@@ -37,6 +37,35 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
     return (value && ![value isKindOfClass:NSNull.class]) ? value : nil;
 }
 
+@implementation SABUserIdenty
+
+- (instancetype)initWithDistinctId:(NSString *)distinctId loginId:(NSString *)loginId anonymousId:(NSString *)anonymousId {
+    self = [super init];
+    if (self) {
+        _distinctId = distinctId;
+        _loginId = loginId;
+        _anonymousId = anonymousId;
+    }
+    return self;
+}
+
+- (void)encodeWithCoder:(nonnull NSCoder *)coder {
+    [coder encodeObject:self.distinctId forKey:@"distinctId"];
+    [coder encodeObject:self.loginId forKey:@"loginId"];
+    [coder encodeObject:self.anonymousId forKey:@"anonymousId"];
+}
+
+- (nullable instancetype)initWithCoder:(nonnull NSCoder *)coder {
+    if (self = [super init]) {
+        self.distinctId = [coder decodeObjectForKey:@"distinctId"];
+        self.loginId = [coder decodeObjectForKey:@"loginId"];
+        self.anonymousId = [coder decodeObjectForKey:@"anonymousId"];
+    }
+    return self;
+}
+
+@end
+
 @implementation SABExperimentResultVariable
 
 - (instancetype)initWithDictionary:(NSDictionary *)configDic {
@@ -91,7 +120,11 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
         case SABExperimentResultTypeString:
             return variables;
         case SABExperimentResultTypeJSON: {
-            return [SABJSONUtils JSONObjectWithString:variables];
+            id jsonValue = [SABJSONUtils JSONObjectWithString:variables];
+            if (!jsonValue) { // 可能存在 jsonString 格式问题导致解析失败
+                SABLogWarn(@"JSON type experiment failed to parse: %@", variables);
+            }
+            return jsonValue;
         }
     }
     return nil;
@@ -295,7 +328,7 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
     [coder encodeObject:self.errorMessage forKey:@"errorMessage"];
     [coder encodeObject:self.results forKey:@"results"];
     [coder encodeObject:self.responseObject forKey:@"responseObject"];
-    [coder encodeObject:self.distinctId forKey:@"distinctId"];
+    [coder encodeObject:self.userIdenty forKey:@"userIdenty"];
 }
 
 - (instancetype)initWithCoder:(NSCoder *)coder {
@@ -306,10 +339,18 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
         self.errorMessage = [coder decodeObjectForKey:@"errorMessage"];
         self.results = [coder decodeObjectForKey:@"results"];
         self.responseObject = [coder decodeObjectForKey:@"responseObject"];
-        self.distinctId = [coder decodeObjectForKey:@"distinctId"];
+        // 调用 set 方法，设置每个试验 userIdenty
+        self.userIdenty = [coder decodeObjectForKey:@"userIdenty"];
     }
     return self;
 }
 
+- (void)setUserIdenty:(SABUserIdenty *)userIdenty {
+    _userIdenty = userIdenty;
+    // 每个试验，设置 userIdenty，用于 track 事件
+    for (SABExperimentResult *result in self.results.allValues) {
+        result.userIdenty = userIdenty;
+    }
+}
 @end
 

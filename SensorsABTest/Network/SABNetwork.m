@@ -74,6 +74,7 @@
         if (httpResponse.statusCode == 200) {
             completionHandler([SABJSONUtils JSONObjectWithData:data], nil);
         } else {
+            SABLogError(@"SABNetwork dataTaskWithRequest failure, error: %@, response: %@",error, response);
             completionHandler(nil, error);
         }
     }];

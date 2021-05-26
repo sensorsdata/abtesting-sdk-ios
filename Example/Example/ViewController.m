@@ -172,12 +172,12 @@
                 }
                 break;
 
-                case 2: { // STRING
-                    [[SensorsAnalyticsSDK sharedInstance] identify:@"abtest_relod_identify_12345567"];
+                case 2: { // identify
+                    [[SensorsAnalyticsSDK sharedInstance] identify:@"abtest_relod_identify_1234567"];
                 }
                 break;
 
-                case 3: { // JSON
+                case 3: { // resetAnonymousId
                     [[SensorsAnalyticsSDK sharedInstance] resetAnonymousId];
                 }
                 break;

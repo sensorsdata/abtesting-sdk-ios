@@ -1,8 +1,8 @@
 //
-//  SABExperimentDataManager.h
-//  SensorsABTest
+//  SABSwizzler.h
+//  SensorsABTesting
 //
-//  Created by 储强盛 on 2020/10/11.
+//  Created by 储强盛 on 2021/5/11.
 //  Copyright © 2020 Sensors Data Inc. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,25 +19,21 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SABFetchResultResponse.h"
-#import "SABRequest.h"
-
-typedef void(^SABFetchResultResponseCompletionHandler)(SABFetchResultResponse *_Nullable responseData, NSError * _Nullable error);
 
 NS_ASSUME_NONNULL_BEGIN
 
-/// 数据存储和解析
-@interface SABExperimentDataManager : NSObject
+@interface SABSwizzler : NSObject
 
-/// 获取缓存试验结果
-- (nullable SABExperimentResult *)cachedExperimentResultWithParamName:(NSString *)paramName;
-
-/// 异步请求所有试验
-- (void)asyncFetchAllExperimentWithRequest:(SABExperimentRequest *)requestData completionHandler:(SABFetchResultResponseCompletionHandler)completionHandler;
-
-/// 切换用户，清空缓存
-- (void)clearExperiment;
++ (void)swizzleSATrackEvent;
 
 @end
+
+
+@interface NSObject (SABSwizzler)
+
++ (void)sensorsabtest_swizzle:(SEL)originalSelector withSelector:(SEL)destinationSelector destinationClass:(Class)destinationClass;
+
+@end
+
 
 NS_ASSUME_NONNULL_END

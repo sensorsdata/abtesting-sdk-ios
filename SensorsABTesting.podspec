@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'SensorsABTesting'
-  s.version      = "0.0.3"
+  s.version      = "0.0.4"
   s.summary      = 'The official iOS SDK of Sensors A/B Testing.'
   s.homepage     = 'http://www.sensorsdata.cn'
   s.license      = { :type => 'Apache 2.0', :file => 'LICENSE' }
@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.requires_arc = true
   s.cocoapods_version = '>= 1.5.0'
   s.ios.framework = 'UIKit', 'Foundation'
-  s.dependency 'SensorsAnalyticsSDK', '>=2.1.14'
+  s.dependency 'SensorsAnalyticsSDK', '>=2.6.3'
 
   s.source_files = 'SensorsABTest/**/*.{h,m}'
   s.public_header_files = 'SensorsABTest/**/SensorsABTestConfigOptions.h', 'SensorsABTest/**/SensorsABTest.h'

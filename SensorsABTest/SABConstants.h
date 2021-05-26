@@ -45,14 +45,18 @@ extern NSString *const kSABLibPluginVersion;
 /// abtesting iOS SDK 版本号
 extern NSString *const kSABIOSLibPrefix;
 
+#pragma mark userId
+extern NSString *const kSABLoginId;
+
+extern NSString *const kSABDistinctId;
+
+extern NSString *const kSABAnonymousId;
+
 #pragma mark value
 /// 请求试验 timeoutInterval 默认值
 extern NSTimeInterval const kSABFetchABTestResultDefaultTimeoutInterval;
 
 #pragma mark - fileName
-/// 0.0.2 及之前版本试验缓存文件名
-extern NSString *const kSABExperimentResultOldFileName;
-
 /// 试验缓存文件名
 extern NSString *const kSABExperimentResultFileName;
 

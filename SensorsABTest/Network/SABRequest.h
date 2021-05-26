@@ -18,6 +18,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SABFetchResultResponse.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -38,8 +39,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy) NSDictionary *body;
 
-/// 更新用户标识信息
-- (void)refreshUserIdenty;
+/// 请求时刻的用户标识
+@property (nonatomic, strong) SABUserIdenty *userIdenty;
 
 - (instancetype)initWithBaseURL:(NSURL *)url projectKey:(NSString *)key;
 

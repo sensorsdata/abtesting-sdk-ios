@@ -33,6 +33,7 @@
 #import "SABNetwork.h"
 #import "SensorsABTestConfigOptions+Private.h"
 #import "SABRequest.h"
+#import "SABSwizzler.h"
 
 static SensorsABTest *sharedABTest = nil;
 
@@ -69,6 +70,7 @@ static SensorsABTest *sharedABTest = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sharedABTest = [[SensorsABTest alloc] initWithConfigOptions:configOptions];
+        [SABSwizzler swizzleSATrackEvent];
     });
     SABLogInfo(@"start SensorsABTest success");
 }

@@ -78,8 +78,7 @@
 
     NSString *filePath = [SABFileStore filePath:fileName];
     @try {
-        BOOL isDelete = [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
-        return isDelete;
+        return [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
     } @catch (NSException *exception) {
         SABLogError(@"%@ unable to delete data in %@, starting fresh", self, filePath);
     }

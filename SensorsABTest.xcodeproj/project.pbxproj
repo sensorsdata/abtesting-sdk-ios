@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4D04037C2657C7820006D84D /* SABEventTracker.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D0403782657C7820006D84D /* SABEventTracker.h */; };
+		4D04037D2657C7820006D84D /* SABEventTracker.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0403792657C7820006D84D /* SABEventTracker.m */; };
+		4D04037E2657C7820006D84D /* SABSwizzler.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D04037A2657C7820006D84D /* SABSwizzler.h */; };
+		4D04037F2657C7820006D84D /* SABSwizzler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D04037B2657C7820006D84D /* SABSwizzler.m */; };
 		4D15CF4324EE83B1003D2748 /* SensorsABTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D15CF3924EE83B1003D2748 /* SensorsABTest.framework */; };
 		4D15CF4824EE83B1003D2748 /* SensorsABTestTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D15CF4724EE83B1003D2748 /* SensorsABTestTests.m */; };
 		4D2A4A1125345083000B7150 /* SABManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2A4A1025345083000B7150 /* SABManagerTests.m */; };
@@ -58,6 +62,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4D0403782657C7820006D84D /* SABEventTracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SABEventTracker.h; sourceTree = "<group>"; };
+		4D0403792657C7820006D84D /* SABEventTracker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SABEventTracker.m; sourceTree = "<group>"; };
+		4D04037A2657C7820006D84D /* SABSwizzler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SABSwizzler.h; sourceTree = "<group>"; };
+		4D04037B2657C7820006D84D /* SABSwizzler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SABSwizzler.m; sourceTree = "<group>"; };
 		4D15CF3924EE83B1003D2748 /* SensorsABTest.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SensorsABTest.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D15CF4224EE83B1003D2748 /* SensorsABTestTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SensorsABTestTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D15CF4724EE83B1003D2748 /* SensorsABTestTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SensorsABTestTests.m; sourceTree = "<group>"; };
@@ -202,6 +210,10 @@
 				4D73D60B254BC6110020E711 /* SABBridge.m */,
 				4D73D60D254BC6110020E711 /* SABLogBridge.h */,
 				4D73D60A254BC6110020E711 /* SABLogBridge.m */,
+				4D04037A2657C7820006D84D /* SABSwizzler.h */,
+				4D04037B2657C7820006D84D /* SABSwizzler.m */,
+				4D0403782657C7820006D84D /* SABEventTracker.h */,
+				4D0403792657C7820006D84D /* SABEventTracker.m */,
 			);
 			path = SABridge;
 			sourceTree = "<group>";
@@ -232,8 +244,10 @@
 				4D73D624254BC6110020E711 /* SABFetchResultResponse.h in Headers */,
 				4D73D632254BC6110020E711 /* SensorsABTestConfigOptions+Private.h in Headers */,
 				4D73D61F254BC6110020E711 /* SABRequest.h in Headers */,
+				4D04037C2657C7820006D84D /* SABEventTracker.h in Headers */,
 				4D73D634254BC6110020E711 /* NSString+SABHelper.h in Headers */,
 				4D73D635254BC6110020E711 /* SABURLUtils.h in Headers */,
+				4D04037E2657C7820006D84D /* SABSwizzler.h in Headers */,
 				4D73D61D254BC6110020E711 /* SABNetwork.h in Headers */,
 				4D73D62E254BC6110020E711 /* SensorsABTestConfigOptions.h in Headers */,
 				4D73D62F254BC6110020E711 /* SABConstants.h in Headers */,
@@ -346,6 +360,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D04037F2657C7820006D84D /* SABSwizzler.m in Sources */,
+				4D04037D2657C7820006D84D /* SABEventTracker.m in Sources */,
 				4D73D622254BC6110020E711 /* SABFileStore.m in Sources */,
 				4D73D629254BC6110020E711 /* SABConstants.m in Sources */,
 				4D73D639254BC6110020E711 /* NSString+SABHelper.m in Sources */,

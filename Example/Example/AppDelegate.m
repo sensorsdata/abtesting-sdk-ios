@@ -11,7 +11,7 @@
 #import <SensorsABTest.h>
 
 /// 测试环境，获取试验地址
-static NSString* kSABResultsTestServerURL = @"http://abtesting.saas.debugbox.sensorsdata.cn/api/v2/abtest/online/results?project-key=1C77D685FC5441F52550B4F5973B340EB693EBB4";
+static NSString* kSABResultsTestURL = @"http://abtesting.saas.debugbox.sensorsdata.cn/api/v2/abtest/online/results?project-key=1C77D685FC5441F52550B4F5973B340EB693EBB4";
 
 // 测试环境，数据接收地址
 static NSString* kSABTestServerURL = @"http://10.120.173.133:8106/sa?project=default";
@@ -28,7 +28,7 @@ static NSString* kSABTestServerURL = @"http://10.120.173.133:8106/sa?project=def
 
     SAConfigOptions *options = [[SAConfigOptions alloc] initWithServerURL:kSABTestServerURL launchOptions:launchOptions];
 //    options.autoTrackEventType = SensorsAnalyticsEventTypeAppStart | SensorsAnalyticsEventTypeAppEnd | SensorsAnalyticsEventTypeAppClick | SensorsAnalyticsEventTypeAppViewScreen;
-    options.autoTrackEventType = SensorsAnalyticsEventTypeAppStart | SensorsAnalyticsEventTypeAppEnd;
+    options.autoTrackEventType = SensorsAnalyticsEventTypeAppEnd | SensorsAnalyticsEventTypeAppClick | SensorsAnalyticsEventTypeAppViewScreen;
     options.enableTrackAppCrash = YES;
 
     options.enableHeatMap = YES;
@@ -40,7 +40,7 @@ static NSString* kSABTestServerURL = @"http://10.120.173.133:8106/sa?project=def
 
     [[SensorsAnalyticsSDK sharedInstance] setFlushNetworkPolicy:SensorsAnalyticsNetworkTypeALL];
 
-    SensorsABTestConfigOptions *abtestConfigOptions = [[SensorsABTestConfigOptions alloc] initWithURL:kSABResultsTestServerURL];
+    SensorsABTestConfigOptions *abtestConfigOptions = [[SensorsABTestConfigOptions alloc] initWithURL:kSABResultsTestURL];
     [SensorsABTest startWithConfigOptions:abtestConfigOptions];
     
     return YES;

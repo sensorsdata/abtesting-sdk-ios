@@ -55,6 +55,17 @@ typedef NS_ENUM(NSInteger, SABFetchResultResponseStatus) {
     SABFetchResultResponseStatusFailed
 };
 
+@interface SABUserIdenty : NSObject <NSCoding>
+
+@property (nonatomic, copy) NSString *distinctId;
+@property (nonatomic, copy) NSString *loginId;
+@property (nonatomic, copy) NSString *anonymousId;
+
+- (instancetype)init NS_UNAVAILABLE;
+- (instancetype)initWithDistinctId:(NSString *)distinctId loginId:(NSString *)loginId anonymousId:(NSString *)anonymousId;
+
+@end
+
 /// 试验值
 @interface SABExperimentResultVariable : NSObject<NSCopying, NSCoding>
 
@@ -85,6 +96,8 @@ typedef NS_ENUM(NSInteger, SABFetchResultResponseStatus) {
 
 /// 试验结果配置
 @property (nonatomic, strong) SABExperimentResultVariable *variable;
+
+@property (nonatomic, strong) SABUserIdenty *userIdenty;
 
 /// 试验结果和默认值是否相同类型
 - (BOOL)isSameTypeWithDefaultValue:(id)defaultValue;
@@ -119,8 +132,8 @@ value: result 试验结果
 /// 原始数据
 @property (nonatomic, copy) NSDictionary *responseObject;
 
-/// 保存 distinctId，校验试验
-@property (nonatomic, copy) NSString *distinctId;
+/// 用户标识信息，校验试验
+@property (nonatomic, strong) SABUserIdenty *userIdenty;
 
 - (instancetype)initWithDictionary:(NSDictionary *)responseDic;
 

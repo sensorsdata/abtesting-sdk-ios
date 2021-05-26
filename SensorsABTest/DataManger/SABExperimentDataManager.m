@@ -51,10 +51,8 @@
 
 - (void)asyncFetchAllExperimentWithRequest:(SABExperimentRequest *)requestData completionHandler:(SABFetchResultResponseCompletionHandler)completionHandler {
 
-    NSString *requestDistinctId = [SABBridge distinctId];
     [SABNetwork dataTaskWithRequest:requestData.request completionHandler:^(id _Nullable jsonObject, NSError *_Nullable error) {
         if (error) {
-            SABLogError(@"asyncFetchAllABTest failure, error: %@, jsonObject: %@", error, jsonObject);
             completionHandler(nil, error);
             return;
         }
@@ -62,34 +60,20 @@
         // 数据格式错误
         if (!jsonObject || ![jsonObject isKindOfClass:NSDictionary.class]) {
             SABLogError(@"asyncFetchAllABTest invalid %@", jsonObject);
-            completionHandler(nil, nil);
-            return;
-        }
-
-        // 判断 distinctId 是否变化
-        NSString *currentDistinctId = [SABBridge distinctId];
-        if (![currentDistinctId isEqualToString:requestDistinctId]) {
-            SABLogWarn(@"distinctId has been changed, requestDistinctId is %@, currentDistinctId is %@, Retry to asyncFetchAllABTest", requestDistinctId, currentDistinctId);
-
-            // 刷新用户标识
-            [requestData refreshUserIdenty];
-
-            // 重试请求
-            [self asyncFetchAllExperimentWithRequest:requestData completionHandler:^(SABFetchResultResponse * _Nullable responseData, NSError * _Nullable error) {
-                completionHandler(responseData, error);
-            }];
+            NSError *error = [[NSError alloc] initWithDomain:@"SABResponseInvalidError" code:-1011 userInfo:@{NSLocalizedDescriptionKey: @"JSON parse error"}];
+            completionHandler(nil, error);
             return;
         }
 
         // 数据解析
         SABFetchResultResponse *responseData = [[SABFetchResultResponse alloc] initWithDictionary:jsonObject];
-
         // 获取试验成功，更新缓存
         if (responseData.status == SABFetchResultResponseStatusSuccess) {
             SABLogInfo(@"asyncFetchAllExperiment success jsonObject %@", jsonObject);
             
-            // 缓存请求时刻的 distinctId
-            responseData.distinctId = requestDistinctId;
+            // 缓存请求时刻的用户信息
+            responseData.userIdenty = requestData.userIdenty;
+
             self.resultResponse = responseData;
             // 存储到本地
             [self archiveExperimentResult:responseData];
@@ -107,25 +91,17 @@
         id result = [NSKeyedUnarchiver unarchiveObjectWithData:data];
 
         // 解析缓存
-        if ([result isKindOfClass:SABFetchResultResponse.class]) {
-            SABFetchResultResponse *resultResponse = (SABFetchResultResponse *)result;
-            NSString *distinctId = [SABBridge distinctId];
-            // 校验缓存试验的 distinctId
-            if ([resultResponse.distinctId isEqualToString:distinctId] && resultResponse.results.count > 0) {
-                self.resultResponse = resultResponse;
+        if (![result isKindOfClass:SABFetchResultResponse.class]) {
+            SABLogDebug(@"unarchiveExperimentResult fail %@", result);
+            return;
+        }
 
-                SABLogInfo(@"unarchiveExperimentResult success jsonObject %@", resultResponse.responseObject);
-            }
-
-            // TODO: v0.0.3 添加，尝试删除一次老版缓存，下个版本移除
-        } else {
-            // 首次安装，删除老版缓存
-            BOOL isDelete = [SABFileStore deleteFileWithFileName:kSABExperimentResultOldFileName];
-            if (isDelete) {
-                SABLogInfo(@"delete old version experimentResult success");
-            } else {
-                SABLogWarn(@"delete old version experimentResult fail");
-            }
+        SABFetchResultResponse *resultResponse = (SABFetchResultResponse *)result;
+        NSString *distinctId = [SABBridge distinctId];
+        // 校验缓存试验的 distinctId
+        if ([resultResponse.userIdenty.distinctId isEqualToString:distinctId] && resultResponse.results.count > 0) {
+            self.resultResponse = resultResponse;
+            SABLogInfo(@"unarchiveExperimentResult success jsonObject %@", resultResponse.responseObject);
         }
     });
 }
@@ -146,12 +122,19 @@
     if (![SABValidUtils isValidString:paramName]) {
         return nil;
     }
-    return self.resultResponse.results[paramName];
+    
+    __block SABExperimentResult *result = nil;
+    dispatch_sync(self.serialQueue, ^{
+        result = self.resultResponse.results[paramName];
+    });
+    return result;
 }
 
-- (void)validateExperiment {
-    // TODO: v0.0.3 添加，因为 SA 的问题，这里或 distinctId 可能不是最新，直接清除缓存即可，待 SA 通知逻辑更新后，改成判断 distinctId 是否一致来清除缓存
+- (void)clearExperiment {
     self.resultResponse = nil;
+
+    // 删除本地缓存
+    [SABFileStore deleteFileWithFileName:kSABExperimentResultFileName];
 }
 
 @end
