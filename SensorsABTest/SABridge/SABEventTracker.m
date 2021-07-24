@@ -44,16 +44,24 @@ static NSString * const kSAProperties = @"properties";
             tempEvent = [event mutableCopy];
         }
 
-        // 修改 loginId, distinctId,anonymousId
-        tempEvent[kSALoginId] = properties[kSABLoginId];
-        tempEvent[kSADistinctId] = properties[kSABDistinctId];
-        tempEvent[kSAAnonymousId] = properties[kSABAnonymousId];
-
-        // properties 中 移除 loginId, distinctId,anonymousId
+        // 用于移除 properties 中的 loginId, distinctId,anonymousId
         NSMutableDictionary *tempProperties = [properties mutableCopy];
-        tempProperties[kSABLoginId] = nil;
-        tempProperties[kSABDistinctId] = nil;
-        tempProperties[kSABAnonymousId] = nil;
+
+        // 修改 loginId, distinctId,anonymousId
+        if (properties[kSABLoginId]) {
+            tempEvent[kSALoginId] = properties[kSABLoginId];
+            tempProperties[kSABLoginId] = nil;
+        }
+
+        if (properties[kSABDistinctId]) {
+            tempEvent[kSADistinctId] = properties[kSABDistinctId];
+            tempProperties[kSABDistinctId] = nil;
+        }
+
+        if (properties[kSABAnonymousId]) {
+            tempEvent[kSAAnonymousId] = properties[kSABAnonymousId];
+            tempProperties[kSABAnonymousId] = nil;
+        }
 
         tempEvent[kSAProperties] = tempProperties;
         [self sensorsabtest_trackEvent:tempEvent isSignUp:isSignUp];
