@@ -14,7 +14,7 @@ A/B Testing SDK 是一款用于 A/B 测试的 SDK。
 
 ## 集成文档
 
-请参考神策官网 [A/B Testing SDK iOS 集成文档](https://manual.sensorsdata.cn/sa/latest/page-17569394.html)。
+请参考神策官网：[iOS/macOS SDK 集成（A/B Testing）](https://manual.sensorsdata.cn/sa/latest/page-17569394.html)。
 
 ## 讨论
 
