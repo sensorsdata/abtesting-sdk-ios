@@ -27,9 +27,18 @@
 #import "SABBridge.h"
 #import "SABJSONUtils.h"
 #import "SABConstants.h"
+#import "SABValidUtils.h"
 
 /// timeoutInterval 最小值保护
 static NSTimeInterval kFetchABTestResultMinTimeoutInterval = 1;
+
+@interface SABExperimentRequest()
+
+@property (nonatomic, copy) NSURL *baseURL;
+@property (nonatomic, copy) NSString *projectKey;
+@property (nonatomic, strong) NSMutableDictionary *body;
+
+@end
 
 @implementation SABExperimentRequest
 
@@ -47,13 +56,19 @@ static NSTimeInterval kFetchABTestResultMinTimeoutInterval = 1;
         _userIdenty = userIdenty;
 
         NSMutableDictionary *parametersBody = [NSMutableDictionary dictionary];
+
+#if TARGET_OS_OSX
+        parametersBody[@"platform"] = @"macOS";
+#else
         parametersBody[@"platform"] = @"iOS";
+#endif
         parametersBody[@"login_id"] = loginId;
         parametersBody[@"anonymous_id"] = anonymousId;
         // abtest sdk 版本号
         parametersBody[@"abtest_lib_version"] = kSABLibVersion;
 
         NSDictionary *presetProperties = [SABBridge presetProperties];
+        // 需要的部分 App 预置属性
         if (presetProperties) {
             NSMutableDictionary *properties = [NSMutableDictionary dictionary];
             properties[@"$app_version"] = presetProperties[@"$app_version"];
@@ -68,9 +83,16 @@ static NSTimeInterval kFetchABTestResultMinTimeoutInterval = 1;
             properties[@"$is_first_day"] = presetProperties[@"$is_first_day"];
             parametersBody[@"properties"] = properties;
         }
-        _body = [parametersBody copy];
+        _body = parametersBody;
     }
     return self;
+}
+
+- (void)appendRequestBody:(NSDictionary *)body {
+    if (![SABValidUtils isValidDictionary:body]) {
+        return;
+    }
+    [self.body addEntriesFromDictionary:body];
 }
 
 - (void)setTimeoutInterval:(NSTimeInterval)timeoutInterval {

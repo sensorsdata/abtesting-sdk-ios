@@ -167,22 +167,36 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
             return nil;
         }
         /*
+         
          "abtest_experiment_id": 666,
          "abtest_experiment_group_id": 888,
          "is_control_group": true,
          "is_white_list": false,
-         "variables": [
-             {
-                 "name": "color1",
-                 "value": "1",       // 变量值
-                 "type": "INTEGER"    // 变量类型 INTEGER
-             }
+         "variables": [  // 编程试验包含参数
+            {
+                "name": "color1",
+                "value": "1",       // 变量值
+                "type": "INTEGER"    // 变量类型 INTEGER
+            }
          ]
          */
         _experimentId = dictionaryValueForKey(resultDic, @"abtest_experiment_id");
         _experimentGroupId = dictionaryValueForKey(resultDic, @"abtest_experiment_group_id");
         _controlGroup = [dictionaryValueForKey(resultDic, @"is_control_group") boolValue];
         _whiteList = [dictionaryValueForKey(resultDic, @"is_white_list") boolValue];
+
+        // SA 老版接口，没有 experiment_type 参数，只支持编程试验，设置默认类型
+        _experimentType = SABExperimentTypeCode;
+        NSString *experimentTypeString = dictionaryValueForKey(resultDic, @"experiment_type");
+        if (experimentTypeString.length > 0) {
+            if ([experimentTypeString isEqualToString:@"CODE"]) {
+                _experimentType = SABExperimentTypeCode;
+            } else if ([experimentTypeString isEqualToString:@"LINK"]) {
+                _experimentType = SABExperimentTypeLink;
+            } else {
+                _experimentType = SABExperimentTypeInvalid;
+            }
+        }
     }
     return self;
 }
@@ -243,6 +257,7 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
     resultData.controlGroup = self.controlGroup;
     resultData.whiteList = self.whiteList;
     resultData.variable = self.variable;
+    resultData.experimentType = self.experimentType;
     return resultData;
 }
 
@@ -253,6 +268,7 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
     [coder encodeBool:self.controlGroup forKey:@"controlGroup"];
     [coder encodeBool:self.whiteList forKey:@"whiteList"];
     [coder encodeObject:self.variable forKey:@"variable"];
+    [coder encodeInteger:self.experimentType forKey:@"experimentType"];
 }
 
 - (instancetype)initWithCoder:(NSCoder *)coder {
@@ -263,6 +279,7 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
         self.experimentId = [coder decodeObjectForKey:@"experimentId"];
         self.experimentGroupId = [coder decodeObjectForKey:@"experimentGroupId"];
         self.variable = [coder decodeObjectForKey:@"variable"];
+        self.experimentType = [coder decodeIntegerForKey:@"experimentType"];
     }
     return self;
 }
@@ -280,8 +297,31 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
          "status": "SUCCESS", 查询结果标志（SUCCESS:进行试验；FAILED:不进入试验）
          "error_type": "",  错误类型，请求结果为 FAILED 时返回
          "error": "",  错误描述信息
-         "results": [{ 用户命中的所有试验结果
-         }]
+         "results": [ 用户命中的所有试验结果
+                {
+                     "abtest_experiment_id": "100", // 试验 ID
+                     "abtest_experiment_group_id": "123", // 试验分组 ID
+                     "is_control_group": false, // 是否是对照组
+                     "is_white_list": true, // 是否白名单用户，白名单用户不进行试验事件的上报
+                     "experiment_type": "CODE",  //试验类型 variables/link/...
+                     "variables": [
+                         {
+                             "name": "color1", // 变量名
+                             "value": "1", // 变量值
+                             "type": "INTEGER" // 变量类型 INTEGER
+                         }
+                     ]
+                 },{
+                     "abtest_experiment_id": "100", // 试验 ID
+                     "abtest_experiment_group_id": "123", // 试验分组 ID
+                     "is_control_group": false, // 是否是对照组
+                     "is_white_list": true, // 是否白名单用户，白名单用户不进行试验事件的上报
+                     "experiment_type": "LINK",  //试验类型 variables/link/...
+                     "control_link": "http://aa.com",    //分流 URL 、对照组链接
+                     "link_match_type": "STRICT",    //链接匹配类型 STRICT：精确匹配，FUZZY:模糊匹配
+                     "experiment_link": "http://aa.com/1"    //用户命中的试验链接（试验组就是试验组url、对照组就是对照组链接）
+                }
+            ]
          }
          */
         if ([dictionaryValueForKey(responseDic, @"status") isEqualToString:@"SUCCESS"]) {
@@ -299,6 +339,10 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
             // 遍历所有试验
             for (NSDictionary *resultDic in results) {
                 SABExperimentResult *result = [[SABExperimentResult alloc] initWithDictionary:resultDic];
+                // 非编程试验，Native 不作处理
+                if (result.experimentType != SABExperimentTypeCode) {
+                    continue;
+                }
                 NSArray <NSDictionary *> *variables = dictionaryValueForKey(resultDic, @"variables");
                 // 遍历每个试验下所有试验参数
                 for (NSDictionary *variableDic in variables) {
@@ -311,7 +355,6 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
                     newResult.variable = variable;
                     resultsDic[variable.paramName] = newResult;
                 }
-                
             }
             _results = [resultsDic copy];
         }

@@ -27,7 +27,13 @@
 //    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL fileURLWithPath:path]];
 
     // js 测试页面
-    NSString *httpStr = @"http://ls869359954.gitee.io/sa-sdk-abtest/";
+    NSString *httpStr = @"http://jssdk.debugbox.sensorsdata.cn/js/ls/app/sa-sdk-abtest/index.html";
+    // 多链接试验
+//    httpStr = @"http://jssdk.debugbox.sensorsdata.cn/js/ls/ab/index.html";
+
+    // 不做多链接试验
+//    httpStr = @"http://jssdk.debugbox.sensorsdata.cn/js/ls/ab/index.html?saSDKMultilink=true";
+
     NSURL *httpUrl = [NSURL URLWithString:httpStr];
     NSURLRequest *request = [NSURLRequest requestWithURL:httpUrl];
 

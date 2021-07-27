@@ -25,10 +25,18 @@
 #import "SABConstants.h"
 
 // 当前版本号
-NSString *const kSABLibVersion = @"0.0.5";
+NSString *const kSABLibVersion = @"0.1.0";
 
 // SA 最低支持版本
-NSString *const kSABMinSupportedSALibVersion = @"2.1.14";
+#if TARGET_OS_OSX
+NSString *const kSABMinSupportedSALibVersion = @"3.0.0";
+
+NSString *const kSABLibPrefix = @"macos_abtesting";
+#else
+NSString *const kSABMinSupportedSALibVersion = @"2.6.3";
+// abtesting 插件版本号前缀
+NSString *const kSABLibPrefix = @"ios_abtesting";
+#endif
 
 #pragma mark eventName
 NSString *const kSABTriggerEventName = @"$ABTestTrigger";
@@ -42,9 +50,6 @@ NSString *const kSABTriggerExperimentGroupId = @"$abtest_experiment_group_id";
 
 // 采集插件版本号
 NSString *const kSABLibPluginVersion = @"$lib_plugin_version";
-
-// abtesting 具体版本号
-NSString *const kSABIOSLibPrefix = @"ios_abtesting";
 
 #pragma mark userId
 NSString *const kSABLoginId = @"sab_loginId";
@@ -60,13 +65,13 @@ NSTimeInterval const kSABFetchABTestResultDefaultTimeoutInterval = 30;
 #pragma mark - fileName
 NSString *const kSABExperimentResultFileName = @"SensorsABTestExperimentResultResponse";
 
-#pragma mark - NSNotificationName
+#pragma mark - NSNotificationName，依赖 SA
 #pragma mark H5 打通相关
 /// SA 注入 H5 打通 Bridge
-NSNotificationName const kSABRegisterSAJSBridgeNotification = @"SensorsAnalyticsRegisterJavaScriptBridgeNotification";
+NSNotificationName const kSABSARegisterSAJSBridgeNotification = @"SensorsAnalyticsRegisterJavaScriptBridgeNotification";
 
 /// H5 发送 abtest 消息
-NSNotificationName const kSABMessageFromH5Notification = @"SensorsAnalyticsMessageFromH5Notification";
+NSNotificationName const kSABSAMessageFromH5Notification = @"SensorsAnalyticsMessageFromH5Notification";
 
 #pragma mark 用户 id 变化
 // login
@@ -80,4 +85,8 @@ NSNotificationName const kSABSAIdentifyNotification = @"SensorsAnalyticsTrackIde
 
 // resetAnonymousId
 NSNotificationName const kSABSAResetAnonymousIdNotification = @"SensorsAnalyticsTrackResetAnonymousIdNotification";
+
+#pragma mark other
+// 监听 SA 的生命周期通知，依赖版本 v2.6.3 及以上
+NSNotificationName const kSABSAAppLifecycleStateDidChangeNotification = @"com.sensorsdata.SAAppLifecycleStateDidChange";
 

@@ -21,23 +21,33 @@
 #import <Foundation/Foundation.h>
 #import "SABConstants.h"
 
+/// 试验类型
+typedef NS_ENUM(NSInteger, SABExperimentType) {
+    /// 编程试验
+    SABExperimentTypeCode = 0,
+    /// 多链接试验，只支持 H5
+    SABExperimentTypeLink = 1,
+    /// 无效类型，此类型暂不支持
+    SABExperimentTypeInvalid = -1
+};
+
 /**
  * @abstract
  * 试验结果类型
  *
  * @discussion
  * 试验结果类型枚举
- *   SABExperimentResultTypeInvalid 类型无效，一般为 nil
- *   SABExperimentResultTypeInt - INTEGER 类型结果
- *   SABExperimentResultTypeString - STRING 类型结果
- *   SABExperimentResultTypeBool - BOOLEAN 类型结果
- *   SABExperimentResultTypeJSON - JSON 类型结果
  */
 typedef NS_ENUM(NSInteger, SABExperimentResultType) {
+    /// 类型无效，一般为 nil
     SABExperimentResultTypeInvalid = 0,
+    /// INTEGER 类型结果
     SABExperimentResultTypeInt,
+    /// STRING 类型结果
     SABExperimentResultTypeString,
+    /// BOOLEAN 类型结果
     SABExperimentResultTypeBool,
+    /// JSON 类型结果
     SABExperimentResultTypeJSON
 };
 
@@ -45,13 +55,11 @@ typedef NS_ENUM(NSInteger, SABExperimentResultType) {
  * @abstract
  * 拉取试验结果状态
  *
- * @discussion
- * 拉取试验结果类型
- *   SABFetchResultResponseStatusSuccess - 拉取试验成功
- *   SABFetchResultResponseStatusFailed - 拉取试验失败
  */
 typedef NS_ENUM(NSInteger, SABFetchResultResponseStatus) {
+    /// 拉取试验成功
     SABFetchResultResponseStatusSuccess,
+    /// 拉取试验失败
     SABFetchResultResponseStatusFailed
 };
 
@@ -94,9 +102,13 @@ typedef NS_ENUM(NSInteger, SABFetchResultResponseStatus) {
 /// 是否为白名单
 @property (nonatomic, assign, getter = isWhiteList) BOOL whiteList;
 
-/// 试验结果配置
+/// 编程试验结果
 @property (nonatomic, strong) SABExperimentResultVariable *variable;
 
+/// 试验类型
+@property (nonatomic, assign) SABExperimentType experimentType;
+
+/// 用户标识
 @property (nonatomic, strong) SABUserIdenty *userIdenty;
 
 /// 试验结果和默认值是否相同类型

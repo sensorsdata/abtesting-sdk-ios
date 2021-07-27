@@ -22,7 +22,6 @@
 #error This file must be compiled with ARC. Either turn on ARC for the project or use -fobjc-arc flag on this file.
 #endif
 
-#import <UIKit/UIApplication.h>
 #import <WebKit/WebKit.h>
 #import "SABManager.h"
 #import "SABLogBridge.h"
@@ -44,6 +43,20 @@ static NSInteger const kSABAsyncFetchExperimentMaxTimes = 3;
 
 /// 重试请求时间间隔，单位 秒
 static NSTimeInterval const kSABAsyncFetchExperimentRetryIntervalTime = 30;
+
+/**
+ * @abstract
+ * SDK 生命周期状态
+ *
+ * @discussion
+ * 具体详见 SensorsAnalyticsSDK 中 SAAppLifecycle 的相关实现和通知
+ */
+typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
+    /// App 启动
+    SABAppLifecycleStateStart = 2,
+    /// App 退出
+    SABAppLifecycleStateEnd = 4
+};
 
 @interface SABManager()
 
@@ -86,14 +99,13 @@ static NSTimeInterval const kSABAsyncFetchExperimentRetryIntervalTime = 30;
 - (void)setupListeners {
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
 
-    // 前后台切换
-    [notificationCenter addObserver:self selector:@selector(applicationDidBecomeActive) name:UIApplicationDidBecomeActiveNotification object:nil];
-    [notificationCenter addObserver:self selector:@selector(applicationDidEnterBackground) name:UIApplicationDidEnterBackgroundNotification object:nil];
-
+    // 监听 SDK 生命周期
+    [notificationCenter addObserver:self selector:@selector(appLifecycleStateDidChange:) name:kSABSAAppLifecycleStateDidChangeNotification object:nil];
+    
     // App 与 H5 打通相关通知
-    [notificationCenter addObserver:self selector:@selector(registerSAJSBridge:) name:kSABRegisterSAJSBridgeNotification object:nil];
-    [notificationCenter addObserver:self selector:@selector(messageFromH5:) name:kSABMessageFromH5Notification object:nil];
-
+    [notificationCenter addObserver:self selector:@selector(registerSAJSBridge:) name:kSABSARegisterSAJSBridgeNotification object:nil];
+    [notificationCenter addObserver:self selector:@selector(messageFromH5:) name:kSABSAMessageFromH5Notification object:nil];
+    
     // 用户 id 变化相关通知
     [notificationCenter addObserver:self selector:@selector(reloadAllABTestResult:) name:kSABSALoginNotification object:nil];
     [notificationCenter addObserver:self selector:@selector(reloadAllABTestResult:) name:kSABSALogoutNotification object:nil];
@@ -102,14 +114,22 @@ static NSTimeInterval const kSABAsyncFetchExperimentRetryIntervalTime = 30;
 }
 
 #pragma mark - notification Action
-- (void)applicationDidBecomeActive {
-    // 开启定时更新计时
-    [self startReloadTimer];
-}
-
-- (void)applicationDidEnterBackground {
-    // 关闭定时更新计时
-    [self stopReloadTimer];
+// 状态变化通知
+- (void)appLifecycleStateDidChange:(NSNotification *)sender {
+    NSDictionary *userInfo = sender.userInfo;
+    SABAppLifecycleState newState = [userInfo[@"new"] integerValue];
+    switch (newState) {
+        case SABAppLifecycleStateStart:{
+            // 开启定时更新计时
+            [self startReloadTimer];
+        }
+            break;
+        case SABAppLifecycleStateEnd:{
+            // 关闭定时更新计时
+            [self stopReloadTimer];
+        }
+            break;
+    }
 }
 
 /// 注入 App 与 H5 打通标识
@@ -155,13 +175,22 @@ static NSTimeInterval const kSABAsyncFetchExperimentRetryIntervalTime = 30;
 
     /* 拼接回传 js 的数据结构
      sensorsdata_app_call_js('abtest',"{
-     "message_id":1598947194957,   //唯一标识，H5 发起的请求信息中获取
-     "properties":{},           //App 端 A/B Testing 特定的属性，一期不做暂为
-     "data":{}                 //分流请求响应数据
+     "data":{       //分流请求响应数据
+        "message_id":1598947194957, //唯一标识，H5 发起的请求信息中获取
+        "timeout":XXXXX     //H5 的 timeout
+        "properties":{},    //App 端 A/B Testing 特定的属性，暂未添加
+        "request_body": {   // H5 请求需要增加的参数
+                  "origin_platform": 'H5'
+               }
+        }
      }")
      */
     SABExperimentRequest *requestData = [[SABExperimentRequest alloc] initWithBaseURL:self.configOptions.baseURL projectKey:self.configOptions.projectKey];
+
     requestData.timeoutInterval = [dataDic[@"timeout"] integerValue] / 1000.0;
+    // 拼接 H5 请求参数
+    [requestData appendRequestBody:dataDic[@"request_body"]];
+
     [self.dataManager asyncFetchAllExperimentWithRequest:requestData completionHandler:^(SABFetchResultResponse * _Nullable responseData, NSError * _Nullable error) {
         
         // JS 数据拼接
@@ -183,6 +212,8 @@ static NSTimeInterval const kSABAsyncFetchExperimentRetryIntervalTime = 30;
                 if (error) {
                     // 可能方法不存在；
                     SABLogError(@"window.sensorsdata_app_call_js abtest error：%@", error);
+                } else {
+                    SABLogInfo(@"window.sensorsdata_app_call_js abtest success");
                 }
             }];
         });
@@ -361,7 +392,7 @@ static NSTimeInterval const kSABAsyncFetchExperimentRetryIntervalTime = 30;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         // 首次触发事件，添加版本号
-        NSString *libVersion = [NSString stringWithFormat:@"%@:%@", kSABIOSLibPrefix, kSABLibVersion];
+        NSString *libVersion = [NSString stringWithFormat:@"%@:%@", kSABLibPrefix, kSABLibVersion];
         properties[kSABLibPluginVersion] = @[libVersion];
     });
 

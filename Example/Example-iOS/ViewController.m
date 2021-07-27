@@ -49,8 +49,8 @@
                 break;
 
                 case 2: { // STRING
-                    id result = [[SensorsABTest sharedInstance] fetchCacheABTestWithParamName:@"color2" defaultValue:@"默认值字符串"];
-                    NSLog(@"fetchCacheABTest，paramName：%@ - result:%@\n", @"color2", result);
+                    id result = [[SensorsABTest sharedInstance] fetchCacheABTestWithParamName:@"hef_tes" defaultValue:@"默认值字符串"];
+                    NSLog(@"fetchCacheABTest，paramName：%@ - result:%@\n", @"hef_tes", result);
                 }
                 break;
 

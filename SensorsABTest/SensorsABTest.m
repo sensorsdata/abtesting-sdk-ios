@@ -22,7 +22,6 @@
 #error This file must be compiled with ARC. Either turn on ARC for the project or use -fobjc-arc flag on this file.
 #endif
 
-#import <UIKit/UIApplication.h>
 #import <WebKit/WebKit.h>
 #import "SensorsABTest.h"
 #import "SABLogBridge.h"
@@ -77,7 +76,7 @@ static SensorsABTest *sharedABTest = nil;
 
 /// 返回 神策 A/B Testing SDK 单例
 + (SensorsABTest *)sharedInstance {
-    NSAssert(sharedABTest, @"请先使用 startWithConfigOptions: 初始化 SDK");
+    NSAssert(sharedABTest, @"请先使用 startWithConfigOptions: 初始化 SensorsABTest SDK");
     return sharedABTest;
 }
 
@@ -126,7 +125,7 @@ static SensorsABTest *sharedABTest = nil;
         if (error) {
             SABLogWarn(@"upload distinctId failure，error:%@", error);
         } else {
-            SABLogInfo(@"upload distinctId success，jsonObject：%@", jsonObject);
+            SABLogInfo(@"upload distinctId success");
         }
     }];
     return YES;

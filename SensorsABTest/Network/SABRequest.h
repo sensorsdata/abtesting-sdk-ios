@@ -32,18 +32,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SABExperimentRequest : NSObject <SABRequestProtocol>
 
-@property (nonatomic, copy) NSURL *baseURL;
-@property (nonatomic, copy) NSString *projectKey;
-
 @property (nonatomic, assign) NSTimeInterval timeoutInterval;
-
-@property (nonatomic, copy) NSDictionary *body;
 
 /// 请求时刻的用户标识
 @property (nonatomic, strong) SABUserIdenty *userIdenty;
 
-- (instancetype)initWithBaseURL:(NSURL *)url projectKey:(NSString *)key;
+- (instancetype)init NS_UNAVAILABLE;
 
+- (instancetype)initWithBaseURL:(NSURL *)url projectKey:(NSString *)key NS_DESIGNATED_INITIALIZER;
+
+/// 增加请求参数
+/// @param body 需要增加的参数 body
+- (void)appendRequestBody:(NSDictionary *)body;
 @end
 
 @interface SABWhiteListRequest : NSObject <SABRequestProtocol>

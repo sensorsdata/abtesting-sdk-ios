@@ -37,7 +37,6 @@ typedef NS_ENUM(NSInteger, SABFetchABTestModeType) {
     SABFetchABTestModeTypeFast
 };
 
-
 NS_ASSUME_NONNULL_BEGIN
 
 /// 试验结果数据管理

@@ -70,7 +70,7 @@
         // 获取试验成功，更新缓存
         if (responseData.status == SABFetchResultResponseStatusSuccess) {
             SABLogInfo(@"asyncFetchAllExperiment success jsonObject %@", jsonObject);
-            
+
             // 缓存请求时刻的用户信息
             responseData.userIdenty = requestData.userIdenty;
 

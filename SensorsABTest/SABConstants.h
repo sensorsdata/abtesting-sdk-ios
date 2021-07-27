@@ -42,8 +42,8 @@ extern NSString *const kSABTriggerExperimentGroupId;
 /// 采集插件版本号
 extern NSString *const kSABLibPluginVersion;
 
-/// abtesting iOS SDK 版本号
-extern NSString *const kSABIOSLibPrefix;
+/// abtesting iOS/macOS SDK 版本号
+extern NSString *const kSABLibPrefix;
 
 #pragma mark userId
 extern NSString *const kSABLoginId;
@@ -63,10 +63,10 @@ extern NSString *const kSABExperimentResultFileName;
 #pragma mark - NSNotificationName
 #pragma mark H5 打通相关
 /// SA 注入 H5 打通 Bridge
-extern NSNotificationName const kSABRegisterSAJSBridgeNotification;
+extern NSNotificationName const kSABSARegisterSAJSBridgeNotification;
 
 /// H5 发送 abtest 消息
-extern NSNotificationName const kSABMessageFromH5Notification;
+extern NSNotificationName const kSABSAMessageFromH5Notification;
 
 #pragma mark 用户 id 变化
 // login
@@ -80,3 +80,6 @@ extern NSNotificationName const kSABSAIdentifyNotification;
 
 // resetAnonymousId
 extern NSNotificationName const kSABSAResetAnonymousIdNotification;
+
+// 监听 SA 的生命周期通知，依赖版本 v2.6.3 及以上
+extern NSNotificationName const kSABSAAppLifecycleStateDidChangeNotification;
