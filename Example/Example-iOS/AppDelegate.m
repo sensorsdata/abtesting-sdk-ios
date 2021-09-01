@@ -41,8 +41,9 @@ static NSString* kSABTestServerURL = @"http://10.130.6.4:8106/sa?project=default
     options.enableVisualizedAutoTrack = YES;
     options.enableJavaScriptBridge = YES;
     options.enableLog = YES;
+    options.flushNetworkPolicy = SensorsAnalyticsNetworkTypeALL;
+
     [SensorsAnalyticsSDK startWithConfigOptions:options];
-    [[SensorsAnalyticsSDK sharedInstance] setFlushNetworkPolicy:SensorsAnalyticsNetworkTypeALL];
 }
 
 - (void)startSensorsABTest {

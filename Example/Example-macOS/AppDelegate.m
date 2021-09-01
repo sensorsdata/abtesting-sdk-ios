@@ -36,9 +36,9 @@ static NSString* kSABResultsTestURL = @"http://abtesting.saas.debugbox.sensorsda
     SAConfigOptions *options = [[SAConfigOptions alloc] initWithServerURL:SADefaultServerURL launchOptions:nil];
     options.enableJavaScriptBridge = YES;
     options.enableLog = YES;
+    options.flushNetworkPolicy = SensorsAnalyticsNetworkTypeALL;
+    
     [SensorsAnalyticsSDK startWithConfigOptions:options];
-
-    [[SensorsAnalyticsSDK sharedInstance] setFlushNetworkPolicy:SensorsAnalyticsNetworkTypeALL];
 }
 
 - (void)startSensorsABTest {

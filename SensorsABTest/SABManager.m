@@ -241,54 +241,42 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
         SABLogError(@"paramName: %@ error，paramName must be a valid string!", paramName);
         return;
     }
-    
-    dispatch_block_t fetchABTestBlock = ^() {
-        switch (type) {
-            case SABFetchABTestModeTypeCache: {
-                // 从缓存读取
-                id cacheValue = [self fetchCacheABTestWithParamName:paramName defaultValue:defaultValue];
-                return completionHandler(cacheValue ? : defaultValue);
-            }
-            case SABFetchABTestModeTypeFast: {
-                id cacheValue = [self fetchCacheABTestWithParamName:paramName defaultValue:defaultValue];
-                if (cacheValue) {
-                    return completionHandler(cacheValue);
-                }
-                [self fetchAsyncABTestWithParamName:paramName defaultValue:defaultValue timeoutInterval:timeoutInterval completionHandler:completionHandler];
-                break;
-            }
-            case SABFetchABTestModeTypeAsync: {
-                // 异步请求
-                [self fetchAsyncABTestWithParamName:paramName defaultValue:defaultValue timeoutInterval:timeoutInterval completionHandler:completionHandler];
-            }
-                break;
-            default:
-                break;
+
+    switch (type) {
+        case SABFetchABTestModeTypeCache: {
+            // 从缓存读取
+            id cacheValue = [self fetchCacheABTestWithParamName:paramName defaultValue:defaultValue];
+            return completionHandler(cacheValue ? : defaultValue);
         }
-    };
-    
-    dispatch_queue_t saSerialQueue = [SABBridge saSerialQueue];
-    if (saSerialQueue) {
-        // Cache 获取试验，同步执行
-        if (type == SABFetchABTestModeTypeCache) {
-            dispatch_sync(saSerialQueue, fetchABTestBlock);
-        } else {
-            dispatch_async(saSerialQueue, fetchABTestBlock);
+        case SABFetchABTestModeTypeFast: {
+            id cacheValue = [self fetchCacheABTestWithParamName:paramName defaultValue:defaultValue];
+            if (cacheValue) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    completionHandler(cacheValue);
+                });
+                return;
+            }
+            [self fetchAsyncABTestWithParamName:paramName defaultValue:defaultValue timeoutInterval:timeoutInterval completionHandler:completionHandler];
+            break;
         }
-    } else {
-        fetchABTestBlock();
+        case SABFetchABTestModeTypeAsync: {
+            // 异步请求
+            [self fetchAsyncABTestWithParamName:paramName defaultValue:defaultValue timeoutInterval:timeoutInterval completionHandler:completionHandler];
+        }
+        break;
+        default:
+            break;
     }
 }
 
 /// 获取缓存试验
 - (nullable id)fetchCacheABTestWithParamName:(NSString *)paramName defaultValue:(id)defaultValue {
-    
     if (![SABValidUtils isValidString:paramName]) {
         SABLogError(@"paramName:：%@ error，paramName must be a valid string!", paramName);
         return nil;
     }
     SABExperimentResult *resultData = [self.dataManager cachedExperimentResultWithParamName:paramName];
-    
+
     if (!resultData) {
         SABLogWarn(@"The cache experiment result is empty, paramName: %@", paramName);
         return nil;
@@ -300,7 +288,7 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
         SABLogWarn(@"The experiment result type is inconsistent with the defaultValue type of the interface setting, paramName: %@, experiment result type: %@, defaultValue type: %@", paramName, resulTypeString, defaultValueTypeString);
         return nil;
     }
-    
+
     if (!resultData.isWhiteList) {
         // 埋点
         [self trackABTestWithData:resultData];
@@ -313,7 +301,11 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
     // 异步请求
     SABExperimentRequest *requestData = [[SABExperimentRequest alloc] initWithBaseURL:self.configOptions.baseURL projectKey:self.configOptions.projectKey];
     requestData.timeoutInterval = timeoutInterval;
+
+    __weak typeof(self) weakSelf = self;
     [self.dataManager asyncFetchAllExperimentWithRequest:requestData completionHandler:^(SABFetchResultResponse *_Nullable responseData, NSError *_Nullable error) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+
         if (error || !responseData) {
             SABLogError(@"asyncFetchAllExperimentWithRequest failure，error: %@", error);
             completionHandler(defaultValue);
@@ -321,11 +313,11 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
         }
 
         // 获取缓存并触发 $ABTestTrigger 事件
-        id cacheValue = [self fetchCacheABTestWithParamName:paramName defaultValue:defaultValue];
+        id cacheValue = [strongSelf fetchCacheABTestWithParamName:paramName defaultValue:defaultValue];
 
         // 切到主线程回调结果
         dispatch_async(dispatch_get_main_queue(), ^{
-            completionHandler(cacheValue ?: defaultValue);
+            completionHandler(cacheValue ? : defaultValue);
         });
     }];
 }
@@ -339,20 +331,18 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
 /// @param times 最大次数
 - (void)fetchAllABTestResultWithTimes:(NSInteger)times {
     NSInteger fetchIndex = times - 1;
-    
+
     SABExperimentRequest *requestData = [[SABExperimentRequest alloc] initWithBaseURL:self.configOptions.baseURL projectKey:self.configOptions.projectKey];
-    
-    [self.dataManager asyncFetchAllExperimentWithRequest:requestData completionHandler:^(SABFetchResultResponse * _Nullable responseData, NSError * _Nullable error) {
-        
+
+    [self.dataManager asyncFetchAllExperimentWithRequest:requestData completionHandler:^(SABFetchResultResponse *_Nullable responseData, NSError *_Nullable error) {
         if (fetchIndex <= 0 || !error) {
             return;
         }
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(kSABAsyncFetchExperimentRetryIntervalTime * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self fetchAllABTestResultWithTimes:fetchIndex];
-        });
+                           [self fetchAllABTestResultWithTimes:fetchIndex];
+                       });
     }];
 }
-
 
 #pragma mark - action
 /// track $ABTestTrigger
@@ -388,7 +378,7 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
     properties[kSABLoginId] = userIdenty.loginId;
     properties[kSABDistinctId] = userIdenty.distinctId;
     properties[kSABAnonymousId] = userIdenty.anonymousId;
-    
+
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         // 首次触发事件，添加版本号
@@ -396,9 +386,7 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
         properties[kSABLibPluginVersion] = @[libVersion];
     });
 
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [SABBridge track:kSABTriggerEventName properties:properties];
-    });
+    [SABBridge track:kSABTriggerEventName properties:properties];
 }
 
 /// 开始更新计时

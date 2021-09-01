@@ -43,8 +43,6 @@ NS_ASSUME_NONNULL_BEGIN
 /// SA SDK 版本
 @property (class, nonatomic, copy, readonly) NSString *libVersion;
 
-@property (class, nonatomic, strong, readonly) dispatch_queue_t saSerialQueue;
-
 /// 调用 track 接口，追踪一个带有属性的 event
 /// @param eventName 事件名称
 /// @param properties 事件属性

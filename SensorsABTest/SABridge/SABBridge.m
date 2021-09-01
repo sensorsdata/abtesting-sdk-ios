@@ -70,14 +70,9 @@ typedef void (*SATrackEventMethod)(id, SEL, NSString *, NSDictionary *);
     return [self propertyWithName:@"getPresetProperties"];
 }
 
-+ (dispatch_queue_t)saSerialQueue {
-    dispatch_queue_t serialQueue = [self propertyWithName:@"serialQueue"];
-    return serialQueue;
-}
-
 /// 根据方法名获取属性
 /// @param name 名称
-+ (instancetype)propertyWithName:(NSString *)name {
++ (id)propertyWithName:(NSString *)name {
     id sa = [self sensorsAnalyticsInstance];
     if (!sa) {
         SABLogWarn(@"Get SensorsAnalyticsSDK.sharedIntance failed");
