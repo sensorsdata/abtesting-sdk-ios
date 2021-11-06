@@ -237,7 +237,9 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
         return;
     }
     if (![SABValidUtils isValidString:paramName]) {
-        completionHandler(defaultValue);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completionHandler(defaultValue);
+        });
         SABLogError(@"paramName: %@ error，paramName must be a valid string!", paramName);
         return;
     }
@@ -246,7 +248,10 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
         case SABFetchABTestModeTypeCache: {
             // 从缓存读取
             id cacheValue = [self fetchCacheABTestWithParamName:paramName defaultValue:defaultValue];
-            return completionHandler(cacheValue ? : defaultValue);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionHandler(cacheValue ? : defaultValue);
+            });
+            return;
         }
         case SABFetchABTestModeTypeFast: {
             id cacheValue = [self fetchCacheABTestWithParamName:paramName defaultValue:defaultValue];
@@ -308,7 +313,10 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
 
         if (error || !responseData) {
             SABLogError(@"asyncFetchAllExperimentWithRequest failure，error: %@", error);
-            completionHandler(defaultValue);
+            // 切到主线程回调结果
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionHandler(defaultValue);
+            });
             return;
         }
 

@@ -25,7 +25,7 @@
 #import "SABConstants.h"
 
 // 当前版本号
-NSString *const kSABLibVersion = @"0.1.1";
+NSString *const kSABLibVersion = @"0.1.3";
 
 // SA 最低支持版本
 #if TARGET_OS_OSX
