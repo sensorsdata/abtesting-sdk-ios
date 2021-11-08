@@ -237,21 +237,23 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
         return;
     }
     if (![SABValidUtils isValidString:paramName]) {
-        dispatch_async(dispatch_get_main_queue(), ^{
+        if (type == SABFetchABTestModeTypeCache) {
             completionHandler(defaultValue);
-        });
+        } else {
+            // fast 和 async 异步接口，统一主线程回调结果
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionHandler(defaultValue);
+            });
+        }
         SABLogError(@"paramName: %@ error，paramName must be a valid string!", paramName);
         return;
     }
-
+    
     switch (type) {
         case SABFetchABTestModeTypeCache: {
             // 从缓存读取
             id cacheValue = [self fetchCacheABTestWithParamName:paramName defaultValue:defaultValue];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                completionHandler(cacheValue ? : defaultValue);
-            });
-            return;
+            return completionHandler(cacheValue ? : defaultValue);
         }
         case SABFetchABTestModeTypeFast: {
             id cacheValue = [self fetchCacheABTestWithParamName:paramName defaultValue:defaultValue];
@@ -267,8 +269,8 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
         case SABFetchABTestModeTypeAsync: {
             // 异步请求
             [self fetchAsyncABTestWithParamName:paramName defaultValue:defaultValue timeoutInterval:timeoutInterval completionHandler:completionHandler];
+            break;
         }
-        break;
         default:
             break;
     }
@@ -306,23 +308,23 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
     // 异步请求
     SABExperimentRequest *requestData = [[SABExperimentRequest alloc] initWithBaseURL:self.configOptions.baseURL projectKey:self.configOptions.projectKey];
     requestData.timeoutInterval = timeoutInterval;
-
+    
     __weak typeof(self) weakSelf = self;
     [self.dataManager asyncFetchAllExperimentWithRequest:requestData completionHandler:^(SABFetchResultResponse *_Nullable responseData, NSError *_Nullable error) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
-
+        
         if (error || !responseData) {
             SABLogError(@"asyncFetchAllExperimentWithRequest failure，error: %@", error);
-            // 切到主线程回调结果
+            // 请求失败，主线程回调结果
             dispatch_async(dispatch_get_main_queue(), ^{
                 completionHandler(defaultValue);
             });
             return;
         }
-
+        
         // 获取缓存并触发 $ABTestTrigger 事件
         id cacheValue = [strongSelf fetchCacheABTestWithParamName:paramName defaultValue:defaultValue];
-
+        
         // 切到主线程回调结果
         dispatch_async(dispatch_get_main_queue(), ^{
             completionHandler(cacheValue ? : defaultValue);
