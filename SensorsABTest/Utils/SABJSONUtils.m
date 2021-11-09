@@ -75,4 +75,14 @@
     }
     return data;
 }
+
++ (NSString *)stringWithJSONObject:(id)obj {
+    NSData *jsonData = [self JSONSerializeObject:obj];
+    if (![jsonData isKindOfClass:NSData.class]) {
+        SABLogError(@"json data is invalid");
+        return nil;
+    }
+    return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+}
+
 @end

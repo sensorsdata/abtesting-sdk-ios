@@ -33,6 +33,7 @@
 #import "SensorsABTestConfigOptions+Private.h"
 #import "SABRequest.h"
 #import "SABSwizzler.h"
+#import "SensorsABTestExperiment+Private.h"
 
 static SensorsABTest *sharedABTest = nil;
 
@@ -89,29 +90,47 @@ static SensorsABTest *sharedABTest = nil;
     return self;
 }
 
-#pragma mark - fetch ABTest API
+#pragma mark - Cache Method
 - (nullable id)fetchCacheABTestWithParamName:(NSString *)paramName defaultValue:(id)defaultValue {
     __block id resultValue = defaultValue;
-    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeCache paramName:paramName defaultValue:defaultValue timeoutInterval:kSABFetchABTestResultDefaultTimeoutInterval completionHandler:^(id  _Nullable result) {
+    SensorsABTestExperiment *experiment = [SensorsABTestExperiment experimentWithParamName:paramName defaultValue:defaultValue];
+    experiment.modeType = SABFetchABTestModeTypeCache;
+    [self.manager fetchABTestWithExperiment:experiment completionHandler:^(id  _Nullable result) {
         resultValue = result;
     }];
     return resultValue;
 }
 
+#pragma mark - Async Methods
 - (void)asyncFetchABTestWithParamName:(NSString *)paramName defaultValue:(id)defaultValue completionHandler:(void (^)(id _Nullable result))completionHandler {
-    [self asyncFetchABTestWithParamName:paramName defaultValue:defaultValue timeoutInterval:kSABFetchABTestResultDefaultTimeoutInterval completionHandler:completionHandler];
+    [self asyncFetchABTestWithExperiment:[SensorsABTestExperiment experimentWithParamName:paramName defaultValue:defaultValue] completionHandler:completionHandler];
 }
 
 - (void)asyncFetchABTestWithParamName:(NSString *)paramName defaultValue:(id)defaultValue timeoutInterval:(NSTimeInterval)timeoutInterval completionHandler:(void (^)(id _Nullable result))completionHandler {
-    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeAsync paramName:paramName defaultValue:defaultValue timeoutInterval:timeoutInterval completionHandler:completionHandler];
+    SensorsABTestExperiment *experiment = [SensorsABTestExperiment experimentWithParamName:paramName defaultValue:defaultValue];
+    experiment.timeoutInterval = timeoutInterval;
+    [self asyncFetchABTestWithExperiment:experiment completionHandler:completionHandler];
 }
 
+- (void)asyncFetchABTestWithExperiment:(SensorsABTestExperiment *)experiment completionHandler:(void (^)(id _Nullable result))completionHandler {
+    experiment.modeType = SABFetchABTestModeTypeAsync;
+    [self.manager fetchABTestWithExperiment:experiment completionHandler:completionHandler];
+}
+
+#pragma mark - Fast Methods
 - (void)fastFetchABTestWithParamName:(NSString *)paramName defaultValue:(id)defaultValue completionHandler:(void (^)(id _Nullable result))completionHandler {
-    [self fastFetchABTestWithParamName:paramName defaultValue:defaultValue timeoutInterval:kSABFetchABTestResultDefaultTimeoutInterval completionHandler:completionHandler];
+    [self fastFetchABTestWithExperiment:[SensorsABTestExperiment experimentWithParamName:paramName defaultValue:defaultValue] completionHandler:completionHandler];
 }
 
 - (void)fastFetchABTestWithParamName:(NSString *)paramName defaultValue:(id)defaultValue timeoutInterval:(NSTimeInterval)timeoutInterval completionHandler:(void (^)(id _Nullable result))completionHandler {
-    [self.manager fetchABTestWithModeType:SABFetchABTestModeTypeFast paramName:paramName defaultValue:defaultValue timeoutInterval:timeoutInterval completionHandler:completionHandler];
+    SensorsABTestExperiment *experiment = [SensorsABTestExperiment experimentWithParamName:paramName defaultValue:defaultValue];
+    experiment.timeoutInterval = timeoutInterval;
+    [self fastFetchABTestWithExperiment:experiment completionHandler:completionHandler];
+}
+
+- (void)fastFetchABTestWithExperiment:(SensorsABTestExperiment *)experiment completionHandler:(void (^)(id _Nullable result))completionHandler {
+    experiment.modeType = SABFetchABTestModeTypeFast;
+    [self.manager fetchABTestWithExperiment:experiment completionHandler:completionHandler];
 }
 
 #pragma mark action

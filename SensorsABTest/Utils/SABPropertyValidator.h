@@ -1,9 +1,9 @@
 //
-//  SABJSONUtils.h
+//  SABPropertyValidator.h
 //  SensorsABTest
 //
-//  Created by 储强盛 on 2020/10/15.
-//  Copyright © 2020 Sensors Data Inc. All rights reserved.
+//  Created by 彭远洋 on 2021/10/21.
+//  Copyright © 2021 Sensors Data Inc. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -22,20 +22,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@interface SABPropertyValidator : NSObject
 
-@interface SABJSONUtils : NSObject
-
-/// json 数据解析
-+ (nullable id)JSONObjectWithData:(NSData *)data;
-
-/// JsonString 数据解析
-+ (nullable id)JSONObjectWithString:(NSString *)string;
-
-/// json 序列化
-+ (nullable NSData *)JSONSerializeObject:(id)obj;
-
-/// json string 序列化
-+ (NSString *)stringWithJSONObject:(id)obj;
++ (NSDictionary *)validateProperties:(NSDictionary *)properties error:(NSError **)error;
 
 @end
 

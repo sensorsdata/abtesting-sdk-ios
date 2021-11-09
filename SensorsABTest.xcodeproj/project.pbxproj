@@ -49,6 +49,11 @@
 		4D9E708A2539793900DE11D6 /* 数据格式说明.md in Resources */ = {isa = PBXBuildFile; fileRef = 4D9E70892539793900DE11D6 /* 数据格式说明.md */; };
 		4DE5FBCA258C4B3B00F0E18A /* ABTestTests_result.json in Resources */ = {isa = PBXBuildFile; fileRef = 4DE5FBC9258C4B3B00F0E18A /* ABTestTests_result.json */; };
 		4DE5FBD2258C508B00F0E18A /* SABFetchResultResponseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE5FBD1258C508B00F0E18A /* SABFetchResultResponseTests.m */; };
+		FC2BE2B4272939BD0043C1FA /* SABPropertyValidator.m in Sources */ = {isa = PBXBuildFile; fileRef = FC2BE2B2272939BD0043C1FA /* SABPropertyValidator.m */; };
+		FC2BE2B5272939BD0043C1FA /* SABPropertyValidator.h in Headers */ = {isa = PBXBuildFile; fileRef = FC2BE2B3272939BD0043C1FA /* SABPropertyValidator.h */; };
+		FC2BE2B827293A850043C1FA /* SensorsABTestExperiment.m in Sources */ = {isa = PBXBuildFile; fileRef = FC2BE2B627293A850043C1FA /* SensorsABTestExperiment.m */; };
+		FC2BE2B927293A850043C1FA /* SensorsABTestExperiment.h in Headers */ = {isa = PBXBuildFile; fileRef = FC2BE2B727293A850043C1FA /* SensorsABTestExperiment.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FCC0D0AD2730EA8600BA37E2 /* SensorsABTestExperiment+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = FCC0D0AC2730EA8600BA37E2 /* SensorsABTestExperiment+Private.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -106,6 +111,11 @@
 		4D9E70892539793900DE11D6 /* 数据格式说明.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "数据格式说明.md"; sourceTree = "<group>"; };
 		4DE5FBC9258C4B3B00F0E18A /* ABTestTests_result.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = ABTestTests_result.json; sourceTree = "<group>"; };
 		4DE5FBD1258C508B00F0E18A /* SABFetchResultResponseTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SABFetchResultResponseTests.m; sourceTree = "<group>"; };
+		FC2BE2B2272939BD0043C1FA /* SABPropertyValidator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SABPropertyValidator.m; sourceTree = "<group>"; };
+		FC2BE2B3272939BD0043C1FA /* SABPropertyValidator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SABPropertyValidator.h; sourceTree = "<group>"; };
+		FC2BE2B627293A850043C1FA /* SensorsABTestExperiment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SensorsABTestExperiment.m; sourceTree = "<group>"; };
+		FC2BE2B727293A850043C1FA /* SensorsABTestExperiment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SensorsABTestExperiment.h; sourceTree = "<group>"; };
+		FCC0D0AC2730EA8600BA37E2 /* SensorsABTestExperiment+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SensorsABTestExperiment+Private.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -150,6 +160,9 @@
 			children = (
 				4D73D5FC254BC6100020E711 /* SensorsABTest.h */,
 				4D73D607254BC6110020E711 /* SensorsABTest.m */,
+				FC2BE2B727293A850043C1FA /* SensorsABTestExperiment.h */,
+				FC2BE2B627293A850043C1FA /* SensorsABTestExperiment.m */,
+				FCC0D0AC2730EA8600BA37E2 /* SensorsABTestExperiment+Private.h */,
 				4D73D60E254BC6110020E711 /* SensorsABTestConfigOptions.h */,
 				4D73D611254BC6110020E711 /* SensorsABTestConfigOptions.m */,
 				4D73D612254BC6110020E711 /* SensorsABTestConfigOptions+Private.h */,
@@ -229,6 +242,8 @@
 				4D73D61B254BC6110020E711 /* SABJSONUtils.m */,
 				4D73D615254BC6110020E711 /* NSString+SABHelper.h */,
 				4D73D61A254BC6110020E711 /* NSString+SABHelper.m */,
+				FC2BE2B3272939BD0043C1FA /* SABPropertyValidator.h */,
+				FC2BE2B2272939BD0043C1FA /* SABPropertyValidator.m */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -249,12 +264,15 @@
 				4D73D635254BC6110020E711 /* SABURLUtils.h in Headers */,
 				4D04037E2657C7820006D84D /* SABSwizzler.h in Headers */,
 				4D73D61D254BC6110020E711 /* SABNetwork.h in Headers */,
+				FC2BE2B5272939BD0043C1FA /* SABPropertyValidator.h in Headers */,
 				4D73D62E254BC6110020E711 /* SensorsABTestConfigOptions.h in Headers */,
 				4D73D62F254BC6110020E711 /* SABConstants.h in Headers */,
+				FC2BE2B927293A850043C1FA /* SensorsABTestExperiment.h in Headers */,
 				4D73D61E254BC6110020E711 /* SensorsABTest.h in Headers */,
 				4D73D62C254BC6110020E711 /* SABBridge.h in Headers */,
 				4D73D623254BC6110020E711 /* SABExperimentDataManager.h in Headers */,
 				4D73D637254BC6110020E711 /* SABValidUtils.h in Headers */,
+				FCC0D0AD2730EA8600BA37E2 /* SensorsABTestExperiment+Private.h in Headers */,
 				4D73D625254BC6110020E711 /* SABFileStore.h in Headers */,
 				4D73D621254BC6110020E711 /* SABManager.h in Headers */,
 				4D73D636254BC6110020E711 /* SABJSONUtils.h in Headers */,
@@ -368,10 +386,12 @@
 				4D73D62B254BC6110020E711 /* SABBridge.m in Sources */,
 				4D73D626254BC6110020E711 /* SABFetchResultResponse.m in Sources */,
 				4D73D631254BC6110020E711 /* SensorsABTestConfigOptions.m in Sources */,
+				FC2BE2B4272939BD0043C1FA /* SABPropertyValidator.m in Sources */,
 				4D73D633254BC6110020E711 /* SABValidUtils.m in Sources */,
 				4D73D638254BC6110020E711 /* SABURLUtils.m in Sources */,
 				4D73D630254BC6110020E711 /* SABManager.m in Sources */,
 				4D73D63A254BC6110020E711 /* SABJSONUtils.m in Sources */,
+				FC2BE2B827293A850043C1FA /* SensorsABTestExperiment.m in Sources */,
 				4D73D628254BC6110020E711 /* SensorsABTest.m in Sources */,
 				4D73D620254BC6110020E711 /* SABRequest.m in Sources */,
 				4D73D627254BC6110020E711 /* SABExperimentDataManager.m in Sources */,

@@ -34,6 +34,8 @@
 #import "SensorsABTestConfigOptions+Private.h"
 #import "SABRequest.h"
 #import "SABJSONUtils.h"
+#import "SABPropertyValidator.h"
+#import "SensorsABTestExperiment+Private.h"
 
 /// 调用 js 方法名
 static NSString * const kSABAppCallJSMethodName = @"window.sensorsdata_app_call_js";
@@ -119,15 +121,13 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
     NSDictionary *userInfo = sender.userInfo;
     SABAppLifecycleState newState = [userInfo[@"new"] integerValue];
     switch (newState) {
-        case SABAppLifecycleStateStart:{
+        case SABAppLifecycleStateStart:
             // 开启定时更新计时
             [self startReloadTimer];
-        }
             break;
-        case SABAppLifecycleStateEnd:{
+        case SABAppLifecycleStateEnd:
             // 关闭定时更新计时
             [self stopReloadTimer];
-        }
             break;
     }
 }
@@ -231,13 +231,17 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
 }
 
 #pragma mark - fetch ABTest Action
-- (void)fetchABTestWithModeType:(SABFetchABTestModeType)type paramName:(NSString *)paramName defaultValue:(id)defaultValue timeoutInterval:(NSTimeInterval)timeoutInterval completionHandler:(void (^)(id _Nullable result))completionHandler {
+- (void)fetchABTestWithExperiment:(SensorsABTestExperiment *)experiment completionHandler:(void (^)(id _Nullable result))completionHandler {
     if (!completionHandler) {
         SABLogWarn(@"Please use a valid completionHandler");
         return;
     }
+
+    NSString *paramName = experiment.paramName;
+    id defaultValue = experiment.defaultValue;
+
     if (![SABValidUtils isValidString:paramName]) {
-        if (type == SABFetchABTestModeTypeCache) {
+        if (experiment.modeType == SABFetchABTestModeTypeCache) {
             completionHandler(defaultValue);
         } else {
             // fast 和 async 异步接口，统一主线程回调结果
@@ -249,7 +253,7 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
         return;
     }
     
-    switch (type) {
+    switch (experiment.modeType) {
         case SABFetchABTestModeTypeCache: {
             // 从缓存读取
             id cacheValue = [self fetchCacheABTestWithParamName:paramName defaultValue:defaultValue];
@@ -263,16 +267,11 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
                 });
                 return;
             }
-            [self fetchAsyncABTestWithParamName:paramName defaultValue:defaultValue timeoutInterval:timeoutInterval completionHandler:completionHandler];
-            break;
+            return [self fetchAsyncABTestWithExperiment:experiment completionHandler:completionHandler];
         }
         case SABFetchABTestModeTypeAsync: {
-            // 异步请求
-            [self fetchAsyncABTestWithParamName:paramName defaultValue:defaultValue timeoutInterval:timeoutInterval completionHandler:completionHandler];
-            break;
+            return [self fetchAsyncABTestWithExperiment:experiment completionHandler:completionHandler];
         }
-        default:
-            break;
     }
 }
 
@@ -304,15 +303,33 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
 }
 
 /// 异步请求获取试验
-- (void)fetchAsyncABTestWithParamName:(NSString *)paramName defaultValue:(id)defaultValue timeoutInterval:(NSTimeInterval)timeoutInterval completionHandler:(void (^)(id _Nullable result))completionHandler {
+- (void)fetchAsyncABTestWithExperiment:(SensorsABTestExperiment *)experiment completionHandler:(void (^)(id _Nullable result))completionHandler {
+
+    NSString *paramName = experiment.paramName;
+    id defaultValue = experiment.defaultValue;
+
+    NSError *error;
+    // 验证自定义属性合法性，并统一修改自定义属性值为 String 类型
+    NSDictionary *properties = [SABPropertyValidator validateProperties:experiment.properties error:&error];
+    if (error) {
+        SABLogError(@"%@", error.localizedDescription);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completionHandler(defaultValue);
+        });
+        return;
+    }
+
     // 异步请求
     SABExperimentRequest *requestData = [[SABExperimentRequest alloc] initWithBaseURL:self.configOptions.baseURL projectKey:self.configOptions.projectKey];
-    requestData.timeoutInterval = timeoutInterval;
-    
+    requestData.timeoutInterval = experiment.timeoutInterval;
+    if (properties.count > 0 && paramName) {
+        [requestData appendRequestBody:@{@"custom_properties": properties, @"param_name": paramName}];
+    }
+
     __weak typeof(self) weakSelf = self;
     [self.dataManager asyncFetchAllExperimentWithRequest:requestData completionHandler:^(SABFetchResultResponse *_Nullable responseData, NSError *_Nullable error) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
-        
+
         if (error || !responseData) {
             SABLogError(@"asyncFetchAllExperimentWithRequest failure，error: %@", error);
             // 请求失败，主线程回调结果
@@ -321,10 +338,10 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
             });
             return;
         }
-        
+
         // 获取缓存并触发 $ABTestTrigger 事件
         id cacheValue = [strongSelf fetchCacheABTestWithParamName:paramName defaultValue:defaultValue];
-        
+
         // 切到主线程回调结果
         dispatch_async(dispatch_get_main_queue(), ^{
             completionHandler(cacheValue ? : defaultValue);

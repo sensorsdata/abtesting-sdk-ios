@@ -20,6 +20,7 @@
 
 #import <Foundation/Foundation.h>
 #import "SensorsABTestConfigOptions.h"
+#import "SensorsABTestExperiment.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -51,6 +52,11 @@ NS_ASSUME_NONNULL_BEGIN
 /// @param completionHandler 主线程回调，返回试验结果
 - (void)asyncFetchABTestWithParamName:(NSString *)paramName defaultValue:(id)defaultValue timeoutInterval:(NSTimeInterval)timeoutInterval completionHandler:(void (^)(id _Nullable result))completionHandler;
 
+/// 异步从服务端获取最新试验结果
+/// @param experiment 获取试验参数
+/// @param completionHandler 主线程回调，返回试验结果
+- (void)asyncFetchABTestWithExperiment:(SensorsABTestExperiment *)experiment completionHandler:(void (^)(id _Nullable result))completionHandler;
+
 /// 优先从缓存获取试验结果，如果无缓存试验，则异步从网络请求
 /// @param paramName 试验参数名
 /// @param defaultValue 默认值
@@ -63,6 +69,11 @@ NS_ASSUME_NONNULL_BEGIN
 /// @param timeoutInterval 超时时间，单位为秒
 /// @param completionHandler 主线程回调，返回试验结果
 - (void)fastFetchABTestWithParamName:(NSString *)paramName defaultValue:(id)defaultValue timeoutInterval:(NSTimeInterval)timeoutInterval completionHandler:(void (^)(id _Nullable result))completionHandler;
+
+/// 优先从缓存获取试验结果，如果无缓存试验，则异步从网络请求
+/// @param experiment 获取试验参数
+/// @param completionHandler 主线程回调，返回试验结果
+- (void)fastFetchABTestWithExperiment:(SensorsABTestExperiment *)experiment completionHandler:(void (^)(id _Nullable result))completionHandler;
 
 /// 处理 url scheme 跳转打开 App
 /// @param url URL 参数
