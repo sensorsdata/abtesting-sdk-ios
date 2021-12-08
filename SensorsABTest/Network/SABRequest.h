@@ -44,6 +44,18 @@ NS_ASSUME_NONNULL_BEGIN
 /// 增加请求参数
 /// @param body 需要增加的参数 body
 - (void)appendRequestBody:(NSDictionary *)body;
+
+/**
+ * @abstract
+ * 比较两个请求是否相同
+ *
+ * @discussion
+ * 当前比较内容只包含 body 中的 login_id/anonymous_id/param_name/custom_properties 和 timeoutInterval
+ *
+ * @param request 进行比较的实例对象
+*/
+- (BOOL)isEqualToRequest:(SABExperimentRequest *)request;
+
 @end
 
 @interface SABWhiteListRequest : NSObject <SABRequestProtocol>

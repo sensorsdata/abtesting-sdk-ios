@@ -28,6 +28,7 @@
 #import "SABJSONUtils.h"
 #import "SABConstants.h"
 #import "SABValidUtils.h"
+#import "NSString+SABHelper.h"
 
 /// timeoutInterval 最小值保护
 static NSTimeInterval kFetchABTestResultMinTimeoutInterval = 1;
@@ -93,6 +94,20 @@ static NSTimeInterval kFetchABTestResultMinTimeoutInterval = 1;
         return;
     }
     [self.body addEntriesFromDictionary:body];
+}
+
+- (NSDictionary *)compareParams {
+    NSMutableDictionary *params = [NSMutableDictionary dictionary];
+    params[@"login_id"] = self.body[@"login_id"];
+    params[@"anonymous_id"] = self.body[@"anonymous_id"];
+    params[@"timeout_interval"] = @(self.timeoutInterval);
+    params[@"param_name"] = self.body[@"param_name"];
+    params[@"custom_properties"] = self.body[@"custom_properties"];
+    return params;
+}
+
+- (BOOL)isEqualToRequest:(SABExperimentRequest *)request {
+    return [[request compareParams] isEqualToDictionary:[self compareParams]];
 }
 
 - (void)setTimeoutInterval:(NSTimeInterval)timeoutInterval {

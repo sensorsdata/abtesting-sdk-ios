@@ -29,6 +29,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// 数据存储和解析
 @interface SABExperimentDataManager : NSObject
 
+/// 请求白名单，只在发送请求成功后更新
+@property (atomic, strong, readonly) NSArray <NSString *> *fuzzyExperiments;
+
 /// 获取缓存试验结果
 - (nullable SABExperimentResult *)cachedExperimentResultWithParamName:(NSString *)paramName;
 

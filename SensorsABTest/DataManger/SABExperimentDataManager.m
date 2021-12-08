@@ -33,6 +33,7 @@
 
 /// 试验结果
 @property (atomic, strong) SABFetchResultResponse *resultResponse;
+@property (atomic, strong, readwrite) NSArray <NSString *> *fuzzyExperiments;
 @property (nonatomic, strong) dispatch_queue_t serialQueue;
 @end
 
@@ -75,6 +76,10 @@
             responseData.userIdenty = requestData.userIdenty;
 
             self.resultResponse = responseData;
+
+            // 只有在请求成功后才可以更新白名单
+            self.fuzzyExperiments = responseData.responseObject[@"fuzzy_experiments"];
+
             // 存储到本地
             [self archiveExperimentResult:responseData];
         } else {
@@ -132,6 +137,9 @@
 
 - (void)clearExperiment {
     self.resultResponse = nil;
+
+    // 清除试验时也需要清除当前白名单
+    self.fuzzyExperiments = nil;
 
     // 删除本地缓存
     [SABFileStore deleteFileWithFileName:kSABExperimentResultFileName];

@@ -38,9 +38,12 @@ typedef NS_ENUM(NSInteger, SABFetchABTestModeType) {
     SABFetchABTestModeTypeFast
 };
 
+typedef void (^SABCompletionHandler)(id _Nullable result);
+
 @interface SensorsABTestExperiment (Private)
 
-@property (assign, nonatomic) SABFetchABTestModeType modeType;
+@property (nonatomic, assign) SABFetchABTestModeType modeType;
+@property (nonatomic, copy) SABCompletionHandler handler;
 
 @end
 

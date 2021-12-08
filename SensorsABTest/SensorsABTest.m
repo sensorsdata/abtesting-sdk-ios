@@ -95,9 +95,10 @@ static SensorsABTest *sharedABTest = nil;
     __block id resultValue = defaultValue;
     SensorsABTestExperiment *experiment = [SensorsABTestExperiment experimentWithParamName:paramName defaultValue:defaultValue];
     experiment.modeType = SABFetchABTestModeTypeCache;
-    [self.manager fetchABTestWithExperiment:experiment completionHandler:^(id  _Nullable result) {
+    experiment.handler = ^(id  _Nullable result) {
         resultValue = result;
-    }];
+    };
+    [self.manager fetchABTestWithExperiment:experiment];
     return resultValue;
 }
 
@@ -114,7 +115,8 @@ static SensorsABTest *sharedABTest = nil;
 
 - (void)asyncFetchABTestWithExperiment:(SensorsABTestExperiment *)experiment completionHandler:(void (^)(id _Nullable result))completionHandler {
     experiment.modeType = SABFetchABTestModeTypeAsync;
-    [self.manager fetchABTestWithExperiment:experiment completionHandler:completionHandler];
+    experiment.handler = completionHandler;
+    [self.manager fetchABTestWithExperiment:experiment];
 }
 
 #pragma mark - Fast Methods
@@ -130,7 +132,8 @@ static SensorsABTest *sharedABTest = nil;
 
 - (void)fastFetchABTestWithExperiment:(SensorsABTestExperiment *)experiment completionHandler:(void (^)(id _Nullable result))completionHandler {
     experiment.modeType = SABFetchABTestModeTypeFast;
-    [self.manager fetchABTestWithExperiment:experiment completionHandler:completionHandler];
+    experiment.handler = completionHandler;
+    [self.manager fetchABTestWithExperiment:experiment];
 }
 
 #pragma mark action

@@ -36,8 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// 获取试验结果
 /// @param experiment 试验实例对象
-/// @param completionHandler 回调返回试验结果
-- (void)fetchABTestWithExperiment:(SensorsABTestExperiment *)experiment completionHandler:(void (^)(id _Nullable result))completionHandler;
+- (void)fetchABTestWithExperiment:(SensorsABTestExperiment *)experiment;
 
 @end
 

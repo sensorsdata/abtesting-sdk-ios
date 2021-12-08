@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (SensorsABTestExperiment *)experimentWithParamName:(NSString *)paramName defaultValue:(id)defaultValue;
 
 /// 试验参数名
-@property (strong, nonatomic, readonly) NSString *paramName;
+@property (copy, nonatomic, readonly) NSString *paramName;
 
 /// 默认值
 @property (strong, nonatomic, readonly) id defaultValue;

@@ -29,13 +29,16 @@
 @interface SensorsABTestExperiment ()
 
 /// 试验参数
-@property (strong, nonatomic, readwrite) NSString *paramName;
+@property (nonatomic, copy, readwrite) NSString *paramName;
 
 /// 默认值
-@property (strong, nonatomic, readwrite) id defaultValue;
+@property (nonatomic, strong, readwrite) id defaultValue;
 
 /// 获取类型
-@property (assign, nonatomic) SABFetchABTestModeType modeType;
+@property (nonatomic, assign) SABFetchABTestModeType modeType;
+
+/// 回调函数
+@property (nonatomic, copy) SABCompletionHandler handler;
 
 @end
 

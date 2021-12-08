@@ -36,6 +36,7 @@
 #import "SABJSONUtils.h"
 #import "SABPropertyValidator.h"
 #import "SensorsABTestExperiment+Private.h"
+#import "SABRequestManager.h"
 
 /// 调用 js 方法名
 static NSString * const kSABAppCallJSMethodName = @"window.sensorsdata_app_call_js";
@@ -75,6 +76,9 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
 @property (nonatomic, strong) NSDate *pauseStartTime;
 // 上次执行时间
 @property (nonatomic, strong) NSDate *previousFireTime;
+
+@property (nonatomic, strong) SABRequestManager *requestManager;
+
 @end
 
 @implementation SABManager
@@ -88,6 +92,8 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
         
         // 数据存储和解析
         _dataManager = [[SABExperimentDataManager alloc] init];
+
+        _requestManager = [[SABRequestManager alloc] init];
         
         // 注册监听
         [self setupListeners];
@@ -198,6 +204,7 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
         callJSDataDic[@"message_id"] = dataDic[@"message_id"];
         if (responseData.responseObject) {
             callJSDataDic[@"data"] = responseData.responseObject;
+
         }
         NSData *callJSData = [SABJSONUtils JSONSerializeObject:callJSDataDic];
 
@@ -231,67 +238,72 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
 }
 
 #pragma mark - fetch ABTest Action
-- (void)fetchABTestWithExperiment:(SensorsABTestExperiment *)experiment completionHandler:(void (^)(id _Nullable result))completionHandler {
-    if (!completionHandler) {
+- (void)fetchABTestWithExperiment:(SensorsABTestExperiment *)experiment {
+    if (!experiment.handler) {
         SABLogWarn(@"Please use a valid completionHandler");
         return;
     }
 
-    NSString *paramName = experiment.paramName;
-    id defaultValue = experiment.defaultValue;
-
-    if (![SABValidUtils isValidString:paramName]) {
+    if (![SABValidUtils isValidString:experiment.paramName]) {
         if (experiment.modeType == SABFetchABTestModeTypeCache) {
-            completionHandler(defaultValue);
+            experiment.handler(experiment.defaultValue);
         } else {
             // fast 和 async 异步接口，统一主线程回调结果
             dispatch_async(dispatch_get_main_queue(), ^{
-                completionHandler(defaultValue);
+                experiment.handler(experiment.defaultValue);
             });
         }
-        SABLogError(@"paramName: %@ error，paramName must be a valid string!", paramName);
+        SABLogError(@"paramName: %@ error，paramName must be a valid string!", experiment.paramName);
         return;
     }
     
     switch (experiment.modeType) {
         case SABFetchABTestModeTypeCache: {
             // 从缓存读取
-            id cacheValue = [self fetchCacheABTestWithParamName:paramName defaultValue:defaultValue];
-            return completionHandler(cacheValue ? : defaultValue);
+            id cacheValue = [self fetchCacheABTestWithExperiment:experiment];
+            return experiment.handler(cacheValue ? : experiment.defaultValue);
         }
         case SABFetchABTestModeTypeFast: {
-            id cacheValue = [self fetchCacheABTestWithParamName:paramName defaultValue:defaultValue];
+            id cacheValue = [self fetchCacheABTestWithExperiment:experiment];
             if (cacheValue) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    completionHandler(cacheValue);
+                    experiment.handler(cacheValue);
                 });
                 return;
             }
-            return [self fetchAsyncABTestWithExperiment:experiment completionHandler:completionHandler];
+
+            NSArray<NSString *> *fuzzyExperiments = self.dataManager.fuzzyExperiments;
+            if (fuzzyExperiments && ![fuzzyExperiments containsObject:experiment.paramName]) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    experiment.handler(experiment.defaultValue);
+                });
+                return;
+            }
+            return [self fetchAsyncABTestWithExperiment:experiment];
         }
         case SABFetchABTestModeTypeAsync: {
-            return [self fetchAsyncABTestWithExperiment:experiment completionHandler:completionHandler];
+            return [self fetchAsyncABTestWithExperiment:experiment];
         }
     }
 }
 
 /// 获取缓存试验
-- (nullable id)fetchCacheABTestWithParamName:(NSString *)paramName defaultValue:(id)defaultValue {
-    if (![SABValidUtils isValidString:paramName]) {
-        SABLogError(@"paramName:：%@ error，paramName must be a valid string!", paramName);
+- (nullable id)fetchCacheABTestWithExperiment:(SensorsABTestExperiment *)experiment {
+    if (![SABValidUtils isValidString:experiment.paramName]) {
+        SABLogError(@"paramName: %@ error，paramName must be a valid string!", experiment.paramName);
         return nil;
     }
-    SABExperimentResult *resultData = [self.dataManager cachedExperimentResultWithParamName:paramName];
+    SABExperimentResult *resultData = [self.dataManager cachedExperimentResultWithParamName:experiment.paramName];
 
     if (!resultData) {
-        SABLogWarn(@"The cache experiment result is empty, paramName: %@", paramName);
+        SABLogWarn(@"The cache experiment result is empty, paramName: %@", experiment.paramName);
         return nil;
     }
     // 判断和默认值类型是否一致
-    if (![resultData isSameTypeWithDefaultValue:defaultValue]) {
+    if (![resultData isSameTypeWithDefaultValue:experiment.defaultValue]) {
         NSString *resulTypeString = [SABExperimentResult descriptionWithExperimentResultType:resultData.variable.type];
-        NSString *defaultValueTypeString = [SABExperimentResult descriptionWithExperimentResultType:[SABExperimentResult experimentResultTypeWithValue:defaultValue]];
-        SABLogWarn(@"The experiment result type is inconsistent with the defaultValue type of the interface setting, paramName: %@, experiment result type: %@, defaultValue type: %@", paramName, resulTypeString, defaultValueTypeString);
+        NSString *defaultValueTypeString = [SABExperimentResult descriptionWithExperimentResultType:[SABExperimentResult experimentResultTypeWithValue:experiment.defaultValue]];
+        SABLogWarn(@"The experiment result type is inconsistent with the defaultValue type of the interface setting, paramName: %@, experiment result type: %@, defaultValue type: %@", experiment.paramName, resulTypeString, defaultValueTypeString);
         return nil;
     }
 
@@ -303,18 +315,14 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
 }
 
 /// 异步请求获取试验
-- (void)fetchAsyncABTestWithExperiment:(SensorsABTestExperiment *)experiment completionHandler:(void (^)(id _Nullable result))completionHandler {
-
-    NSString *paramName = experiment.paramName;
-    id defaultValue = experiment.defaultValue;
-
+- (void)fetchAsyncABTestWithExperiment:(SensorsABTestExperiment *)experiment {
     NSError *error;
     // 验证自定义属性合法性，并统一修改自定义属性值为 String 类型
     NSDictionary *properties = [SABPropertyValidator validateProperties:experiment.properties error:&error];
     if (error) {
         SABLogError(@"%@", error.localizedDescription);
         dispatch_async(dispatch_get_main_queue(), ^{
-            completionHandler(defaultValue);
+            experiment.handler(experiment.defaultValue);
         });
         return;
     }
@@ -322,9 +330,17 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
     // 异步请求
     SABExperimentRequest *requestData = [[SABExperimentRequest alloc] initWithBaseURL:self.configOptions.baseURL projectKey:self.configOptions.projectKey];
     requestData.timeoutInterval = experiment.timeoutInterval;
-    if (properties.count > 0 && paramName) {
-        [requestData appendRequestBody:@{@"custom_properties": properties, @"param_name": paramName}];
+    if (properties.count > 0 && experiment.paramName) {
+        [requestData appendRequestBody:@{@"custom_properties": properties, @"param_name": experiment.paramName}];
     }
+
+    // 检查当前请求是否已存在相同的请求任务，当前只针对 Fast 模式下的请求生效
+    if (experiment.modeType == SABFetchABTestModeTypeFast && [self.requestManager containsRequest:requestData]) {
+        [self.requestManager mergeExperimentWithRequest:requestData experiment:experiment];
+        return;
+    }
+
+    [self.requestManager addRequestTask:requestData experiment:experiment];
 
     __weak typeof(self) weakSelf = self;
     [self.dataManager asyncFetchAllExperimentWithRequest:requestData completionHandler:^(SABFetchResultResponse *_Nullable responseData, NSError *_Nullable error) {
@@ -334,17 +350,20 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
             SABLogError(@"asyncFetchAllExperimentWithRequest failure，error: %@", error);
             // 请求失败，主线程回调结果
             dispatch_async(dispatch_get_main_queue(), ^{
-                completionHandler(defaultValue);
+                [strongSelf.requestManager excuteExperimentsWithRequest:requestData completion:^(SensorsABTestExperiment *obj) {
+                    obj.handler(obj.defaultValue);
+                }];
             });
             return;
         }
 
-        // 获取缓存并触发 $ABTestTrigger 事件
-        id cacheValue = [strongSelf fetchCacheABTestWithParamName:paramName defaultValue:defaultValue];
-
-        // 切到主线程回调结果
+        // 通过请求管理器统一回调试验结果，切到主线程回调结果
         dispatch_async(dispatch_get_main_queue(), ^{
-            completionHandler(cacheValue ? : defaultValue);
+            [strongSelf.requestManager excuteExperimentsWithRequest:requestData completion:^(SensorsABTestExperiment *obj) {
+                // 获取缓存并触发 $ABTestTrigger 事件
+                id cacheValue = [strongSelf fetchCacheABTestWithExperiment:obj];
+                obj.handler(cacheValue ? : obj.defaultValue);
+            }];
         });
     }];
 }
@@ -366,8 +385,8 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
             return;
         }
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(kSABAsyncFetchExperimentRetryIntervalTime * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                           [self fetchAllABTestResultWithTimes:fetchIndex];
-                       });
+            [self fetchAllABTestResultWithTimes:fetchIndex];
+        });
     }];
 }
 
