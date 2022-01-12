@@ -1,8 +1,8 @@
 //
-// NSString+SABHelper.h
-// SensorsABTest
+// SABFileStorePlugin.h
+// SensorsABTesting
 //
-// Created by 储强盛 on 2020/9/18.
+// Created by 储强盛 on 2021/12/10.
 // Copyright © 2020-2022 Sensors Data Co., Ltd. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,15 +19,15 @@
 //
 
 #import <Foundation/Foundation.h>
+#if __has_include(<SensorsAnalyticsSDK/SABaseStoreManager.h>)
+#import <SensorsAnalyticsSDK/SAStorePlugin.h>
+#elif __has_include("SAStorePlugin.h")
+#import "SAStorePlugin.h"
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface NSString (SABHelper)
-
-/// 比较版本号大小
-/// @param version 版本号字符串
-/// @return 比较结果
-- (NSComparisonResult)sensorsabtest_compareVersion:(NSString *)version;
+@interface SABFileStorePlugin : NSObject <SAStorePlugin>
 
 @end
 

@@ -12,7 +12,7 @@ target 'Example-iOS' do
   #  pod 'SensorsABTesting'
 
   pod 'SensorsABTesting', :path => './'
-  pod 'SensorsAnalyticsSDK', '>= 3.1.1'
+	pod 'SensorsAnalyticsSDK', '>= 4.2.0'
 end
 
 
@@ -24,5 +24,5 @@ target 'Example-macOS' do
   #  pod 'SensorsABTesting'
 
   pod 'SensorsABTesting', :path => './'
-  pod 'SensorsAnalyticsSDK', '>= 3.1.1'
+  pod 'SensorsAnalyticsSDK', '>= 4.2.0'
 end

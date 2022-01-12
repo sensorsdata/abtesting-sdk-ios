@@ -1,8 +1,8 @@
 //
-// NSString+SABHelper.h
-// SensorsABTest
+// SABStoreManager.h
+// SensorsABTesting
 //
-// Created by 储强盛 on 2020/9/18.
+// Created by 储强盛 on 2021/12/10.
 // Copyright © 2020-2022 Sensors Data Co., Ltd. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,16 +18,17 @@
 // limitations under the License.
 //
 
-#import <Foundation/Foundation.h>
+#if __has_include(<SensorsAnalyticsSDK/SABaseStoreManager.h>)
+#import <SensorsAnalyticsSDK/SABaseStoreManager.h>
+#elif __has_include("SABaseStoreManager.h")
+#import "SABaseStoreManager.h"
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface NSString (SABHelper)
+@interface SABStoreManager : SABaseStoreManager
 
-/// 比较版本号大小
-/// @param version 版本号字符串
-/// @return 比较结果
-- (NSComparisonResult)sensorsabtest_compareVersion:(NSString *)version;
++ (instancetype)sharedInstance;
 
 @end
 

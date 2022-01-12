@@ -1,9 +1,21 @@
 //
-//  WKWebViewController.m
-//  Example
+// WKWebViewController.m
+// Example
 //
-//  Created by 储强盛 on 2020/9/27.
-//  Copyright © 2020 Sensors Data Inc. All rights reserved.
+// Created by 储强盛 on 2020/9/27.
+// Copyright © 2020-2022 Sensors Data Co., Ltd. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 //
 
 #import "WKWebViewController.h"
@@ -23,22 +35,22 @@
 
     [self.view addSubview:_webView];
 
-//    NSString *path = [[[NSBundle mainBundle] bundlePath]  stringByAppendingPathComponent:@"JSCallOC.html"];
-//    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL fileURLWithPath:path]];
+//   NSString *path = [[[NSBundle mainBundle] bundlePath]  stringByAppendingPathComponent:@"JSCallOC.html"];
+//   NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL fileURLWithPath:path]];
 
     // js 测试页面
     NSString *httpStr = @"http://jssdk.debugbox.sensorsdata.cn/js/ls/app/sa-sdk-abtest/index.html";
     // 多链接试验
-//    httpStr = @"http://jssdk.debugbox.sensorsdata.cn/js/ls/ab/index.html";
+//   httpStr = @"http://jssdk.debugbox.sensorsdata.cn/js/ls/ab/index.html";
 
     // 不做多链接试验
-//    httpStr = @"http://jssdk.debugbox.sensorsdata.cn/js/ls/ab/index.html?saSDKMultilink=true";
+//   httpStr = @"http://jssdk.debugbox.sensorsdata.cn/js/ls/ab/index.html?saSDKMultilink=true";
 
     NSURL *httpUrl = [NSURL URLWithString:httpStr];
     NSURLRequest *request = [NSURLRequest requestWithURL:httpUrl];
 
-//    NSString *path = [[[NSBundle mainBundle] bundlePath]  stringByAppendingPathComponent:@"index.html"];
-//    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL fileURLWithPath:path]];
+//   NSString *path = [[[NSBundle mainBundle] bundlePath]  stringByAppendingPathComponent:@"index.html"];
+//   NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL fileURLWithPath:path]];
 
     [self.webView loadRequest:request];
 }

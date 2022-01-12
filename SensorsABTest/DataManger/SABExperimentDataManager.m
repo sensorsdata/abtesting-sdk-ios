@@ -1,21 +1,21 @@
 //
-//  SABExperimentDataManager.m
-//  SensorsABTest
+// SABExperimentDataManager.m
+// SensorsABTest
 //
-//  Created by 储强盛 on 2020/10/11.
-//  Copyright © 2020 Sensors Data Inc. All rights reserved.
+// Created by 储强盛 on 2020/10/11.
+// Copyright © 2020-2022 Sensors Data Co., Ltd. All rights reserved.
 //
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
-//      http://www.apache.org/licenses/LICENSE-2.0
+//     http://www.apache.org/licenses/LICENSE-2.0
 //
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License.
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 //
 
 #if ! __has_feature(objc_arc)
@@ -26,8 +26,9 @@
 #import "SABNetwork.h"
 #import "SABLogBridge.h"
 #import "SABValidUtils.h"
-#import "SABFileStore.h"
 #import "SABBridge.h"
+#import "SABStoreManager.h"
+#import "SABFileStorePlugin.h"
 
 @interface SABExperimentDataManager()
 
@@ -35,6 +36,7 @@
 @property (atomic, strong) SABFetchResultResponse *resultResponse;
 @property (atomic, strong, readwrite) NSArray <NSString *> *fuzzyExperiments;
 @property (nonatomic, strong) dispatch_queue_t serialQueue;
+
 @end
 
 @implementation SABExperimentDataManager
@@ -44,6 +46,9 @@
     if (self) {
         NSString *serialQueueLabel = [NSString stringWithFormat:@"com.SensorsABTest.SABExperimentDataManager.serialQueue.%p", self];
         _serialQueue = dispatch_queue_create([serialQueueLabel UTF8String], DISPATCH_QUEUE_SERIAL);
+
+        [self resgisterStorePlugins];
+        
         // 读取本地缓存
         [self unarchiveExperimentResult];
     }
@@ -89,18 +94,17 @@
     }];
 }
 
+#pragma mark - cache
 /// 读取本地缓存试验
 - (void)unarchiveExperimentResult {
     dispatch_async(self.serialQueue, ^{
-        NSData *data = [SABFileStore unarchiveWithFileName:kSABExperimentResultFileName];
-        id result = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-
+        id result = [SABStoreManager.sharedInstance objectForKey:kSABExperimentResultFileName];
         // 解析缓存
         if (![result isKindOfClass:SABFetchResultResponse.class]) {
-            SABLogDebug(@"unarchiveExperimentResult fail %@", result);
+            SABLogDebug(@"unarchiveExperimentResult failure %@", result);
             return;
         }
-
+        
         SABFetchResultResponse *resultResponse = (SABFetchResultResponse *)result;
         NSString *distinctId = [SABBridge distinctId];
         // 校验缓存试验的 distinctId
@@ -115,11 +119,9 @@
 - (void)archiveExperimentResult:(SABFetchResultResponse *)resultResponse {
     // 存储到本地
     dispatch_async(self.serialQueue, ^{
-        NSData *data = [NSKeyedArchiver archivedDataWithRootObject:resultResponse];
-        [SABFileStore archiveWithFileName:kSABExperimentResultFileName value:data];
+        [SABStoreManager.sharedInstance setObject:resultResponse forKey:kSABExperimentResultFileName];
     });
 }
-
 
 /// 获取缓存试验结果
 /// @param paramName 试验参数名
@@ -137,12 +139,24 @@
 
 - (void)clearExperiment {
     self.resultResponse = nil;
-
     // 清除试验时也需要清除当前白名单
     self.fuzzyExperiments = nil;
+    dispatch_async(self.serialQueue, ^{
+        // 删除本地缓存
+        [SABStoreManager.sharedInstance removeObjectForKey:kSABExperimentResultFileName];
+    });
+}
 
-    // 删除本地缓存
-    [SABFileStore deleteFileWithFileName:kSABExperimentResultFileName];
+#pragma mark - StorePlugins
+- (void)resgisterStorePlugins {
+    // 文件明文存储，兼容历史本地数据
+    SABFileStorePlugin *filePlugin = [[SABFileStorePlugin alloc] init];
+    [[SABStoreManager sharedInstance] registerStorePlugin:filePlugin];
+    
+    // 注册 SA 的自定义插件
+    for (id<SAStorePlugin> plugin in SABBridge.storePlugins) {
+        [[SABStoreManager sharedInstance] registerStorePlugin:plugin];
+    }
 }
 
 @end

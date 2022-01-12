@@ -1,8 +1,8 @@
 //
-// SABValidUtils.m
-// SensorsABTest
+// SABStoreManager.m
+// SensorsABTesting
 //
-// Created by 储强盛 on 2020/9/23.
+// Created by 储强盛 on 2021/12/10.
 // Copyright © 2020-2022 Sensors Data Co., Ltd. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,16 +22,28 @@
 #error This file must be compiled with ARC. Either turn on ARC for the project or use -fobjc-arc flag on this file.
 #endif
 
-#import "SABValidUtils.h"
+#import "SABStoreManager.h"
 
-@implementation SABValidUtils
+@interface SABaseStoreManager (SABPrivate)
 
-+ (BOOL)isValidString:(NSString *)string {
-    return ([string isKindOfClass:[NSString class]] && ([string length] > 0));
+@property (nonatomic, strong, readonly) NSMutableArray<id<SAStorePlugin>> *plugins;
+
+@end
+
+@implementation SABStoreManager
+
++ (instancetype)sharedInstance {
+    static dispatch_once_t onceToken;
+    static SABStoreManager *manager = nil;
+    dispatch_once(&onceToken, ^{
+        manager = [[SABStoreManager alloc] init];
+    });
+    return manager;
 }
 
-+ (BOOL)isValidDictionary:(NSDictionary *)dictionary {
-    return ([dictionary isKindOfClass:[NSDictionary class]] && ([dictionary count] > 0));
+- (BOOL)isRegisteredCustomStorePlugin {
+    // 默认情况下 SensorsABTesting 只有 1 个文件存储插件
+    return self.plugins.count > 1;
 }
 
 @end
