@@ -61,7 +61,7 @@ static NSString* kSABTestServerURL = @"http://10.130.6.4:8106/sa?project=default
 - (void)startSensorsABTest {
     SensorsABTestConfigOptions *abtestConfigOptions = [[SensorsABTestConfigOptions alloc] initWithURL:kSABResultsTestURL];
     [SensorsABTest startWithConfigOptions:abtestConfigOptions];
-
+    
 }
 
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {

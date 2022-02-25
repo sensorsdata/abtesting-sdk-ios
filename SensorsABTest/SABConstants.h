@@ -60,6 +60,9 @@ extern NSTimeInterval const kSABFetchABTestResultDefaultTimeoutInterval;
 /// 试验缓存文件名
 extern NSString *const kSABExperimentResultFileName;
 
+/// 自定义主体 ID
+extern NSString *const kSABCustomIDsFileName;
+
 #pragma mark - NSNotificationName
 #pragma mark H5 打通相关
 /// SA 注入 H5 打通 Bridge

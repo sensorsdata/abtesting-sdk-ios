@@ -38,6 +38,10 @@ NS_ASSUME_NONNULL_BEGIN
 /// @param experiment 试验实例对象
 - (void)fetchABTestWithExperiment:(SensorsABTestExperiment *)experiment;
 
+/// 设置获取试验时的自定义主体 ID，全局有效
+/// @param customIDs 自定义主体 ID
+- (void)setCustomIDs:(NSDictionary <NSString*, NSString*> *)customIDs;
+
 @end
 
 NS_ASSUME_NONNULL_END

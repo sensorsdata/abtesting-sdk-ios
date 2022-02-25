@@ -153,6 +153,10 @@ static SensorsABTest *sharedABTest = nil;
     return YES;
 }
 
+- (void)setCustomIDs:(NSDictionary <NSString*, NSString*> *)customIDs {
+    [self.manager setCustomIDs:customIDs];
+}
+
 + (BOOL)isSupportedSAVersion {
     return [SABBridge.libVersion sensorsabtest_compareVersion:kSABMinSupportedSALibVersion] != NSOrderedAscending ;
 }

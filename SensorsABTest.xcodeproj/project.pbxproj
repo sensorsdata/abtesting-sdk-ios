@@ -260,9 +260,9 @@
 		4DFCBB0327699ED600257689 /* Store */ = {
 			isa = PBXGroup;
 			children = (
-				4DFCBB0427699ED600257689 /* SABFileStorePlugin.h */,
-				4DFCBB0527699ED600257689 /* SABStoreManager.m */,
 				4DFCBB0627699ED600257689 /* SABStoreManager.h */,
+				4DFCBB0527699ED600257689 /* SABStoreManager.m */,
+				4DFCBB0427699ED600257689 /* SABFileStorePlugin.h */,
 				4DFCBB0727699ED600257689 /* SABFileStorePlugin.m */,
 			);
 			path = Store;

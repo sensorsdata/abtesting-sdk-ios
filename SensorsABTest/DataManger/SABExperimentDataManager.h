@@ -31,6 +31,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// 请求白名单，只在发送请求成功后更新
 @property (atomic, strong, readonly) NSArray <NSString *> *fuzzyExperiments;
+/// 自定义主体 ID
+@property (atomic, strong, readonly) NSDictionary <NSString*, NSString*> *customIDs;
 
 /// 获取缓存试验结果
 - (nullable SABExperimentResult *)cachedExperimentResultWithParamName:(NSString *)paramName;
@@ -40,6 +42,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// 切换用户，清空缓存
 - (void)clearExperiment;
+
+- (void)updateCustomIDs:(NSDictionary <NSString*, NSString*>*)customIDs;
 
 @end
 

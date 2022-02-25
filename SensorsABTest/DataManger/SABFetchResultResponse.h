@@ -68,6 +68,7 @@ typedef NS_ENUM(NSInteger, SABFetchResultResponseStatus) {
 @property (nonatomic, copy) NSString *distinctId;
 @property (nonatomic, copy) NSString *loginId;
 @property (nonatomic, copy) NSString *anonymousId;
+@property (nonatomic, copy) NSDictionary *customIDs;
 
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithDistinctId:(NSString *)distinctId loginId:(NSString *)loginId anonymousId:(NSString *)anonymousId;

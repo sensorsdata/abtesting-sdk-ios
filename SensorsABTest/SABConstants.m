@@ -25,7 +25,7 @@
 #import "SABConstants.h"
 
 // 当前版本号
-NSString *const kSABLibVersion = @"0.2.0";
+NSString *const kSABLibVersion = @"0.2.1";
 
 // SA 最低支持版本
 NSString *const kSABMinSupportedSALibVersion = @"4.2.0";
@@ -63,6 +63,8 @@ NSTimeInterval const kSABFetchABTestResultDefaultTimeoutInterval = 30;
 
 #pragma mark - fileName
 NSString *const kSABExperimentResultFileName = @"SensorsABTestExperimentResultResponse";
+
+NSString *const kSABCustomIDsFileName = @"SensorsABTestCustomIDs";
 
 #pragma mark - NSNotificationName，依赖 SA
 #pragma mark H5 打通相关

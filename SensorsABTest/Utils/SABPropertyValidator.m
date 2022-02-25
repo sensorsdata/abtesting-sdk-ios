@@ -24,6 +24,7 @@
 
 #import "SABPropertyValidator.h"
 #import "SABJSONUtils.h"
+#import "SABLogBridge.h"
 
 #define SABPropertyError(errorCode, fromat, ...) \
     [NSError errorWithDomain:@"SensorsABTestErrorDomain" \
@@ -159,7 +160,7 @@ static NSRegularExpression *_regexForValidKey;
 
 @implementation SABPropertyValidator
 
-+ (NSDictionary *)validateProperties:(NSDictionary *)properties error:(NSError **)error {
++ (NSDictionary *_Nullable)validateProperties:(NSDictionary *)properties error:(NSError **)error {
     if (![properties isKindOfClass:[NSDictionary class]]) {
         return nil;
     }
@@ -187,5 +188,38 @@ static NSRegularExpression *_regexForValidKey;
     }
     return result;
 }
+
++ (NSDictionary * _Nullable)validateCustomIDs:(NSDictionary<NSString*, NSString*> * _Nullable)customIDs {
+    if (![customIDs isKindOfClass:[NSDictionary class]]) {
+        return nil;
+    }
+    NSMutableDictionary *result = [NSMutableDictionary dictionary];
+    for (id key in customIDs) {
+        if (![key isKindOfClass:NSString.class]) { // 键名类型不合法
+            SABLogError(@"customID name [ %@ ] is not valid", key);
+            continue;
+        }
+        if (![key sensorsabtest_validatePropertyKey]) { // 键名内容不合法
+            SABLogError(@"customID name [ %@ ] is not valid", key);
+            continue;
+        }
+
+        id value = customIDs[key];
+        if (![value isKindOfClass:NSString.class]) { // 键值类型不合法
+            SABLogError(@"customID values must be String. customID [ %@ ] of value [ %@ ] is not valid", key, value);
+            // 只报错提示，保留内容
+            result[key] = value;
+            continue;
+        }
+
+        NSString *newValue = (NSString *)value;
+        if (newValue.length < 1 || newValue.length > 1024) { // 键值内容不合法
+            SABLogError(@"customID [ %@ ] of value [ %@ ] is not valid ", key, value);
+        }
+        result[key] = newValue;
+    }
+    return result;
+}
+
 
 @end

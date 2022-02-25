@@ -23,6 +23,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+extern NSString *const kSABRequestBodyCustomIDs;
+extern NSString *const kSABRequestBodyCustomProperties;
+extern NSString *const kSABRequestBodyParamName;
+
 @protocol SABRequestProtocol <NSObject>
 
 @property (nonatomic, assign) NSTimeInterval timeoutInterval;
@@ -45,6 +49,10 @@ NS_ASSUME_NONNULL_BEGIN
 /// 增加请求参数
 /// @param body 需要增加的参数 body
 - (void)appendRequestBody:(NSDictionary *)body;
+
+/// 增加自定义主体 ID
+/// @param customIDs 自定义主体 ID
+- (void)appendCustomIDs:(NSDictionary *)customIDs;
 
 /**
  * @abstract

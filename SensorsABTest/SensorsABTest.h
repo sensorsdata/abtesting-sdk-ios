@@ -80,6 +80,10 @@ NS_ASSUME_NONNULL_BEGIN
 /// @return YES/NO 是否为本业务的合法 url
 - (BOOL)handleOpenURL:(NSURL *)url NS_SWIFT_NAME(handle(openURL:));
 
+/// 设置获取试验时的自定义主体 ID，全局有效
+/// @param customIDs 自定义主体 ID
+- (void)setCustomIDs:(NSDictionary <NSString*, NSString*> *)customIDs;
+
 @end
 
 NS_ASSUME_NONNULL_END

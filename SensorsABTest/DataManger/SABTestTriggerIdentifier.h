@@ -1,15 +1,15 @@
 //
-// SABPropertyValidator.h
+// SABTestTriggerIdentifier.h
 // SensorsABTest
 //
-// Created by 彭远洋 on 2021/10/21.
-// Copyright © 2020-2022 Sensors Data Co., Ltd. All rights reserved.
+// Created by  储强盛 on 2022/2/15.
+// Copyright © 2015-2022 Sensors Data Co., Ltd. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+// http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,12 +22,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SABPropertyValidator : NSObject
+/// 事件标识，用户区分是否触发过 $ABTestTrigger 事件
+@interface SABTestTriggerIdentifier : NSObject
 
-+ (NSDictionary *_Nullable)validateProperties:(NSDictionary *)properties error:(NSError **)error;
+/// 自定义主体 ID
+@property (nonatomic, copy) NSDictionary <NSString*, NSString*> *customIDs;
 
-+ (NSDictionary *_Nullable)validateCustomIDs:(NSDictionary<NSString*, NSString*> * _Nullable)customIDs;
+- (instancetype)init NS_UNAVAILABLE;
 
+/// 指定初始化方法
+- (instancetype)initWithExperimentId:(NSString *)experimentId distinctId:(NSString *)distinctId NS_DESIGNATED_INITIALIZER;
 @end
 
 NS_ASSUME_NONNULL_END

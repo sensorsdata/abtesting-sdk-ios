@@ -35,6 +35,7 @@
 /// 试验结果
 @property (atomic, strong) SABFetchResultResponse *resultResponse;
 @property (atomic, strong, readwrite) NSArray <NSString *> *fuzzyExperiments;
+@property (atomic, strong, readwrite) NSDictionary <NSString*, NSString*> *customIDs;
 @property (nonatomic, strong) dispatch_queue_t serialQueue;
 
 @end
@@ -46,13 +47,23 @@
     if (self) {
         NSString *serialQueueLabel = [NSString stringWithFormat:@"com.SensorsABTest.SABExperimentDataManager.serialQueue.%p", self];
         _serialQueue = dispatch_queue_create([serialQueueLabel UTF8String], DISPATCH_QUEUE_SERIAL);
-
         [self resgisterStorePlugins];
-        
+
+        /* 读取本地缓存前，需要先读取自定义主体 ID
+         如果读取为 nil，初始化空 Dictionary，方便后续使用 isEqualToDictionary: 判断
+         */
+        _customIDs = [[SABStoreManager sharedInstance] dictionaryForKey:kSABCustomIDsFileName] ?: [NSDictionary dictionary];
+
+
         // 读取本地缓存
         [self unarchiveExperimentResult];
     }
     return self;
+}
+
+- (void)updateCustomIDs:(NSDictionary<NSString *,NSString *> *)customIDs {
+    self.customIDs = customIDs;
+    [[SABStoreManager sharedInstance] setObject:customIDs forKey:kSABCustomIDsFileName];
 }
 
 - (void)asyncFetchAllExperimentWithRequest:(SABExperimentRequest *)requestData completionHandler:(SABFetchResultResponseCompletionHandler)completionHandler {
@@ -107,8 +118,9 @@
         
         SABFetchResultResponse *resultResponse = (SABFetchResultResponse *)result;
         NSString *distinctId = [SABBridge distinctId];
+        NSDictionary *customIDs = resultResponse.userIdenty.customIDs;
         // 校验缓存试验的 distinctId
-        if ([resultResponse.userIdenty.distinctId isEqualToString:distinctId] && resultResponse.results.count > 0) {
+        if ([resultResponse.userIdenty.distinctId isEqualToString:distinctId] && [customIDs isEqualToDictionary:self.customIDs] && resultResponse.results.count > 0) {
             self.resultResponse = resultResponse;
             SABLogInfo(@"unarchiveExperimentResult success jsonObject %@", resultResponse.responseObject);
         }

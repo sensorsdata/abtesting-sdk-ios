@@ -34,6 +34,13 @@
 /// timeoutInterval 最小值保护
 static NSTimeInterval kFetchABTestResultMinTimeoutInterval = 1;
 
+NSString *const kSABRequestBodyCustomIDs = @"custom_ids";
+NSString *const kSABRequestBodyCustomProperties = @"custom_properties";
+NSString *const kSABRequestBodyLoginID = @"login_id";
+NSString *const kSABRequestBodyAnonymousID = @"anonymous_id";
+NSString *const kSABRequestBodyTimeoutInterval = @"timeout_interval";
+NSString *const kSABRequestBodyParamName = @"param_name";
+
 @interface SABExperimentRequest()
 
 @property (nonatomic, copy) NSURL *baseURL;
@@ -64,8 +71,8 @@ static NSTimeInterval kFetchABTestResultMinTimeoutInterval = 1;
 #else
         parametersBody[@"platform"] = @"iOS";
 #endif
-        parametersBody[@"login_id"] = loginId;
-        parametersBody[@"anonymous_id"] = anonymousId;
+        parametersBody[kSABRequestBodyLoginID] = loginId;
+        parametersBody[kSABRequestBodyAnonymousID] = anonymousId;
         // abtest sdk 版本号
         parametersBody[@"abtest_lib_version"] = kSABLibVersion;
 
@@ -89,6 +96,14 @@ static NSTimeInterval kFetchABTestResultMinTimeoutInterval = 1;
     return self;
 }
 
+- (void)appendCustomIDs:(NSDictionary *)customIDs {
+    if (customIDs.count == 0) {
+        return;
+    }
+    self.userIdenty.customIDs = customIDs;
+    [self appendRequestBody:@{kSABRequestBodyCustomIDs: customIDs}];
+}
+
 - (void)appendRequestBody:(NSDictionary *)body {
     if (![SABValidUtils isValidDictionary:body]) {
         return;
@@ -98,11 +113,12 @@ static NSTimeInterval kFetchABTestResultMinTimeoutInterval = 1;
 
 - (NSDictionary *)compareParams {
     NSMutableDictionary *params = [NSMutableDictionary dictionary];
-    params[@"login_id"] = self.body[@"login_id"];
-    params[@"anonymous_id"] = self.body[@"anonymous_id"];
-    params[@"timeout_interval"] = @(self.timeoutInterval);
-    params[@"param_name"] = self.body[@"param_name"];
-    params[@"custom_properties"] = self.body[@"custom_properties"];
+    params[kSABRequestBodyLoginID] = self.body[kSABRequestBodyLoginID];
+    params[kSABRequestBodyAnonymousID] = self.body[kSABRequestBodyAnonymousID];
+    params[kSABRequestBodyTimeoutInterval] = @(self.timeoutInterval);
+    params[kSABRequestBodyParamName] = self.body[kSABRequestBodyParamName];
+    params[kSABRequestBodyCustomProperties] = self.body[kSABRequestBodyCustomProperties];
+    params[kSABRequestBodyCustomIDs] = self.body[kSABRequestBodyCustomIDs];
     return params;
 }
 
