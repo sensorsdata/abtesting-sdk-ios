@@ -49,11 +49,8 @@
         _serialQueue = dispatch_queue_create([serialQueueLabel UTF8String], DISPATCH_QUEUE_SERIAL);
         [self resgisterStorePlugins];
 
-        /* 读取本地缓存前，需要先读取自定义主体 ID
-         如果读取为 nil，初始化空 Dictionary，方便后续使用 isEqualToDictionary: 判断
-         */
-        _customIDs = [[SABStoreManager sharedInstance] dictionaryForKey:kSABCustomIDsFileName] ?: [NSDictionary dictionary];
-
+        // 读取本地缓存前，需要先读取自定义主体 ID
+        _customIDs = [[SABStoreManager sharedInstance] dictionaryForKey:kSABCustomIDsFileName];
 
         // 读取本地缓存
         [self unarchiveExperimentResult];
@@ -119,8 +116,11 @@
         SABFetchResultResponse *resultResponse = (SABFetchResultResponse *)result;
         NSString *distinctId = [SABBridge distinctId];
         NSDictionary *customIDs = resultResponse.userIdenty.customIDs;
+        // 校验 customIDs
+        BOOL isSameCustomIDs = (customIDs.count == 0 && self.customIDs.count == 0) || [customIDs isEqualToDictionary:self.customIDs];
         // 校验缓存试验的 distinctId
-        if ([resultResponse.userIdenty.distinctId isEqualToString:distinctId] && [customIDs isEqualToDictionary:self.customIDs] && resultResponse.results.count > 0) {
+        BOOL isSameDistinctId = [resultResponse.userIdenty.distinctId isEqualToString:distinctId];
+        if (isSameDistinctId && isSameCustomIDs && resultResponse.results.count > 0) {
             self.resultResponse = resultResponse;
             SABLogInfo(@"unarchiveExperimentResult success jsonObject %@", resultResponse.responseObject);
         }

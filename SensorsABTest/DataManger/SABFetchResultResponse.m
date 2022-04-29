@@ -53,6 +53,7 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
     [coder encodeObject:self.distinctId forKey:@"distinctId"];
     [coder encodeObject:self.loginId forKey:@"loginId"];
     [coder encodeObject:self.anonymousId forKey:@"anonymousId"];
+    [coder encodeObject:self.customIDs forKey:@"customIDs"];
 }
 
 - (nullable instancetype)initWithCoder:(nonnull NSCoder *)coder {
@@ -60,6 +61,7 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
         self.distinctId = [coder decodeObjectForKey:@"distinctId"];
         self.loginId = [coder decodeObjectForKey:@"loginId"];
         self.anonymousId = [coder decodeObjectForKey:@"anonymousId"];
+        self.customIDs = [coder decodeObjectForKey:@"customIDs"];
     }
     return self;
 }
