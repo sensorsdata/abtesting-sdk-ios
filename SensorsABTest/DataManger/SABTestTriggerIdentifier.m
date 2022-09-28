@@ -23,30 +23,41 @@
 #endif
 
 #import "SABTestTriggerIdentifier.h"
+#import "SABFetchResultResponse.h"
+
 
 @interface SABTestTriggerIdentifier()
+
+/// 当前用户 distinctId
+@property (nonatomic, copy) NSString *distinctId;
 
 /// 试验 Id
 @property (nonatomic, copy) NSString *experimentId;
 
-/// 当前用户 distinctId
-@property (nonatomic, copy) NSString *distinctId;
+@property (nonatomic, copy, readwrite) NSString *experimentGroupId;
+
 
 @end
 
 @implementation SABTestTriggerIdentifier
 
-- (instancetype)initWithExperimentId:(NSString *)experimentId distinctId:(NSString *)distinctId {
+
+- (instancetype)initWithExperiment:(SABExperimentResult *)experimentResult distinctId:(NSString *)distinctId {
     self = [super init];
     if (self) {
-        _experimentId = experimentId;
+        _experimentId = experimentResult.experimentId;
+        _experimentGroupId = experimentResult.experimentGroupId;
         _distinctId = distinctId;
     }
     return self;
 }
 
+#pragma mark isEqual
 /// 实现 isEqual:，判断是否为相同事件标识
 - (BOOL)isEqual:(SABTestTriggerIdentifier *)identify {
+    if (identify == self) {
+        return YES;
+    }
     if (![self.distinctId isEqualToString:identify.distinctId]) {
         return NO;
     }
@@ -57,6 +68,37 @@
         return self.customIDs.count == 0;
     }
     return [self.customIDs isEqualToDictionary:identify.customIDs];
+}
+
+- (NSUInteger)hash {
+    NSUInteger value = 0;
+    value ^= [self.experimentId hash];
+    value ^= [self.experimentGroupId hash];
+    value ^= [self.distinctId hash];
+    if (self.customIDs.count > 0) {
+        value ^= [self.customIDs hash];
+    }
+    return value;
+}
+
+
+#pragma mark NSCoding
+- (void)encodeWithCoder:(NSCoder *)coder {
+    [coder encodeObject:self.experimentId forKey:@"experimentId"];
+    [coder encodeObject:self.experimentGroupId forKey:@"experimentGroupId"];
+    [coder encodeObject:self.distinctId forKey:@"distinctId"];
+    [coder encodeObject:self.customIDs forKey:@"customIDs"];
+}
+
+- (instancetype)initWithCoder:(NSCoder *)coder {
+    self = [super init];
+    if (self) {
+        self.experimentId = [coder decodeObjectForKey:@"experimentId"];
+        self.experimentGroupId = [coder decodeObjectForKey:@"experimentGroupId"];
+        self.distinctId = [coder decodeObjectForKey:@"distinctId"];
+        self.customIDs = [coder decodeObjectForKey:@"customIDs"];
+    }
+    return self;
 }
 
 @end

@@ -38,6 +38,8 @@
 #import "SensorsABTestExperiment+Private.h"
 #import "SABRequestManager.h"
 #import "SABTestTriggerIdentifier.h"
+#import "SABStoreManager.h"
+#import "SABFileStorePlugin.h"
 
 /// 调用 js 方法名
 static NSString * const kSABAppCallJSMethodName = @"window.sensorsdata_app_call_js";
@@ -70,7 +72,8 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
 @property (nonatomic, strong) SABExperimentDataManager *dataManager;
 
 /// 触发过的事件标识
-@property (nonatomic, strong) NSMutableArray<SABTestTriggerIdentifier *> *trackedIdentifiers;
+@property (nonatomic, copy) NSArray<SABTestTriggerIdentifier *> *trackedIdentifiers;
+@property (nonatomic, strong) dispatch_queue_t serialQueue;
 
 @property (nonatomic, strong) NSTimer *timer;
 // 暂停时刻时间
@@ -89,8 +92,9 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
     self = [super init];
     if (self) {
         _configOptions = [configOptions copy];
-        _trackedIdentifiers = [NSMutableArray array];
-        
+        NSString *serialQueueLabel = [NSString stringWithFormat:@"com.SensorsABTest.SABManager.serialQueue.%p", self];
+        _serialQueue = dispatch_queue_create([serialQueueLabel UTF8String], DISPATCH_QUEUE_SERIAL);
+
         // 数据存储和解析
         _dataManager = [[SABExperimentDataManager alloc] init];
 
@@ -98,7 +102,9 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
         
         // 注册监听
         [self setupListeners];
-        
+
+        [self unarchiveABTestTriggerIdentifiers];
+
         // 获取所有最新试验结果
         [self fetchAllABTestResultWithTimes:kSABAsyncFetchExperimentMaxTimes];
     }
@@ -120,6 +126,23 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
     [notificationCenter addObserver:self selector:@selector(reloadAllABTestResult:) name:kSABSALogoutNotification object:nil];
     [notificationCenter addObserver:self selector:@selector(reloadAllABTestResult:) name:kSABSAIdentifyNotification object:nil];
     [notificationCenter addObserver:self selector:@selector(reloadAllABTestResult:) name:kSABSAResetAnonymousIdNotification object:nil];
+}
+
+#pragma mark - ABTestTrigger Identifiers
+/// 缓存事件标识信息
+- (void)archiveABTestTriggerIdentifiers:(NSArray <SABTestTriggerIdentifier *>*)trackedIdentifiers {
+    // 存储到本地
+    self.trackedIdentifiers = trackedIdentifiers;
+
+    [SABStoreManager.sharedInstance setObject:trackedIdentifiers forKey:kSABTestTriggerIdentifiersFileName];
+}
+
+/// 读取本地缓存事件标识信息
+- (void)unarchiveABTestTriggerIdentifiers {
+    dispatch_async(self.serialQueue, ^{
+        NSArray <SABTestTriggerIdentifier *> *results = [SABStoreManager.sharedInstance objectForKey:kSABTestTriggerIdentifiersFileName];
+        self.trackedIdentifiers = results;
+    });
 }
 
 #pragma mark - notification Action
@@ -306,6 +329,7 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
         SABLogWarn(@"The cache experiment result is empty, paramName: %@", experiment.paramName);
         return nil;
     }
+
     // 判断和默认值类型是否一致
     if (![resultData isSameTypeWithDefaultValue:experiment.defaultValue]) {
         NSString *resulTypeString = [SABExperimentResult descriptionWithExperimentResultType:resultData.variable.type];
@@ -315,9 +339,12 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
     }
 
     if (!resultData.isWhiteList) {
-        // 埋点
-        [self trackABTestWithData:resultData];
+        dispatch_async(self.serialQueue, ^{
+            // 埋点
+            [self trackABTestWithData:resultData];
+        });
     }
+
     return resultData.variable.value;
 }
 
@@ -416,14 +443,29 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
     }
 
     // 构建触发事件标识
-    SABTestTriggerIdentifier *eventIdentify = [[SABTestTriggerIdentifier alloc] initWithExperimentId:resultData.experimentId distinctId:distinctId];
+    SABTestTriggerIdentifier *eventIdentify = [[SABTestTriggerIdentifier alloc] initWithExperiment:resultData distinctId:distinctId];
     eventIdentify.customIDs = self.dataManager.customIDs;
-    // 是否已经触发事件
-    if ([self.trackedIdentifiers containsObject:eventIdentify]) {
-        return;
+
+    NSArray *trackedIdentifiers = self.trackedIdentifiers;
+    NSMutableArray *newTrackedIdentifiers = [NSMutableArray arrayWithArray:trackedIdentifiers];
+
+    /// 对比是否触发过相同事件
+    for (SABTestTriggerIdentifier *trackedEventIdentify in trackedIdentifiers) {
+        if (![trackedEventIdentify isEqual:eventIdentify]) {
+            continue;
+        }
+
+        // 试验组 Id 相同，不触发事件
+        if ([trackedEventIdentify.experimentGroupId isEqualToString:eventIdentify.experimentGroupId]) {
+            return;
+        } else { // 试验组 Id 不同，移除事件标识，后续再次触发事件
+            [newTrackedIdentifiers removeObject:trackedEventIdentify];
+            break;
+        }
     }
+
     // 记录当前试验触发事件
-    [self.trackedIdentifiers addObject:eventIdentify];
+    [newTrackedIdentifiers addObject:eventIdentify];
 
     NSMutableDictionary *properties = [NSMutableDictionary dictionary];
     properties[kSABTriggerExperimentId] = resultData.experimentId;
@@ -442,6 +484,9 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
     });
 
     [SABBridge track:kSABTriggerEventName properties:properties];
+
+    // 缓存事件标识信息
+    [self archiveABTestTriggerIdentifiers:[newTrackedIdentifiers copy]];
 }
 
 /// 开始更新计时

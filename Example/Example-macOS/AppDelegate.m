@@ -26,8 +26,7 @@
 static NSString *const SADefaultServerURL = @"http://10.130.6.4:8106/sa?project=default";
 
 /// 测试环境，获取试验地址
-static NSString* kSABResultsTestURL = @"http://abtesting.saas.debugbox.sensorsdata.cn/api/v2/abtest/online/results?project-key=438B9364C98D54371751BA82F6484A1A03A5155E";
-
+static NSString* kSABResultsTestURL = @"http://10.129.138.19:8202/api/v2/abtest/online/results?project-key=4D3483ECF05968FC4522BB2B52CB3B1CCA1D3FCA";
 
 @interface AppDelegate ()
 
