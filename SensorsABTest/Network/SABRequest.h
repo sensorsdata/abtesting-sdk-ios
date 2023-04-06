@@ -44,15 +44,22 @@ extern NSString *const kSABRequestBodyParamName;
 
 - (instancetype)init NS_UNAVAILABLE;
 
-- (instancetype)initWithBaseURL:(NSURL *)url projectKey:(NSString *)key NS_DESIGNATED_INITIALIZER;
+/// 初始化 App 原生分流请求
+/// @param url 分流 Base url
+/// @param key SaaS 的项目 key
+/// @param userIdenty 用户信息
+- (instancetype)initWithBaseURL:(NSURL *)url projectKey:(NSString *)key userIdenty:(SABUserIdenty *)userIdenty NS_DESIGNATED_INITIALIZER;
+
+
+/// 初始化 App 内嵌 H5 分流请求
+/// @param url 分流 Base url
+/// @param key SaaS 的项目 key
+/// @param userIdenty 用户信息
+- (instancetype)initWebRequestWithBaseURL:(NSURL *)url projectKey:(NSString *)key userIdenty:(SABUserIdenty *)userIdenty NS_DESIGNATED_INITIALIZER;
 
 /// 增加请求参数
 /// @param body 需要增加的参数 body
 - (void)appendRequestBody:(NSDictionary *)body;
-
-/// 增加自定义主体 ID
-/// @param customIDs 自定义主体 ID
-- (void)appendCustomIDs:(NSDictionary *)customIDs;
 
 /**
  * @abstract

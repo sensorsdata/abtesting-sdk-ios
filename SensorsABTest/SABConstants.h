@@ -57,14 +57,18 @@ extern NSString *const kSABAnonymousId;
 extern NSTimeInterval const kSABFetchABTestResultDefaultTimeoutInterval;
 
 #pragma mark - fileName
-/// 试验缓存文件名
+/// 试验分流缓存文件名
 extern NSString *const kSABExperimentResultFileName;
 
 /// 自定义主体 ID
 extern NSString *const kSABCustomIDsFileName;
 
-/// 触发 ABTestTrigger 事件标识信息
-extern NSString *const kSABTestTriggerIdentifiersFileName;
+/// 命中试验记录
+extern NSString *const kSABHitExperimentRecordSourcesFileName;
+
+/// 事件触发配置
+extern NSString *const kSABTestTrackConfigFileName;
+
 
 #pragma mark - NSNotificationName
 #pragma mark H5 打通相关

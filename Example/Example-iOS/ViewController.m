@@ -155,13 +155,45 @@
             }
         }
             break;
-        case 3: { // other
+        case 3: { // Subject 多主体，fache 接口
+            switch (row) { //
+                case 0: { // user 主体
+                    id result = [[SensorsABTest sharedInstance] fetchCacheABTestWithParamName:@"li" defaultValue:@(1111)];
+                    NSLog(@"fetchCacheABTest，Subject User，paramName：%@ - result:%@\n", @"li", result);
+                }
+                    break;
+                    
+                case 1: { // device 主体
+                    id result = [[SensorsABTest sharedInstance] fetchCacheABTestWithParamName:@"cqs_color" defaultValue:@"默认试验值"];
+                    NSLog(@"fetchCacheABTest，Subject Device，paramName：%@ - result:%@\n", @"cqs_color", result);
+                }
+                    break;
+                case 2: { // custom 主体
+                    id result = [[SensorsABTest sharedInstance] fetchCacheABTestWithParamName:@"cqs_os" defaultValue:@"默认试验值"];
+                    NSLog(@"fetchCacheABTest，Subject Custom，paramName：%@ - result:%@\n", @"cqs_os", result);
+                }
+                    break;
+                case 3: { // 自定义属性试验
+                    SensorsABTestExperiment *experiment = [[SensorsABTestExperiment alloc] initWithParamName:@"cqs_device" defaultValue:@"设备默认值"];
+                    experiment.properties = @{@"device": @"iPhone"};
+                    [[SensorsABTest sharedInstance] fastFetchABTestWithExperiment:experiment completionHandler:^(id  _Nullable result) {
+
+                        NSLog(@"fastFetchABTestWithExperiment，自定义属性 device 试验，paramName：%@ - result:%@\n", @"cqs_device", result);
+                    }];
+                }
+                    break;
+                default:
+                    break;
+            }
+        }
+            break;
+        case 4: { // other
             switch (row) { //
                 case 0: { // flush
                     [[SensorsAnalyticsSDK sharedInstance] flush];
                 }
                     break;
-                    
+
                 case 1: { // go webView
                     WKWebViewController *webViewVC = [[WKWebViewController alloc] init];
                     [self.navigationController pushViewController:webViewVC animated:YES];
@@ -172,7 +204,7 @@
             }
         }
             break;
-        case 4: { // login、logout、identify 、resetAnonymousId
+        case 5: { // login、logout、identify 、resetAnonymousId
             switch (row) {
                 case 0: { // login
                     [[SensorsAnalyticsSDK sharedInstance] login:@"login_test_20201217" withProperties:@{ @"name": @"batest_relod_login" }];
@@ -198,8 +230,9 @@
                     break;
             }
         }
+            break;
             // other
-        case 5: {
+        case 6: {
             switch (row) {
                 case 0: {
                     
@@ -211,19 +244,16 @@
                         dispatch_async(serialQueue1, ^{
                             id result = [[SensorsABTest sharedInstance] fetchCacheABTestWithParamName:@"index_cqs" defaultValue:@(1111)];
                             NSLog(@"fetchCacheABTest1，paramName：%@ - result:%@\n", @"index_cqs", result);
-                            
                         });
                         
                         dispatch_async(serialQueue2, ^{
                             id result = [[SensorsABTest sharedInstance] fetchCacheABTestWithParamName:@"index_cqs" defaultValue:@(2222)];
                             NSLog(@"fetchCacheABTest2，paramName：%@ - result:%@\n", @"index_cqs", result);
-                            
                         });
                         
                         dispatch_async(serialQueue3, ^{
                             id result = [[SensorsABTest sharedInstance] fetchCacheABTestWithParamName:@"index_cqs" defaultValue:@(3333)];
                             NSLog(@"fetchCacheABTest3，paramName：%@ - result:%@\n", @"index_cqs", result);
-                            
                         });
                     }
                 }

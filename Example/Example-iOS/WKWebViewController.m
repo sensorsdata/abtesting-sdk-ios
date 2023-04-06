@@ -46,6 +46,9 @@
     // 不做多链接试验
 //   httpStr = @"http://jssdk.debugbox.sensorsdata.cn/js/ls/ab/index.html?saSDKMultilink=true";
 
+    // 配置化测试
+//    httpStr = @"http://10.120.195.209/js/zyf/abtest_regex/index.html";
+
     NSURL *httpUrl = [NSURL URLWithString:httpStr];
     NSURLRequest *request = [NSURLRequest requestWithURL:httpUrl];
 

@@ -85,4 +85,11 @@
     [SensorsAnalyticsSDK.sharedInstance track:eventName withProperties:properties];
 }
 
++ (void)registerABTestPropertyPlugin:(SAPropertyPlugin *)propertyPlugin {
+    [SensorsAnalyticsSDK.sharedInstance registerPropertyPlugin:propertyPlugin];
+}
+
++ (void)unregisterWithPropertyPluginClass:(Class)pluginClass {
+    [SensorsAnalyticsSDK.sharedInstance unregisterPropertyPluginWithPluginClass:pluginClass];
+}
 @end

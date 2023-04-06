@@ -23,10 +23,10 @@
 #import <SensorsABTest.h>
 
 /// 测试环境，获取试验地址
-static NSString* kSABResultsTestURL = @"http://10.129.138.19:8202/api/v2/abtest/online/results?project-key=4D3483ECF05968FC4522BB2B52CB3B1CCA1D3FCA";
+static NSString* kSABResultsTestURL = @"http://10.129.29.10:8202/api/v2/abtest/online/results?project-key=130EB9E0EE57A09D91AC167C6CE63F7723CE0B22";
 
 // 测试环境，数据接收地址
-static NSString* kSABTestServerURL = @"http://10.130.6.4:8106/sa?project=default";
+static NSString* kSABTestServerURL = @"http://10.129.28.106:8106/sa?project=default";
 
 @interface AppDelegate ()
 
@@ -47,21 +47,28 @@ static NSString* kSABTestServerURL = @"http://10.130.6.4:8106/sa?project=default
 
 - (void)startSensorsAnalyticsSDKWithConfigOptions:(NSDictionary *)launchOptions {
     SAConfigOptions *options = [[SAConfigOptions alloc] initWithServerURL:kSABTestServerURL launchOptions:launchOptions];
-    options.autoTrackEventType = SensorsAnalyticsEventTypeAppStart | SensorsAnalyticsEventTypeAppEnd | SensorsAnalyticsEventTypeAppClick | SensorsAnalyticsEventTypeAppViewScreen;
+//    options.autoTrackEventType = SensorsAnalyticsEventTypeAppStart | SensorsAnalyticsEventTypeAppEnd | SensorsAnalyticsEventTypeAppClick | SensorsAnalyticsEventTypeAppViewScreen;
+    options.autoTrackEventType = SensorsAnalyticsEventTypeAppStart | SensorsAnalyticsEventTypeAppEnd | SensorsAnalyticsEventTypeAppViewScreen;
 
     options.enableHeatMap = YES;
     options.enableVisualizedAutoTrack = YES;
     options.enableJavaScriptBridge = YES;
+#ifdef DEBUG
     options.enableLog = YES;
     options.flushNetworkPolicy = SensorsAnalyticsNetworkTypeNONE;
+#endif
+
 
     [SensorsAnalyticsSDK startWithConfigOptions:options];
+
 }
 
 - (void)startSensorsABTest {
     SensorsABTestConfigOptions *abtestConfigOptions = [[SensorsABTestConfigOptions alloc] initWithURL:kSABResultsTestURL];
     [SensorsABTest startWithConfigOptions:abtestConfigOptions];
-    
+
+    [SensorsABTest.sharedInstance setCustomIDs:@{@"custom_subject_id":@"iOS自定义主体333"}];
+
 }
 
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {

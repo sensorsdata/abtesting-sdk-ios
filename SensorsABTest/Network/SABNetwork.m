@@ -67,6 +67,7 @@
     NSURLSessionDataTask *task = [network.session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
 
         if (error || ![response isKindOfClass:[NSHTTPURLResponse class]]) {
+            SABLogError(@"SABNetwork dataTaskWithRequest failure, error: %@, response: %@",error, response);
             return completionHandler(nil, error);
         }
 

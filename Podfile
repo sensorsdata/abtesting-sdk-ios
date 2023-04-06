@@ -4,7 +4,7 @@ workspace 'SensorsABTest'
 project './Example/Example.xcodeproj'
 
 target 'Example-iOS' do
-  platform :ios, '8.0'
+  platform :ios, '9.0'
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
 
@@ -12,7 +12,8 @@ target 'Example-iOS' do
   #  pod 'SensorsABTesting'
 
   pod 'SensorsABTesting', :path => './'
-	pod 'SensorsAnalyticsSDK', '>= 4.2.0'
+  pod 'SensorsAnalyticsSDK', '>= 4.5.6'
+
 end
 
 
@@ -23,6 +24,7 @@ target 'Example-macOS' do
 
   #  pod 'SensorsABTesting'
 
-  pod 'SensorsABTesting', :path => './'
-  pod 'SensorsAnalyticsSDK', '>= 4.2.0'
+#  pod 'SensorsABTesting', :path => './'
+#  pod 'SensorsAnalyticsSDK', '>= 4.5.6'
+
 end

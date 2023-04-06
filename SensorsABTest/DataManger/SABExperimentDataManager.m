@@ -29,51 +29,102 @@
 #import "SABBridge.h"
 #import "SABStoreManager.h"
 #import "SABFileStorePlugin.h"
+#import "SABTestGlobalPropertyPlugin.h"
+#import "SABHitExperimentRecordsManager.h"
+
+/// 所有分流试验记录属性 key
+static NSString * const kSABAllResultsResultIdSourcesKey = @"abtest_dispatch_result";
+
+/// 所有命中试验记录属性 key
+static NSString * const kSABAllHitExperimentResultIdSourcesKey = @"abtest_result";
 
 @interface SABExperimentDataManager()
 
 /// 试验结果
 @property (atomic, strong) SABFetchResultResponse *resultResponse;
+
+/// 试验参数白名单
+///
+/// 表示当前时刻无法确认状态的试验参数集合。
+/// 后续 Fast 请求，当列表不存在时直接发送请求;
+/// 当列表存在，且试验参数在列表内时则发送请求，否则表示试验已下线或未上线，则直接返回默认值。
 @property (atomic, strong, readwrite) NSArray <NSString *> *fuzzyExperiments;
-@property (atomic, strong, readwrite) NSDictionary <NSString*, NSString*> *customIDs;
 @property (nonatomic, strong) dispatch_queue_t serialQueue;
+
+@property (atomic, strong, readwrite) SABTestTrackConfig *trackConfig;
+@property (atomic, strong, readwrite) SABUserIdenty *currentUserIndenty;
+
+@property (nonatomic, strong) SABTestGlobalPropertyPlugin *globalPropertyPlugin;
+
+/// 用户命中记录数据
+@property (nonatomic, strong) SABHitExperimentRecordsManager *hitRecordsManager;
 
 @end
 
 @implementation SABExperimentDataManager
 
-- (instancetype)init {
+- (instancetype)initWithSerialQueue:(dispatch_queue_t)serialQueue {
     self = [super init];
     if (self) {
-        NSString *serialQueueLabel = [NSString stringWithFormat:@"com.SensorsABTest.SABExperimentDataManager.serialQueue.%p", self];
-        _serialQueue = dispatch_queue_create([serialQueueLabel UTF8String], DISPATCH_QUEUE_SERIAL);
+        _serialQueue = serialQueue;
+        _hitRecordsManager = [[SABHitExperimentRecordsManager alloc] initWithSerialQueue:serialQueue];
+
         [self resgisterStorePlugins];
 
-        // 读取本地缓存前，需要先读取自定义主体 ID
-        _customIDs = [[SABStoreManager sharedInstance] dictionaryForKey:kSABCustomIDsFileName];
+        [self buildUserIdenty];
 
-        // 读取本地缓存
+        // 解析事件触发配置
+        [self unarchiveTriggerConfig];
+        if (self.trackConfig.propertySwitch) {
+            [self resgisterPropertyPlugins];
+        }
+
+        // 读取本地分流缓存
         [self unarchiveExperimentResult];
+
+        dispatch_async(_serialQueue, ^{
+            /*更新命中记录属性
+             本地命中记录在队列中读取，更新也需要放在队列中排队
+             */
+            [self refreshHitExperimentResultIdSources];
+        });
     }
     return self;
 }
 
+- (void)buildUserIdenty {
+    NSString *distinctId = [SABBridge distinctId];
+    NSString *loginId = [SABBridge loginId];
+    NSString *anonymousId = [SABBridge anonymousId];
+    SABUserIdenty *userIdenty = [[SABUserIdenty alloc] initWithDistinctId:distinctId loginId:loginId anonymousId:anonymousId];
+
+    // 读取本地缓存前，需要先读取自定义主体 ID
+    NSDictionary *customIDs = [[SABStoreManager sharedInstance] dictionaryForKey:kSABCustomIDsFileName];
+    if (customIDs.count > 0) {
+        userIdenty.customIDs = customIDs;
+    }
+
+    self.currentUserIndenty = userIdenty;
+}
+
 - (void)updateCustomIDs:(NSDictionary<NSString *,NSString *> *)customIDs {
-    self.customIDs = customIDs;
+    self.currentUserIndenty.customIDs = customIDs;
     [[SABStoreManager sharedInstance] setObject:customIDs forKey:kSABCustomIDsFileName];
+}
+
+- (void)updateUserIdenty {
+    self.currentUserIndenty.distinctId = [SABBridge distinctId];
+    self.currentUserIndenty.loginId = [SABBridge loginId];
+    self.currentUserIndenty.anonymousId = [SABBridge anonymousId];
 }
 
 - (void)asyncFetchAllExperimentWithRequest:(SABExperimentRequest *)requestData completionHandler:(SABFetchResultResponseCompletionHandler)completionHandler {
 
     [SABNetwork dataTaskWithRequest:requestData.request completionHandler:^(id _Nullable jsonObject, NSError *_Nullable error) {
-        if (error) {
-            completionHandler(nil, error);
-            return;
-        }
 
         // 数据格式错误
         if (!jsonObject || ![jsonObject isKindOfClass:NSDictionary.class]) {
-            SABLogError(@"asyncFetchAllABTest invalid %@", jsonObject);
+            SABLogWarn(@"asyncFetchAllABTest invalid %@", jsonObject);
             NSError *error = [[NSError alloc] initWithDomain:@"SABResponseInvalidError" code:-1011 userInfo:@{NSLocalizedDescriptionKey: @"JSON parse error"}];
             completionHandler(nil, error);
             return;
@@ -95,6 +146,12 @@
 
             // 存储到本地
             [self archiveExperimentResult:responseData];
+
+            // 更新事件触发配置
+            [self updateTriggerConfig:responseData.responseObject[@"track_config"]];
+
+            // 更新试验分流记录
+            [self refreshResultsResultIdSourcesProperties];
         } else {
             SABLogWarn(@"asyncFetchAllExperiment fail，request： %@，jsonObject %@", requestData.request, jsonObject);
         }
@@ -102,10 +159,23 @@
     }];
 }
 
-#pragma mark - cache
+#pragma mark - query
+/// 查询扩展试验信息属性，作为预置属性采集
+- (NSDictionary *)queryExtendedPropertiesWithExperimentResult:(SABExperimentResult *)resultData {
+    NSMutableDictionary *extendedProperties = [NSMutableDictionary dictionary];
+    for (NSString *key in self.trackConfig.extendedPropertyKeys) {
+        // 作为预置属性上报，需要拼接 $
+        NSString *propertyKey = [@"$" stringByAppendingString:key];
+        extendedProperties[propertyKey] = resultData.extendedInfo[key];
+    }
+    return [extendedProperties copy];
+}
+
+#pragma mark - ExperimentResult
 /// 读取本地缓存试验
 - (void)unarchiveExperimentResult {
     dispatch_async(self.serialQueue, ^{
+
         id result = [SABStoreManager.sharedInstance objectForKey:kSABExperimentResultFileName];
         // 解析缓存
         if (![result isKindOfClass:SABFetchResultResponse.class]) {
@@ -114,15 +184,15 @@
         }
         
         SABFetchResultResponse *resultResponse = (SABFetchResultResponse *)result;
-        NSString *distinctId = [SABBridge distinctId];
-        NSDictionary *customIDs = resultResponse.userIdenty.customIDs;
-        // 校验 customIDs
-        BOOL isSameCustomIDs = (customIDs.count == 0 && self.customIDs.count == 0) || [customIDs isEqualToDictionary:self.customIDs];
-        // 校验缓存试验的 distinctId
-        BOOL isSameDistinctId = [resultResponse.userIdenty.distinctId isEqualToString:distinctId];
-        if (isSameDistinctId && isSameCustomIDs && resultResponse.results.count > 0) {
+        // 校验用户信息
+        if ([resultResponse.userIdenty isEqualUserIdenty:self.currentUserIndenty]) {
             self.resultResponse = resultResponse;
             SABLogInfo(@"unarchiveExperimentResult success jsonObject %@", resultResponse.responseObject);
+
+            // 更新分流记录属性
+            [self refreshResultsResultIdSourcesProperties];
+        } else {
+            SABLogWarn(@"userIdenty changed，unarchiveExperimentResult failure");
         }
     });
 }
@@ -149,7 +219,23 @@
     return result;
 }
 
-- (void)clearExperiment {
+/// 查询出组试验结果
+- (SABExperimentResult *)queryOutResultWithParamName:(NSString *)paramName {
+    if (![SABValidUtils isValidString:paramName]) {
+        return nil;
+    }
+    
+    __block SABExperimentResult *result = nil;
+    dispatch_sync(self.serialQueue, ^{
+        result = self.resultResponse.outResults[paramName];
+    });
+    return result;
+}
+
+- (void)clearExperimentResults {
+    // 刷新内存中的命中记录属性
+    [self refreshHitExperimentResultIdSources];
+
     self.resultResponse = nil;
     // 清除试验时也需要清除当前白名单
     self.fuzzyExperiments = nil;
@@ -159,7 +245,82 @@
     });
 }
 
+#pragma mark - TriggerConfig
+- (void)unarchiveTriggerConfig {
+    id result = [SABStoreManager.sharedInstance objectForKey:kSABTestTrackConfigFileName];
+    // 解析缓存
+    if (![result isKindOfClass:SABTestTrackConfig.class]) {
+        SABLogDebug(@"unarchiveTriggerConfig failure %@", result);
+
+        // 构建默认配置
+        self.trackConfig = [[SABTestTrackConfig alloc] init];
+        return;
+    }
+
+    self.trackConfig = result;
+}
+
+/// 更新触发配置
+-(void)updateTriggerConfig:(NSDictionary *)triggerConfigDic {
+    if (![SABValidUtils isValidDictionary:triggerConfigDic]) {
+        // 判断是否为远程下发配置
+        if (!self.trackConfig.isRemoteConfig) {
+            return;
+        }
+
+        // 没有返回有效配置，清除本地配置文件
+        dispatch_async(self.serialQueue, ^{
+            [SABStoreManager.sharedInstance removeObjectForKey:kSABTestTrackConfigFileName];
+        });
+
+        // 恢复默认配置，如已注销属性插件，则注销
+        self.trackConfig = [[SABTestTrackConfig alloc] init];
+        if (!self.trackConfig.propertySwitch && self.globalPropertyPlugin) {
+            [self unresgisterPropertyPlugins];
+        }
+        return;
+    }
+
+    SABTestTrackConfig *trackConfig = [[SABTestTrackConfig alloc] initWithDictionary:triggerConfigDic];
+    self.trackConfig = trackConfig;
+
+    // 需注册属性插件
+    if (!self.globalPropertyPlugin && trackConfig.propertySwitch) {
+        [self resgisterPropertyPlugins];
+
+        // 刷新属性内容
+        [self refreshHitExperimentResultIdSources];
+        [self refreshResultsResultIdSourcesProperties];
+    }
+
+    // 需注销属性插件
+    if (!trackConfig.propertySwitch && self.globalPropertyPlugin) {
+        [self unresgisterPropertyPlugins];
+    }
+
+    // 本地缓存更新
+    dispatch_async(self.serialQueue, ^{
+        [SABStoreManager.sharedInstance setObject:trackConfig forKey:kSABTestTrackConfigFileName];
+    });
+}
+
+#pragma mark - handle HitExperimentRecords
+- (BOOL)enableTrackWithHitExperiment:(SABExperimentResult *)resultData {
+
+    BOOL enableTrack = [self.hitRecordsManager enableTrackWithHitExperiment:resultData];
+
+    if (!enableTrack) {
+        return enableTrack;
+    }
+
+    [self refreshHitExperimentResultIdSources];
+
+    return YES;
+}
+
+
 #pragma mark - StorePlugins
+/// 注册合规存储插件
 - (void)resgisterStorePlugins {
     // 文件明文存储，兼容历史本地数据
     SABFileStorePlugin *filePlugin = [[SABFileStorePlugin alloc] init];
@@ -171,4 +332,55 @@
     }
 }
 
+
+#pragma mark - PropertyPlugins
+/// 注册属性插件
+- (void)resgisterPropertyPlugins {
+    self.globalPropertyPlugin = [[SABTestGlobalPropertyPlugin alloc] init];
+    [SABBridge registerABTestPropertyPlugin:self.globalPropertyPlugin];
+}
+
+/// 注销属性插件
+- (void)unresgisterPropertyPlugins {
+    [SABBridge unregisterWithPropertyPluginClass:SABTestGlobalPropertyPlugin.class];
+    self.globalPropertyPlugin = nil;
+}
+
+/// 更新试验分流记录属性
+- (void)refreshResultsResultIdSourcesProperties {
+    NSArray *allResultIdOfResults = self.resultResponse.allResultIdOfResults;
+    if (!self.trackConfig.propertySwitch || !allResultIdOfResults) {
+        return;
+    }
+
+    [self refreshGlobalProperty:@{kSABAllResultsResultIdSourcesKey: allResultIdOfResults}];
+}
+
+/// 刷新试验命中记录属性
+- (void)refreshHitExperimentResultIdSources {
+    if (!self.trackConfig.propertySwitch) {
+        return;
+    }
+
+    NSArray *resultIdSources = [self.hitRecordsManager queryAllResultIdOfHitRecordsWithUser:self.currentUserIndenty];
+    if (!resultIdSources) {
+        return;
+    }
+
+    [self refreshGlobalProperty:@{kSABAllHitExperimentResultIdSourcesKey: resultIdSources}];
+}
+
+/// 刷新插件采集属性
+- (void)refreshGlobalProperty:(NSDictionary *)properties {
+    if (!properties) {
+        return;
+    }
+    if (dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL) == dispatch_queue_get_label(self.serialQueue)) {
+        [self.globalPropertyPlugin refreshGlobalProperties:properties];
+    } else {
+        dispatch_async(self.serialQueue, ^{
+            [self.globalPropertyPlugin refreshGlobalProperties:properties];
+        });
+    }
+}
 @end

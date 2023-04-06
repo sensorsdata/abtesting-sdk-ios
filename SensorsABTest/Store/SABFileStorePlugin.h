@@ -27,6 +27,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/// 文件存储插件，兼容历史明文本地数据
 @interface SABFileStorePlugin : NSObject <SAStorePlugin>
 
 @end

@@ -49,11 +49,66 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
     return self;
 }
 
+/// 构建用户主体信息
+- (instancetype)initWithSubjectType:(SABUserSubjectType)subjectType subjectId:(NSString *)subjectId {
+    self = [super init];
+    if (self) {
+        _subjectType = subjectType;
+        _subjectId = subjectId;
+    }
+    return self;
+}
+
+- (BOOL)isEqualUserIdenty:(SABUserIdenty *)userIdenty {
+    if (self == userIdenty) {
+        return YES;
+    }
+    if (!userIdenty) {
+        return NO;
+    }
+
+    // 如果包含 subject 用户信息，优先匹配
+    if (self.subjectId && userIdenty.subjectId) {
+        if (self.subjectType == userIdenty.subjectType && [self.subjectId isEqualToString:userIdenty.subjectId]) {
+            return YES;
+        }
+        return NO;
+    }
+
+    // 如果设置了 customIDs，也需要匹配 customIDs
+    BOOL isSameCustomIDs = (self.customIDs.count == 0 && userIdenty.customIDs.count == 0) || [self.customIDs isEqualToDictionary:userIdenty.customIDs];
+    // distinctId 和 anonymousId 都相同，才能确认为相同用户，防止影响设备主体试验分流
+    if ([self.distinctId isEqualToString:userIdenty.distinctId] && [self.anonymousId isEqualToString:userIdenty.anonymousId] && isSameCustomIDs) {
+        return YES;
+    }
+    return NO;
+}
+
+#pragma mark NSCopying
+- (id)copyWithZone:(nullable NSZone *)zone {
+    SABUserIdenty *userIdenty = [[[self class] allocWithZone:zone] init];
+    userIdenty.distinctId = self.distinctId;
+    userIdenty.loginId = self.loginId;
+    userIdenty.anonymousId = self.anonymousId;
+    userIdenty.customIDs = self.customIDs;
+    
+    userIdenty.subjectType = self.subjectType;
+    userIdenty.subjectId = self.subjectId;
+
+    return userIdenty;
+}
+
+
+#pragma mark NSCoding
 - (void)encodeWithCoder:(nonnull NSCoder *)coder {
     [coder encodeObject:self.distinctId forKey:@"distinctId"];
     [coder encodeObject:self.loginId forKey:@"loginId"];
     [coder encodeObject:self.anonymousId forKey:@"anonymousId"];
     [coder encodeObject:self.customIDs forKey:@"customIDs"];
+
+    [coder encodeInteger:self.subjectType forKey:@"subjectType"];
+    [coder encodeObject:self.subjectId forKey:@"subjectId"];
+
 }
 
 - (nullable instancetype)initWithCoder:(nonnull NSCoder *)coder {
@@ -62,6 +117,9 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
         self.loginId = [coder decodeObjectForKey:@"loginId"];
         self.anonymousId = [coder decodeObjectForKey:@"anonymousId"];
         self.customIDs = [coder decodeObjectForKey:@"customIDs"];
+
+        self.subjectType = [coder decodeIntegerForKey:@"subjectType"];
+        self.subjectId = [coder decodeObjectForKey:@"subjectId"];
     }
     return self;
 }
@@ -164,17 +222,18 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
 
 - (instancetype)initWithDictionary:(NSDictionary *)resultDic {
     self = [super init];
+
+
     if (self) {
         if (![resultDic isKindOfClass:NSDictionary.class]) {
             return nil;
         }
         /*
-         
          "abtest_experiment_id": 666,
          "abtest_experiment_group_id": 888,
          "is_control_group": true,
          "is_white_list": false,
-         "variables": [  // 编程试验包含参数
+         "variables": [  // 编程试验包含参数，一个试验组可能包含多个试验参数
             {
                 "name": "color1",
                 "value": "1",       // 变量值
@@ -188,19 +247,36 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
         _whiteList = [dictionaryValueForKey(resultDic, @"is_white_list") boolValue];
 
         // SA 老版接口，没有 experiment_type 参数，只支持编程试验，设置默认类型
-        _experimentType = SABExperimentTypeCode;
-        NSString *experimentTypeString = dictionaryValueForKey(resultDic, @"experiment_type");
-        if (experimentTypeString.length > 0) {
-            if ([experimentTypeString isEqualToString:@"CODE"]) {
-                _experimentType = SABExperimentTypeCode;
-            } else if ([experimentTypeString isEqualToString:@"LINK"]) {
-                _experimentType = SABExperimentTypeLink;
-            } else {
-                _experimentType = SABExperimentTypeInvalid;
-            }
-        }
+        // H5 支持的多链接试验和可视化试验，没有 variables 字段
+        _experimentType = dictionaryValueForKey(resultDic, @"experiment_type");
+
+        // 解析试验结果唯一标识
+        _experimentResultId = dictionaryValueForKey(resultDic, @"abtest_experiment_result_id");
+        // 扩展信息
+        _extendedInfo = resultDic;
     }
     return self;
+}
+
+/// 保存当前试验的用户信息
+- (void)setUserIdenty:(SABUserIdenty *)userIdenty {
+    _userIdenty = userIdenty;
+
+    NSString *subjectId = dictionaryValueForKey(self.extendedInfo, @"subject_id");
+    if (![SABValidUtils isValidString:subjectId]) {
+        return;
+    }
+
+    // 解析命中当前试验的用户主体
+    _userIdenty.subjectId = subjectId;
+    NSString *subjectName = dictionaryValueForKey(self.extendedInfo, @"subject_name");
+    if ([subjectName isEqualToString:@"CUSTOM"]) {
+        _userIdenty.subjectType = SABUserSubjectTypeCustom;
+    } else if ([subjectName isEqualToString:@"DEVICE"]) {
+        _userIdenty.subjectType = SABUserSubjectTypeDevice;
+    } else { // 用户主体， USER
+        _userIdenty.subjectType = SABUserSubjectTypeUser;
+    }
 }
 
 - (BOOL)isSameTypeWithDefaultValue:(id)defaultValue {
@@ -260,6 +336,10 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
     resultData.whiteList = self.whiteList;
     resultData.variable = self.variable;
     resultData.experimentType = self.experimentType;
+
+    resultData.experimentResultId = self.experimentResultId;
+    resultData.extendedInfo = self.extendedInfo;
+
     return resultData;
 }
 
@@ -270,7 +350,10 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
     [coder encodeBool:self.controlGroup forKey:@"controlGroup"];
     [coder encodeBool:self.whiteList forKey:@"whiteList"];
     [coder encodeObject:self.variable forKey:@"variable"];
-    [coder encodeInteger:self.experimentType forKey:@"experimentType"];
+    [coder encodeObject:self.experimentType forKey:@"experimentType"];
+
+    [coder encodeObject:self.experimentResultId forKey:@"experimentResultId"];
+    [coder encodeObject:self.extendedInfo forKey:@"extendedInfo"];
 }
 
 - (instancetype)initWithCoder:(NSCoder *)coder {
@@ -281,7 +364,10 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
         self.experimentId = [coder decodeObjectForKey:@"experimentId"];
         self.experimentGroupId = [coder decodeObjectForKey:@"experimentGroupId"];
         self.variable = [coder decodeObjectForKey:@"variable"];
-        self.experimentType = [coder decodeIntegerForKey:@"experimentType"];
+        self.experimentType = [coder decodeObjectForKey:@"experimentType"];
+
+        self.experimentResultId = [coder decodeObjectForKey:@"experimentResultId"];
+        self.extendedInfo = [coder decodeObjectForKey:@"extendedInfo"];
     }
     return self;
 }
@@ -294,7 +380,7 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
         if (![responseDic isKindOfClass:NSDictionary.class]) {
             return nil;
         }
-        /*
+        /* 老版 SaaS 环境
          {
          "status": "SUCCESS", 查询结果标志（SUCCESS:进行试验；FAILED:不进入试验）
          "error_type": "",  错误类型，请求结果为 FAILED 时返回
@@ -323,7 +409,113 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
                      "link_match_type": "STRICT",    //链接匹配类型 STRICT：精确匹配，FUZZY:模糊匹配
                      "experiment_link": "http://aa.com/1"    //用户命中的试验链接（试验组就是试验组url、对照组就是对照组链接）
                 }
-            ]
+            ],
+         "fuzzy_experiments": [
+                 "TeamEntranceType",
+                 "goodImageConfig"
+             ]
+         }
+         */
+
+        /* 新版 091 SaaS 返回结果
+         {
+             "status": "SUCCESS",
+             "results":
+             [
+                 {
+                     "abtest_experiment_id": "1011",
+                     "abtest_experiment_group_id": "3",
+                     "is_control_group": false,
+                     "is_white_list": false,
+                     "experiment_type": "CODE",
+                     "variables":
+                     [
+                         {
+                             "name": "cqs_os",
+                             "type": "STRING",
+                             "value": "windows"
+                         }
+                     ],
+                     "abtest_unique_id": "10110103",
+                     "subject_id": "iOS自定义主体Id",
+                     "subject_name": "CUSTOM",
+                     "abtest_version": "1",
+                     "stickiness": "STICKINESS"
+                 },
+                 {
+                     "abtest_experiment_id": "1012",
+                     "abtest_experiment_group_id": "1",
+                     "is_control_group": false,
+                     "is_white_list": true,
+                     "experiment_type": "CODE",
+                     "variables":
+                     [
+                         {
+                             "name": "cqs_color",
+                             "type": "STRING",
+                             "value": "red"
+                         },
+                         {
+                             "name": "cqs_index",
+                             "type": "INTEGER",
+                             "value": "1"
+                         }
+                     ],
+                     "abtest_unique_id": "10120101",
+                     "subject_id": "AAC58A96-445E-4D12-8028-EC518988AAF2",
+                     "subject_name": "DEVICE",
+                     "abtest_version": "1",
+                     "stickiness": "STICKINESS"
+                 },
+                 {
+                     "abtest_experiment_id": "1007",
+                     "abtest_experiment_group_id": "0",
+                     "is_control_group": true,
+                     "is_white_list": false,
+                     "experiment_type": "CODE",
+                     "variables":
+                     [
+                         {
+                             "name": "li",
+                             "type": "INTEGER",
+                             "value": "1"
+                         }
+                     ],
+                     "abtest_unique_id": "10060114",
+                     "subject_id": "AAC58A96-445E-4D12-8028-EC518988AAF2",
+                     "subject_name": "USER",
+                     "abtest_version": "1",
+                     "stickiness": "STICKINESS"
+                 }
+             ],
+             "track_config":  // 新增事件触发配置，用于控制事件触发逻辑，默认不返回，修改后全量返回
+             {
+                 "item_switch": false,
+                 "trigger_switch": true,
+                 "property_set_switch": false,
+                 "trigger_content_ext":
+                 [
+                     "abtest_experiment_version",
+                     "abtest_experiment_result_id"
+                 ]
+             },
+             "out_results":  // 新增出组记录列表，只返回关键的试验信息，用于上报出组
+             [
+                 {
+                     "abtest_experiment_id": "335",
+                     "abtest_experiment_group_id": "0",
+                     "abtest_experiment_result_id": "-1",
+                     "subject_id": "AAC58A96-445E-4D12-8028-EC518988AAADSD",
+                     "subject_name": "USER",
+                     "abtest_version": "1",
+                     "variables":
+                     [
+                         {
+                             "name": "ai"
+                         }
+                     ]
+                 }
+             ]
          }
          */
         if ([dictionaryValueForKey(responseDic, @"status") isEqualToString:@"SUCCESS"]) {
@@ -333,38 +525,72 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
         }
         _errorType = dictionaryValueForKey(responseDic, @"error_type");
         _errorMessage = dictionaryValueForKey(responseDic, @"error");
-        
+
+        // 进组结果解析
         NSArray <NSDictionary *> *results = dictionaryValueForKey(responseDic, @"results");
         if (results.count > 0) {
-            // 构造试验数据
-            NSMutableDictionary <NSString *, SABExperimentResult *> *resultsDic = [NSMutableDictionary dictionary];
-            // 遍历所有试验
-            for (NSDictionary *resultDic in results) {
-                SABExperimentResult *result = [[SABExperimentResult alloc] initWithDictionary:resultDic];
-                // 非编程试验，Native 不作处理
-                if (result.experimentType != SABExperimentTypeCode) {
-                    continue;
-                }
-                NSArray <NSDictionary *> *variables = dictionaryValueForKey(resultDic, @"variables");
-                // 遍历每个试验下所有试验参数
-                for (NSDictionary *variableDic in variables) {
-                    SABExperimentResultVariable *variable = [[SABExperimentResultVariable alloc] initWithDictionary:variableDic];
-                    // 后端已按照更新时间做排序，相同 paramName 只取第一个即为最新试验
-                    if (resultsDic[variable.paramName]) {
-                        continue;
-                    }
-                    SABExperimentResult *newResult = [result copy];
-                    newResult.variable = variable;
-                    resultsDic[variable.paramName] = newResult;
-                }
-            }
-            _results = [resultsDic copy];
+            // 构建分流试验结果
+            _results = [self buildExperimentResultsWithArray:results isResults:YES];
+        } else {
+            // 请求成功，无分流结果
+            _allResultIdOfResults = @[];
+        }
+
+        // 出组分流结果解析
+        NSArray <NSDictionary *> *outListArray = dictionaryValueForKey(responseDic, @"out_list");
+        if (outListArray.count > 0) {
+            // 构建出组试验结果
+            _outResults = [self buildExperimentResultsWithArray:outListArray isResults:NO];
         }
         
         _responseObject = [responseDic copy];
     }
     return self;
 }
+
+
+/// 构建试验结果集合
+/// @param results 试验结果集合 json
+/// @param isResults 是否进组结果
+- (NSDictionary <NSString *, SABExperimentResult *> *) buildExperimentResultsWithArray:(NSArray <NSDictionary *> *)results isResults:(BOOL)isResults {
+    // 构造试验数据
+    NSMutableDictionary <NSString *, SABExperimentResult *> *resultsDic = [NSMutableDictionary dictionary];
+    NSMutableSet <NSString *>*allResultIdOfResults = [NSMutableSet set];
+
+    // 遍历所有试验
+    for (NSDictionary *resultDic in results) {
+        SABExperimentResult *result = [[SABExperimentResult alloc] initWithDictionary:resultDic];
+
+        if (isResults && result.experimentResultId) {
+            // 构建所有分流结果 result_id 记录
+            [allResultIdOfResults addObject:result.experimentResultId];
+        }
+
+        NSArray <NSDictionary *> *variables = dictionaryValueForKey(resultDic, @"variables");
+        // 没有试验结果，Native 不作处理
+        if (variables.count == 0) {
+            continue;
+        }
+        // 遍历每个试验下所有试验参数
+        for (NSDictionary *variableDic in variables) {
+            SABExperimentResultVariable *variable = [[SABExperimentResultVariable alloc] initWithDictionary:variableDic];
+            // 后端已按照更新时间做排序，相同 paramName 只取第一个即为最新试验
+            if (!variable.paramName || resultsDic[variable.paramName]) {
+                continue;
+            }
+            SABExperimentResult *newResult = [result copy];
+            newResult.variable = variable;
+            resultsDic[variable.paramName] = newResult;
+        }
+    }
+
+    if (isResults) {
+        _allResultIdOfResults = [allResultIdOfResults allObjects];
+    }
+
+    return [resultsDic copy];
+}
+
 
 #pragma mark NSCoding
 - (void)encodeWithCoder:(NSCoder *)coder {
@@ -374,6 +600,9 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
     [coder encodeObject:self.results forKey:@"results"];
     [coder encodeObject:self.responseObject forKey:@"responseObject"];
     [coder encodeObject:self.userIdenty forKey:@"userIdenty"];
+
+    [coder encodeObject:self.outResults forKey:@"outResults"];
+    [coder encodeObject:self.allResultIdOfResults forKey:@"allResultIdOfResults"];
 }
 
 - (instancetype)initWithCoder:(NSCoder *)coder {
@@ -386,15 +615,22 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
         self.responseObject = [coder decodeObjectForKey:@"responseObject"];
         // 调用 set 方法，设置每个试验 userIdenty
         self.userIdenty = [coder decodeObjectForKey:@"userIdenty"];
+
+        self.outResults = [coder decodeObjectForKey:@"outResults"];
+        self.allResultIdOfResults = [coder decodeObjectForKey:@"allResultIdOfResults"];
     }
     return self;
 }
 
 - (void)setUserIdenty:(SABUserIdenty *)userIdenty {
     _userIdenty = userIdenty;
-    // 每个试验，设置 userIdenty，用于 track 事件
+    // 每个试验结果，设置 userIdenty，用于 track 事件
     for (SABExperimentResult *result in self.results.allValues) {
-        result.userIdenty = userIdenty;
+        result.userIdenty = [userIdenty copy];
+    }
+
+    for (SABExperimentResult *result in self.outResults.allValues) {
+        result.userIdenty = [userIdenty copy];
     }
 }
 @end

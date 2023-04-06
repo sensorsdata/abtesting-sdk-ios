@@ -51,17 +51,13 @@ NSString *const kSABRequestBodyParamName = @"param_name";
 
 @implementation SABExperimentRequest
 
-- (instancetype)initWithBaseURL:(NSURL *)url projectKey:(NSString *)key {
+- (instancetype)initWebRequestWithBaseURL:(NSURL *)url projectKey:(NSString *)key userIdenty:(SABUserIdenty *)userIdenty {
     self = [super init];
     if (self) {
         _baseURL = url;
         _projectKey = key;
         _timeoutInterval = kSABFetchABTestResultDefaultTimeoutInterval;
 
-        NSString *distinctId = [SABBridge distinctId];
-        NSString *loginId = [SABBridge loginId];
-        NSString *anonymousId = [SABBridge anonymousId];
-        SABUserIdenty *userIdenty = [[SABUserIdenty alloc] initWithDistinctId:distinctId loginId:loginId anonymousId:anonymousId];
         _userIdenty = userIdenty;
 
         NSMutableDictionary *parametersBody = [NSMutableDictionary dictionary];
@@ -71,8 +67,8 @@ NSString *const kSABRequestBodyParamName = @"param_name";
 #else
         parametersBody[@"platform"] = @"iOS";
 #endif
-        parametersBody[kSABRequestBodyLoginID] = loginId;
-        parametersBody[kSABRequestBodyAnonymousID] = anonymousId;
+        parametersBody[kSABRequestBodyLoginID] = userIdenty.loginId;
+        parametersBody[kSABRequestBodyAnonymousID] = userIdenty.anonymousId;
         // abtest sdk 版本号
         parametersBody[@"abtest_lib_version"] = kSABLibVersion;
 
@@ -92,6 +88,17 @@ NSString *const kSABRequestBodyParamName = @"param_name";
             parametersBody[@"properties"] = properties;
         }
         _body = parametersBody;
+
+    }
+    return self;
+}
+
+- (instancetype)initWithBaseURL:(NSURL *)url projectKey:(NSString *)key userIdenty:(SABUserIdenty *)userIdenty {
+    self = [[SABExperimentRequest alloc] initWebRequestWithBaseURL:url projectKey:key userIdenty:userIdenty];
+    if (self) {
+        // 拼接自定义主体 ID
+        [self appendCustomIDs:userIdenty.customIDs];
+
     }
     return self;
 }
@@ -100,7 +107,6 @@ NSString *const kSABRequestBodyParamName = @"param_name";
     if (customIDs.count == 0) {
         return;
     }
-    self.userIdenty.customIDs = customIDs;
     [self appendRequestBody:@{kSABRequestBodyCustomIDs: customIDs}];
 }
 

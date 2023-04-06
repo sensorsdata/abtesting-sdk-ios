@@ -14,6 +14,14 @@
 		4D15CF4324EE83B1003D2748 /* SensorsABTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D15CF3924EE83B1003D2748 /* SensorsABTest.framework */; };
 		4D15CF4824EE83B1003D2748 /* SensorsABTestTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D15CF4724EE83B1003D2748 /* SensorsABTestTests.m */; };
 		4D2A4A1125345083000B7150 /* SABManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2A4A1025345083000B7150 /* SABManagerTests.m */; };
+		4D63FFAB297A32E10069CDEA /* SABTestGlobalPropertyPlugin.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D63FFA9297A32E10069CDEA /* SABTestGlobalPropertyPlugin.h */; };
+		4D63FFAC297A32E10069CDEA /* SABTestGlobalPropertyPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D63FFAA297A32E10069CDEA /* SABTestGlobalPropertyPlugin.m */; };
+		4D63FFB5297A32F70069CDEA /* SABHitExperimentRecordsManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D63FFAD297A32F70069CDEA /* SABHitExperimentRecordsManager.h */; };
+		4D63FFB6297A32F70069CDEA /* SABTestTrackConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D63FFAE297A32F70069CDEA /* SABTestTrackConfig.h */; };
+		4D63FFB7297A32F70069CDEA /* SABHitExperimentRecordsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D63FFAF297A32F70069CDEA /* SABHitExperimentRecordsManager.m */; };
+		4D63FFBA297A32F70069CDEA /* SABHitExperimentRecordSources.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D63FFB2297A32F70069CDEA /* SABHitExperimentRecordSources.m */; };
+		4D63FFBB297A32F70069CDEA /* SABTestTrackConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D63FFB3297A32F70069CDEA /* SABTestTrackConfig.m */; };
+		4D63FFBC297A32F70069CDEA /* SABHitExperimentRecordSources.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D63FFB4297A32F70069CDEA /* SABHitExperimentRecordSources.h */; };
 		4D6ED41225303900002ACB41 /* SABUtilsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6ED41125303900002ACB41 /* SABUtilsTests.m */; };
 		4D73D61C254BC6110020E711 /* SABNetwork.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D73D5FA254BC6100020E711 /* SABNetwork.m */; };
 		4D73D61D254BC6110020E711 /* SABNetwork.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D73D5FB254BC6100020E711 /* SABNetwork.h */; };
@@ -80,6 +88,14 @@
 		4D15CF4724EE83B1003D2748 /* SensorsABTestTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SensorsABTestTests.m; sourceTree = "<group>"; };
 		4D15CF4924EE83B1003D2748 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4D2A4A1025345083000B7150 /* SABManagerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SABManagerTests.m; sourceTree = "<group>"; };
+		4D63FFA9297A32E10069CDEA /* SABTestGlobalPropertyPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SABTestGlobalPropertyPlugin.h; sourceTree = "<group>"; };
+		4D63FFAA297A32E10069CDEA /* SABTestGlobalPropertyPlugin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SABTestGlobalPropertyPlugin.m; sourceTree = "<group>"; };
+		4D63FFAD297A32F70069CDEA /* SABHitExperimentRecordsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SABHitExperimentRecordsManager.h; sourceTree = "<group>"; };
+		4D63FFAE297A32F70069CDEA /* SABTestTrackConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SABTestTrackConfig.h; sourceTree = "<group>"; };
+		4D63FFAF297A32F70069CDEA /* SABHitExperimentRecordsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SABHitExperimentRecordsManager.m; sourceTree = "<group>"; };
+		4D63FFB2297A32F70069CDEA /* SABHitExperimentRecordSources.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SABHitExperimentRecordSources.m; sourceTree = "<group>"; };
+		4D63FFB3297A32F70069CDEA /* SABTestTrackConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SABTestTrackConfig.m; sourceTree = "<group>"; };
+		4D63FFB4297A32F70069CDEA /* SABHitExperimentRecordSources.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SABHitExperimentRecordSources.h; sourceTree = "<group>"; };
 		4D6ED41125303900002ACB41 /* SABUtilsTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SABUtilsTests.m; sourceTree = "<group>"; };
 		4D73D5FA254BC6100020E711 /* SABNetwork.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SABNetwork.m; sourceTree = "<group>"; };
 		4D73D5FB254BC6100020E711 /* SABNetwork.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SABNetwork.h; sourceTree = "<group>"; };
@@ -221,6 +237,12 @@
 				4D73D605254BC6100020E711 /* SABFetchResultResponse.m */,
 				4D73D602254BC6100020E711 /* SABExperimentDataManager.h */,
 				4D73D606254BC6110020E711 /* SABExperimentDataManager.m */,
+				4D63FFAE297A32F70069CDEA /* SABTestTrackConfig.h */,
+				4D63FFB3297A32F70069CDEA /* SABTestTrackConfig.m */,
+				4D63FFB4297A32F70069CDEA /* SABHitExperimentRecordSources.h */,
+				4D63FFB2297A32F70069CDEA /* SABHitExperimentRecordSources.m */,
+				4D63FFAD297A32F70069CDEA /* SABHitExperimentRecordsManager.h */,
+				4D63FFAF297A32F70069CDEA /* SABHitExperimentRecordsManager.m */,
 			);
 			path = DataManger;
 			sourceTree = "<group>";
@@ -260,6 +282,8 @@
 		4DFCBB0327699ED600257689 /* Store */ = {
 			isa = PBXGroup;
 			children = (
+				4D63FFA9297A32E10069CDEA /* SABTestGlobalPropertyPlugin.h */,
+				4D63FFAA297A32E10069CDEA /* SABTestGlobalPropertyPlugin.m */,
 				4DFCBB0627699ED600257689 /* SABStoreManager.h */,
 				4DFCBB0527699ED600257689 /* SABStoreManager.m */,
 				4DFCBB0427699ED600257689 /* SABFileStorePlugin.h */,
@@ -282,6 +306,7 @@
 				4D73D61F254BC6110020E711 /* SABRequest.h in Headers */,
 				4D04037C2657C7820006D84D /* SABEventTracker.h in Headers */,
 				4D73D634254BC6110020E711 /* NSString+SABHelper.h in Headers */,
+				4D63FFB6297A32F70069CDEA /* SABTestTrackConfig.h in Headers */,
 				4DFCBB0827699ED600257689 /* SABFileStorePlugin.h in Headers */,
 				4D73D635254BC6110020E711 /* SABURLUtils.h in Headers */,
 				4D04037E2657C7820006D84D /* SABSwizzler.h in Headers */,
@@ -289,14 +314,17 @@
 				FC2BE2B5272939BD0043C1FA /* SABPropertyValidator.h in Headers */,
 				4D73D62E254BC6110020E711 /* SensorsABTestConfigOptions.h in Headers */,
 				FC97219E274C8F420092812F /* SABRequestManager.h in Headers */,
+				4D63FFBC297A32F70069CDEA /* SABHitExperimentRecordSources.h in Headers */,
 				4D73D62F254BC6110020E711 /* SABConstants.h in Headers */,
 				FC2BE2B927293A850043C1FA /* SensorsABTestExperiment.h in Headers */,
+				4D63FFB5297A32F70069CDEA /* SABHitExperimentRecordsManager.h in Headers */,
 				4D73D61E254BC6110020E711 /* SensorsABTest.h in Headers */,
 				4D73D62C254BC6110020E711 /* SABBridge.h in Headers */,
 				4D73D623254BC6110020E711 /* SABExperimentDataManager.h in Headers */,
 				4D73D637254BC6110020E711 /* SABValidUtils.h in Headers */,
 				FCC0D0AD2730EA8600BA37E2 /* SensorsABTestExperiment+Private.h in Headers */,
 				4D73D621254BC6110020E711 /* SABManager.h in Headers */,
+				4D63FFAB297A32E10069CDEA /* SABTestGlobalPropertyPlugin.h in Headers */,
 				4D73D636254BC6110020E711 /* SABJSONUtils.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -400,9 +428,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D63FFB7297A32F70069CDEA /* SABHitExperimentRecordsManager.m in Sources */,
 				4D04037F2657C7820006D84D /* SABSwizzler.m in Sources */,
 				4D04037D2657C7820006D84D /* SABEventTracker.m in Sources */,
 				4D73D629254BC6110020E711 /* SABConstants.m in Sources */,
+				4D63FFBA297A32F70069CDEA /* SABHitExperimentRecordSources.m in Sources */,
 				4D73D639254BC6110020E711 /* NSString+SABHelper.m in Sources */,
 				4D73D62B254BC6110020E711 /* SABBridge.m in Sources */,
 				4DFCBB0B27699ED600257689 /* SABFileStorePlugin.m in Sources */,
@@ -415,8 +445,10 @@
 				4D73D638254BC6110020E711 /* SABURLUtils.m in Sources */,
 				4D73D630254BC6110020E711 /* SABManager.m in Sources */,
 				4D73D63A254BC6110020E711 /* SABJSONUtils.m in Sources */,
+				4D63FFBB297A32F70069CDEA /* SABTestTrackConfig.m in Sources */,
 				FC2BE2B827293A850043C1FA /* SensorsABTestExperiment.m in Sources */,
 				4D73D628254BC6110020E711 /* SensorsABTest.m in Sources */,
+				4D63FFAC297A32E10069CDEA /* SABTestGlobalPropertyPlugin.m in Sources */,
 				4D73D620254BC6110020E711 /* SABRequest.m in Sources */,
 				4D73D627254BC6110020E711 /* SABExperimentDataManager.m in Sources */,
 				4D73D62A254BC6110020E711 /* SABLogBridge.m in Sources */,

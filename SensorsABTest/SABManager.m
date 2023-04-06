@@ -37,9 +37,10 @@
 #import "SABPropertyValidator.h"
 #import "SensorsABTestExperiment+Private.h"
 #import "SABRequestManager.h"
-#import "SABTestTriggerIdentifier.h"
 #import "SABStoreManager.h"
 #import "SABFileStorePlugin.h"
+#import "SABNetwork.h"
+
 
 /// 调用 js 方法名
 static NSString * const kSABAppCallJSMethodName = @"window.sensorsdata_app_call_js";
@@ -71,8 +72,6 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
 
 @property (nonatomic, strong) SABExperimentDataManager *dataManager;
 
-/// 触发过的事件标识
-@property (nonatomic, copy) NSArray<SABTestTriggerIdentifier *> *trackedIdentifiers;
 @property (nonatomic, strong) dispatch_queue_t serialQueue;
 
 @property (nonatomic, strong) NSTimer *timer;
@@ -94,19 +93,20 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
         _configOptions = [configOptions copy];
         NSString *serialQueueLabel = [NSString stringWithFormat:@"com.SensorsABTest.SABManager.serialQueue.%p", self];
         _serialQueue = dispatch_queue_create([serialQueueLabel UTF8String], DISPATCH_QUEUE_SERIAL);
-
-        // 数据存储和解析
-        _dataManager = [[SABExperimentDataManager alloc] init];
-
-        _requestManager = [[SABRequestManager alloc] init];
         
         // 注册监听
         [self setupListeners];
+        
+        // 数据存储和解析
+        _dataManager = [[SABExperimentDataManager alloc] initWithSerialQueue:_serialQueue];
 
-        [self unarchiveABTestTriggerIdentifiers];
+        _requestManager = [[SABRequestManager alloc] init];
 
         // 获取所有最新试验结果
         [self fetchAllABTestResultWithTimes:kSABAsyncFetchExperimentMaxTimes];
+
+        // 开启定时器，兼容 AB 延迟初始化
+        [self startReloadTimer];
     }
     return self;
 };
@@ -121,28 +121,11 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
     [notificationCenter addObserver:self selector:@selector(registerSAJSBridge:) name:kSABSARegisterSAJSBridgeNotification object:nil];
     [notificationCenter addObserver:self selector:@selector(messageFromH5:) name:kSABSAMessageFromH5Notification object:nil];
     
-    // 用户 id 变化相关通知
-    [notificationCenter addObserver:self selector:@selector(reloadAllABTestResult:) name:kSABSALoginNotification object:nil];
-    [notificationCenter addObserver:self selector:@selector(reloadAllABTestResult:) name:kSABSALogoutNotification object:nil];
-    [notificationCenter addObserver:self selector:@selector(reloadAllABTestResult:) name:kSABSAIdentifyNotification object:nil];
-    [notificationCenter addObserver:self selector:@selector(reloadAllABTestResult:) name:kSABSAResetAnonymousIdNotification object:nil];
-}
-
-#pragma mark - ABTestTrigger Identifiers
-/// 缓存事件标识信息
-- (void)archiveABTestTriggerIdentifiers:(NSArray <SABTestTriggerIdentifier *>*)trackedIdentifiers {
-    // 存储到本地
-    self.trackedIdentifiers = trackedIdentifiers;
-
-    [SABStoreManager.sharedInstance setObject:trackedIdentifiers forKey:kSABTestTriggerIdentifiersFileName];
-}
-
-/// 读取本地缓存事件标识信息
-- (void)unarchiveABTestTriggerIdentifiers {
-    dispatch_async(self.serialQueue, ^{
-        NSArray <SABTestTriggerIdentifier *> *results = [SABStoreManager.sharedInstance objectForKey:kSABTestTriggerIdentifiersFileName];
-        self.trackedIdentifiers = results;
-    });
+    // 修改用户通知
+    [notificationCenter addObserver:self selector:@selector(changeUserIdentyAction:) name:kSABSALoginNotification object:nil];
+    [notificationCenter addObserver:self selector:@selector(changeUserIdentyAction:) name:kSABSALogoutNotification object:nil];
+    [notificationCenter addObserver:self selector:@selector(changeUserIdentyAction:) name:kSABSAIdentifyNotification object:nil];
+    [notificationCenter addObserver:self selector:@selector(changeUserIdentyAction:) name:kSABSAResetAnonymousIdNotification object:nil];
 }
 
 #pragma mark - notification Action
@@ -215,24 +198,27 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
         }
      }")
      */
-    SABExperimentRequest *requestData = [[SABExperimentRequest alloc] initWithBaseURL:self.configOptions.baseURL projectKey:self.configOptions.projectKey];
+    SABExperimentRequest *requestData = [[SABExperimentRequest alloc] initWebRequestWithBaseURL:self.configOptions.baseURL projectKey:self.configOptions.projectKey userIdenty:self.dataManager.currentUserIndenty];
 
     requestData.timeoutInterval = [dataDic[@"timeout"] integerValue] / 1000.0;
     // 拼接 H5 请求参数
     [requestData appendRequestBody:dataDic[@"request_body"]];
 
-    // 拼接自定义主体 ID
-    [requestData appendCustomIDs:self.dataManager.customIDs];
+    [SABNetwork dataTaskWithRequest:requestData.request completionHandler:^(id _Nullable jsonObject, NSError *_Nullable error) {
 
-    [self.dataManager asyncFetchAllExperimentWithRequest:requestData completionHandler:^(SABFetchResultResponse * _Nullable responseData, NSError * _Nullable error) {
-        
         // JS 数据拼接
         NSMutableDictionary *callJSDataDic = [NSMutableDictionary dictionary];
         callJSDataDic[@"message_id"] = dataDic[@"message_id"];
-        if (responseData.responseObject) {
-            callJSDataDic[@"data"] = responseData.responseObject;
 
+        if ([jsonObject isKindOfClass:NSDictionary.class]) {
+            callJSDataDic[@"data"] = jsonObject;
+            
+            SABLogInfo(@"App asyncFetchWebExperiment success jsonObject %@", jsonObject);
+        } else {
+            NSError *error = [[NSError alloc] initWithDomain:@"SABResponseInvalidError" code:-1011 userInfo:@{NSLocalizedDescriptionKey: @"JSON parse error"}];
+            SABLogWarn(@"App asyncFetchWebABTest invalid %@, error: %@", jsonObject, error);
         }
+
         NSData *callJSData = [SABJSONUtils JSONSerializeObject:callJSDataDic];
 
         // base64 编码，避免转义字符丢失的问题
@@ -254,14 +240,19 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
     }];
 }
 
-- (void)reloadAllABTestResult:(NSNotification *)notification {
+/// 修改用户
+- (void)changeUserIdentyAction:(NSNotification *)notification {
+    /// 更新用户信息
+    [self.dataManager updateUserIdenty];
+
     SABLogDebug(@"Receive notification: %@ and reload ABTest results", notification.name);
     [self reloadAllABTestResult];
 }
 
+/// 更新试验分流
 - (void)reloadAllABTestResult {
     // 用户 ID 信息发生变化，清除试验缓存
-    [self.dataManager clearExperiment];
+    [self.dataManager clearExperimentResults];
 
     // 重新请求试验
     [self fetchAllABTestResult];
@@ -324,6 +315,15 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
         return nil;
     }
     SABExperimentResult *resultData = [self.dataManager cachedExperimentResultWithParamName:experiment.paramName];
+    
+    //查询出组试验
+    SABExperimentResult *outResultData = [self.dataManager queryOutResultWithParamName:experiment.paramName];
+    if (outResultData && !outResultData.whiteList) {
+        dispatch_async(self.serialQueue, ^{
+            // 埋点
+            [self trackABTestWithData:outResultData];
+        });;
+    }
 
     if (!resultData) {
         SABLogWarn(@"The cache experiment result is empty, paramName: %@", experiment.paramName);
@@ -362,13 +362,12 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
     }
 
     // 异步请求
-    SABExperimentRequest *requestData = [[SABExperimentRequest alloc] initWithBaseURL:self.configOptions.baseURL projectKey:self.configOptions.projectKey];
+    SABExperimentRequest *requestData = [[SABExperimentRequest alloc] initWithBaseURL:self.configOptions.baseURL projectKey:self.configOptions.projectKey userIdenty:self.dataManager.currentUserIndenty];
     requestData.timeoutInterval = experiment.timeoutInterval;
+    // 包含自定义属性
     if (properties.count > 0 && experiment.paramName) {
         [requestData appendRequestBody:@{kSABRequestBodyCustomProperties: properties, kSABRequestBodyParamName: experiment.paramName}];
     }
-    // 拼接自定义主体 ID
-    [requestData appendCustomIDs:self.dataManager.customIDs];
 
     // 检查当前请求是否已存在相同的请求任务，当前只针对 Fast 模式下的请求生效
     if (experiment.modeType == SABFetchABTestModeTypeFast && [self.requestManager containsRequest:requestData]) {
@@ -414,9 +413,7 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
 - (void)fetchAllABTestResultWithTimes:(NSInteger)times {
     NSInteger fetchIndex = times - 1;
 
-    SABExperimentRequest *requestData = [[SABExperimentRequest alloc] initWithBaseURL:self.configOptions.baseURL projectKey:self.configOptions.projectKey];
-    // 拼接自定义主体 ID
-    [requestData appendCustomIDs:self.dataManager.customIDs];
+    SABExperimentRequest *requestData = [[SABExperimentRequest alloc] initWithBaseURL:self.configOptions.baseURL projectKey:self.configOptions.projectKey userIdenty:self.dataManager.currentUserIndenty];
 
     [self.dataManager asyncFetchAllExperimentWithRequest:requestData completionHandler:^(SABFetchResultResponse *_Nullable responseData, NSError *_Nullable error) {
         if (fetchIndex <= 0 || !error) {
@@ -442,30 +439,11 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
         return;
     }
 
-    // 构建触发事件标识
-    SABTestTriggerIdentifier *eventIdentify = [[SABTestTriggerIdentifier alloc] initWithExperiment:resultData distinctId:distinctId];
-    eventIdentify.customIDs = self.dataManager.customIDs;
-
-    NSArray *trackedIdentifiers = self.trackedIdentifiers;
-    NSMutableArray *newTrackedIdentifiers = [NSMutableArray arrayWithArray:trackedIdentifiers];
-
-    /// 对比是否触发过相同事件
-    for (SABTestTriggerIdentifier *trackedEventIdentify in trackedIdentifiers) {
-        if (![trackedEventIdentify isEqual:eventIdentify]) {
-            continue;
-        }
-
-        // 试验组 Id 相同，不触发事件
-        if ([trackedEventIdentify.experimentGroupId isEqualToString:eventIdentify.experimentGroupId]) {
-            return;
-        } else { // 试验组 Id 不同，移除事件标识，后续再次触发事件
-            [newTrackedIdentifiers removeObject:trackedEventIdentify];
-            break;
-        }
+    // 命中试验处理，并判断是否需要触发事件
+    BOOL enableTrack = [self.dataManager enableTrackWithHitExperiment:resultData];
+    if (!enableTrack) {
+        return;
     }
-
-    // 记录当前试验触发事件
-    [newTrackedIdentifiers addObject:eventIdentify];
 
     NSMutableDictionary *properties = [NSMutableDictionary dictionary];
     properties[kSABTriggerExperimentId] = resultData.experimentId;
@@ -476,17 +454,23 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
     properties[kSABDistinctId] = userIdenty.distinctId;
     properties[kSABAnonymousId] = userIdenty.anonymousId;
 
+    // 拼接扩展属性
+    NSDictionary *extendedProperties = [self.dataManager queryExtendedPropertiesWithExperimentResult:resultData];
+    if (extendedProperties) {
+        [properties addEntriesFromDictionary:extendedProperties];
+    }
+
+    if (!self.dataManager.trackConfig.triggerSwitch) {
+        return;
+    }
+
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         // 首次触发事件，添加版本号
         NSString *libVersion = [NSString stringWithFormat:@"%@:%@", kSABLibPrefix, kSABLibVersion];
         properties[kSABLibPluginVersion] = @[libVersion];
     });
-
     [SABBridge track:kSABTriggerEventName properties:properties];
-
-    // 缓存事件标识信息
-    [self archiveABTestTriggerIdentifiers:[newTrackedIdentifiers copy]];
 }
 
 /// 开始更新计时
@@ -528,14 +512,18 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
 - (void)setCustomIDs:(NSDictionary <NSString*, NSString*> *)customIDs {
     NSDictionary *tempCustomIDs = [SABPropertyValidator validateCustomIDs:customIDs];
     // 内容都为空时，不需要更新 customIDs 信息
-    if (tempCustomIDs.count == 0 && self.dataManager.customIDs.count == 0) {
+    if (tempCustomIDs.count == 0 && self.dataManager.currentUserIndenty.customIDs.count == 0) {
         return;
     }
     // 自定义主体 ID 未发生变化，不需要更新
-    if ([tempCustomIDs isEqualToDictionary:self.dataManager.customIDs]) {
+    if ([tempCustomIDs isEqualToDictionary:self.dataManager.currentUserIndenty.customIDs]) {
         return;
     }
+
+    SABLogDebug(@"setCustomIDs，reloadAllABTestResult");
+
     [self.dataManager updateCustomIDs:tempCustomIDs];
+
     [self reloadAllABTestResult];
 }
 

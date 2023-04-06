@@ -22,6 +22,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class SAPropertyPlugin;
+
 /// 与 SensorsAnalyticsSDK 的桥接工具
 @interface SABBridge : NSObject
 
@@ -51,6 +53,13 @@ NS_ASSUME_NONNULL_BEGIN
 /// @param properties 事件属性
 + (void)track:(NSString *)eventName properties:(NSDictionary *)properties;
 
+/// 注册 AB 属性插件
+/// @param propertyPlugin 属性插件
++ (void)registerABTestPropertyPlugin:(SAPropertyPlugin *)propertyPlugin;
+
+/// 注销 AB 属性插件
+/// @param pluginClass 属性插件类型
++ (void)unregisterWithPropertyPluginClass:(Class)pluginClass;
 @end
 
 NS_ASSUME_NONNULL_END

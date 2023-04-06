@@ -121,7 +121,29 @@
     [SensorsAnalyticsSDK.sharedInstance resetAnonymousId];
 }
 
+#pragma mark - Subject
 
+- (IBAction)fetchUserResultAction:(NSButton *)sender {
+
+    SensorsABTestExperiment *experiment = [[SensorsABTestExperiment alloc] initWithParamName:@"cqs_device" defaultValue:@"设备默认值"];
+
+    // 自定义属性试验
+    experiment.properties = @{@"device": @"iPhone"};
+    [[SensorsABTest sharedInstance] fastFetchABTestWithExperiment:experiment completionHandler:^(id  _Nullable result) {
+
+        NSLog(@"fastFetchABTestWithExperiment，自定义属性 device 试验，paramName：%@ - result:%@\n", @"cqs_device", result);
+    }];
+}
+
+- (IBAction)fetchDeviceResultAction:(NSButton *)sender {
+    id result = [[SensorsABTest sharedInstance] fetchCacheABTestWithParamName:@"cqs_color" defaultValue:@"默认试验值"];
+    NSLog(@"fetchCacheABTest，Subject Device，paramName：%@ - result:%@\n", @"cqs_color", result);
+}
+
+- (IBAction)fetchCustomResultAction:(NSButton *)sender {
+    id result = [[SensorsABTest sharedInstance] fetchCacheABTestWithParamName:@"cqs_os" defaultValue:@"默认试验值"];
+    NSLog(@"fetchCacheABTest，Subject Custom，paramName：%@ - result:%@\n", @"cqs_os", result);
+}
 
 - (void)setRepresentedObject:(id)representedObject {
     [super setRepresentedObject:representedObject];
