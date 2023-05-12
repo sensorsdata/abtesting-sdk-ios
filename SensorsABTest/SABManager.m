@@ -37,8 +37,6 @@
 #import "SABPropertyValidator.h"
 #import "SensorsABTestExperiment+Private.h"
 #import "SABRequestManager.h"
-#import "SABStoreManager.h"
-#import "SABFileStorePlugin.h"
 #import "SABNetwork.h"
 
 

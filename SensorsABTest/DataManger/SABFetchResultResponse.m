@@ -600,7 +600,6 @@ static id dictionaryValueForKey(NSDictionary *dic, NSString *key) {
     [coder encodeObject:self.results forKey:@"results"];
     [coder encodeObject:self.responseObject forKey:@"responseObject"];
     [coder encodeObject:self.userIdenty forKey:@"userIdenty"];
-
     [coder encodeObject:self.outResults forKey:@"outResults"];
     [coder encodeObject:self.allResultIdOfResults forKey:@"allResultIdOfResults"];
 }

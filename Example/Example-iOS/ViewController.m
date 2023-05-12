@@ -48,9 +48,6 @@
                 case 0: { // INTEGER
                     id result = [[SensorsABTest sharedInstance] fetchCacheABTestWithParamName:@"color1" defaultValue:@(1111)];
                     NSLog(@"fetchCacheABTest，paramName：%@ - result:%@\n", @"color1", result);
-                    
-                    //                    id result2 = [[SensorsABTest sharedInstance] fetchCacheABTestWithParamName:@"102" defaultValue:@(1111)];
-                    //                    NSLog(@"fetchCacheABTest，paramName：%@ - result:%@\n", @"102", result2);
                 }
                     break;
                     
@@ -82,10 +79,6 @@
                 case 0: { // INTEGER
                     [[SensorsABTest sharedInstance] asyncFetchABTestWithParamName:@"color1" defaultValue:@(1111) completionHandler:^(id _Nullable result) {
                         NSLog(@"asyncFetchABTest，paramName：%@ - result:%@\n", @"color1", result);
-                    }];
-                    
-                    [[SensorsABTest sharedInstance] asyncFetchABTestWithParamName:@"19" defaultValue:@(1111) completionHandler:^(id _Nullable result) {
-                        NSLog(@"asyncFetchABTest，paramName：%@ - result:%@\n", @"19", result);
                     }];
                 }
                     break;
@@ -123,9 +116,6 @@
                         NSLog(@"fastFetchABTest，paramName：%@ - result:%@\n", @"color1", result);
                     }];
                     
-                    [[SensorsABTest sharedInstance] fastFetchABTestWithParamName:@"21" defaultValue:@(1111) completionHandler:^(id _Nullable result) {
-                        NSLog(@"asyncFetchABTest，paramName：%@ - result:%@\n", @"21", result);
-                    }];
                 }
                     break;
                     
@@ -158,8 +148,8 @@
         case 3: { // Subject 多主体，fache 接口
             switch (row) { //
                 case 0: { // user 主体
-                    id result = [[SensorsABTest sharedInstance] fetchCacheABTestWithParamName:@"li" defaultValue:@(1111)];
-                    NSLog(@"fetchCacheABTest，Subject User，paramName：%@ - result:%@\n", @"li", result);
+                    id result = [[SensorsABTest sharedInstance] fetchCacheABTestWithParamName:@"cqs_index" defaultValue:@(1111)];
+                    NSLog(@"fetchCacheABTest，Subject User，paramName：%@ - result:%@\n", @"cqs_index", result);
                 }
                     break;
                     

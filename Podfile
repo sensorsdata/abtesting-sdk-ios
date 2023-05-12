@@ -9,7 +9,7 @@ target 'Example-iOS' do
   use_frameworks!
 
   #  pod 'SensorsAnalyticsSDK'
-  #  pod 'SensorsABTesting'
+#  pod 'SensorsABTesting'
 
   pod 'SensorsABTesting', :path => './'
   pod 'SensorsAnalyticsSDK', '>= 4.5.6'

@@ -54,7 +54,11 @@
 /// 解析本地命中试验记录
 - (void)unarchiveABTestHitExperimentRecordSources {
     dispatch_async(self.serialQueue, ^{
-        NSArray <SABHitExperimentRecordSources *> *results = [SABStoreManager.sharedInstance objectForKey:kSABHitExperimentRecordSourcesFileName];
+        NSData *data = [SABStoreManager.sharedInstance objectForKey:kSABHitExperimentRecordSourcesFileName];
+        NSArray <SABHitExperimentRecordSources *> *results = nil;
+        if ([data isKindOfClass:NSData.class]) {
+            results = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+        }
         self.allHitExperimentRecordSources = [NSMutableArray arrayWithArray:results];
     });
 }
@@ -64,9 +68,10 @@
      if (self.allHitExperimentRecordSources.count == 0) {
          return;
      }
+     NSData *data = [NSKeyedArchiver archivedDataWithRootObject:[self.allHitExperimentRecordSources copy]];
      dispatch_async(self.serialQueue, ^{
          // 存储到本地
-         [SABStoreManager.sharedInstance setObject:[self.allHitExperimentRecordSources copy] forKey:kSABHitExperimentRecordSourcesFileName];
+         [SABStoreManager.sharedInstance setObject:data forKey:kSABHitExperimentRecordSourcesFileName];
      });
  }
 

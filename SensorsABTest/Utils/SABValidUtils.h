@@ -30,6 +30,8 @@ NS_ASSUME_NONNULL_BEGIN
 /// 是否为有效 Dictionary
 + (BOOL)isValidDictionary:(NSDictionary *)dictionary;
 
+/// 是否为有效的 data
++ (BOOL)isValidData:(NSData *)data;
 @end
 
 NS_ASSUME_NONNULL_END

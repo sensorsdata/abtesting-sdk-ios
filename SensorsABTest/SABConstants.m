@@ -25,7 +25,7 @@
 #import "SABConstants.h"
 
 // 当前版本号
-NSString *const kSABLibVersion = @"1.0.0";
+NSString *const kSABLibVersion = @"1.0.1";
 
 // SA 最低支持版本
 NSString *const kSABMinSupportedSALibVersion = @"4.5.6";
@@ -62,11 +62,11 @@ NSString *const kSABAnonymousId = @"sab_anonymousId";
 NSTimeInterval const kSABFetchABTestResultDefaultTimeoutInterval = 30;
 
 #pragma mark - fileName
-NSString *const kSABExperimentResultFileName = @"SensorsABTestExperimentResultsResponse";
+NSString *const kSABExperimentResultFileName = @"SensorsABTestExperimentResultsResponseData";
 
 NSString *const kSABCustomIDsFileName = @"SensorsABTestCustomIDs";
 
-NSString *const kSABHitExperimentRecordSourcesFileName = @"SensorsABTestHitExperimentRecordSources";
+NSString *const kSABHitExperimentRecordSourcesFileName = @"SensorsABTestHitExperimentRecordSourcesData";
 
 NSString *const kSABTestTrackConfigFileName = @"SensorsABTestTrackConfigSources";
 
@@ -95,3 +95,19 @@ NSNotificationName const kSABSAResetAnonymousIdNotification = @"SensorsAnalytics
 // 监听 SA 的生命周期通知，依赖版本 v2.6.3 及以上
 NSNotificationName const kSABSAAppLifecycleStateDidChangeNotification = @"com.sensorsdata.SAAppLifecycleStateDidChange";
 
+
+void sabtest_dispatch_safe_async(dispatch_queue_t queue,DISPATCH_NOESCAPE dispatch_block_t block) {
+    if ((dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL)) == dispatch_queue_get_label(queue)) {
+        block();
+    } else {
+        dispatch_async(queue, block);
+    }
+}
+
+void sabtest_dispatch_safe_sync(dispatch_queue_t queue,DISPATCH_NOESCAPE dispatch_block_t block) {
+    if ((dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL)) == dispatch_queue_get_label(queue)) {
+        block();
+    } else {
+        dispatch_sync(queue, block);
+    }
+}

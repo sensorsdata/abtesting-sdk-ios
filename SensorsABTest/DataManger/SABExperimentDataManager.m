@@ -38,10 +38,12 @@ static NSString * const kSABAllResultsResultIdSourcesKey = @"abtest_dispatch_res
 /// 所有命中试验记录属性 key
 static NSString * const kSABAllHitExperimentResultIdSourcesKey = @"abtest_result";
 
-@interface SABExperimentDataManager()
+@interface SABExperimentDataManager() {
+    __block SABFetchResultResponse *_resultResponse;
+}
 
 /// 试验结果
-@property (atomic, strong) SABFetchResultResponse *resultResponse;
+@property (nonatomic, strong) SABFetchResultResponse *resultResponse;
 
 /// 试验参数白名单
 ///
@@ -66,10 +68,10 @@ static NSString * const kSABAllHitExperimentResultIdSourcesKey = @"abtest_result
 - (instancetype)initWithSerialQueue:(dispatch_queue_t)serialQueue {
     self = [super init];
     if (self) {
+        [self resgisterStorePlugins];
+
         _serialQueue = serialQueue;
         _hitRecordsManager = [[SABHitExperimentRecordsManager alloc] initWithSerialQueue:serialQueue];
-
-        [self resgisterStorePlugins];
 
         [self buildUserIdenty];
 
@@ -99,7 +101,7 @@ static NSString * const kSABAllHitExperimentResultIdSourcesKey = @"abtest_result
     SABUserIdenty *userIdenty = [[SABUserIdenty alloc] initWithDistinctId:distinctId loginId:loginId anonymousId:anonymousId];
 
     // 读取本地缓存前，需要先读取自定义主体 ID
-    NSDictionary *customIDs = [[SABStoreManager sharedInstance] dictionaryForKey:kSABCustomIDsFileName];
+    NSDictionary *customIDs = [SABStoreManager.sharedInstance dictionaryForKey:kSABCustomIDsFileName];
     if (customIDs.count > 0) {
         userIdenty.customIDs = customIDs;
     }
@@ -109,7 +111,7 @@ static NSString * const kSABAllHitExperimentResultIdSourcesKey = @"abtest_result
 
 - (void)updateCustomIDs:(NSDictionary<NSString *,NSString *> *)customIDs {
     self.currentUserIndenty.customIDs = customIDs;
-    [[SABStoreManager sharedInstance] setObject:customIDs forKey:kSABCustomIDsFileName];
+    [SABStoreManager.sharedInstance setObject:customIDs forKey:kSABCustomIDsFileName];
 }
 
 - (void)updateUserIdenty {
@@ -159,6 +161,23 @@ static NSString * const kSABAllHitExperimentResultIdSourcesKey = @"abtest_result
     }];
 }
 
+#pragma mark - readWrite
+// 增加读写锁，保证数据的线程安全
+- (SABFetchResultResponse *)resultResponse {
+    __block SABFetchResultResponse *response;
+    sabtest_dispatch_safe_sync(self.serialQueue, ^{
+        response = _resultResponse;
+    });
+    return response;
+}
+
+- (void)setResultResponse:(SABFetchResultResponse *)resultResponse {
+    sabtest_dispatch_safe_async(self.serialQueue, ^{
+        _resultResponse = resultResponse;
+    });
+}
+
+
 #pragma mark - query
 /// 查询扩展试验信息属性，作为预置属性采集
 - (NSDictionary *)queryExtendedPropertiesWithExperimentResult:(SABExperimentResult *)resultData {
@@ -176,10 +195,15 @@ static NSString * const kSABAllHitExperimentResultIdSourcesKey = @"abtest_result
 - (void)unarchiveExperimentResult {
     dispatch_async(self.serialQueue, ^{
 
-        id result = [SABStoreManager.sharedInstance objectForKey:kSABExperimentResultFileName];
+        NSData *data = [SABStoreManager.sharedInstance objectForKey:kSABExperimentResultFileName];
+        if (![data isKindOfClass:NSData.class]) {
+            SABLogDebug(@"unarchiveExperimentResult objectForKey failure %@", data);
+            return;
+        }
+        SABFetchResultResponse *result = [NSKeyedUnarchiver unarchiveObjectWithData:data];
         // 解析缓存
         if (![result isKindOfClass:SABFetchResultResponse.class]) {
-            SABLogDebug(@"unarchiveExperimentResult failure %@", result);
+            SABLogDebug(@"unarchiveExperimentResult unarchiveObjectWithData failure %@", result);
             return;
         }
         
@@ -200,8 +224,9 @@ static NSString * const kSABAllHitExperimentResultIdSourcesKey = @"abtest_result
 /// 写入本地缓存
 - (void)archiveExperimentResult:(SABFetchResultResponse *)resultResponse {
     // 存储到本地
+    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:resultResponse];
     dispatch_async(self.serialQueue, ^{
-        [SABStoreManager.sharedInstance setObject:resultResponse forKey:kSABExperimentResultFileName];
+        [SABStoreManager.sharedInstance setObject:data forKey:kSABExperimentResultFileName];
     });
 }
 
@@ -211,7 +236,7 @@ static NSString * const kSABAllHitExperimentResultIdSourcesKey = @"abtest_result
     if (![SABValidUtils isValidString:paramName]) {
         return nil;
     }
-    
+
     __block SABExperimentResult *result = nil;
     dispatch_sync(self.serialQueue, ^{
         result = self.resultResponse.results[paramName];
@@ -224,7 +249,7 @@ static NSString * const kSABAllHitExperimentResultIdSourcesKey = @"abtest_result
     if (![SABValidUtils isValidString:paramName]) {
         return nil;
     }
-    
+
     __block SABExperimentResult *result = nil;
     dispatch_sync(self.serialQueue, ^{
         result = self.resultResponse.outResults[paramName];
@@ -324,11 +349,11 @@ static NSString * const kSABAllHitExperimentResultIdSourcesKey = @"abtest_result
 - (void)resgisterStorePlugins {
     // 文件明文存储，兼容历史本地数据
     SABFileStorePlugin *filePlugin = [[SABFileStorePlugin alloc] init];
-    [[SABStoreManager sharedInstance] registerStorePlugin:filePlugin];
+    [SABStoreManager.sharedInstance registerStorePlugin:filePlugin];
     
     // 注册 SA 的自定义插件
     for (id<SAStorePlugin> plugin in SABBridge.storePlugins) {
-        [[SABStoreManager sharedInstance] registerStorePlugin:plugin];
+        [SABStoreManager.sharedInstance registerStorePlugin:plugin];
     }
 }
 

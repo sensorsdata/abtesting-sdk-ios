@@ -62,7 +62,7 @@ static NSString * const kSABFileStorePluginType = @"cn.sensorsdata.ABTesting.Fil
 }
 
 - (void)setObject:(nullable id)value forKey:(nonnull NSString *)key {
-    if (!key) {
+    if (!key || !value) {
         SABLogError(@"key should not be nil for file store");
         return;
     }
@@ -80,6 +80,7 @@ static NSString * const kSABFileStorePluginType = @"cn.sensorsdata.ABTesting.Fil
     [[NSFileManager defaultManager] setAttributes:protection
                                      ofItemAtPath:filePath
                                             error:nil];
+    
     NSData *data = [NSKeyedArchiver archivedDataWithRootObject:value];
     if (![NSKeyedArchiver archiveRootObject:data toFile:filePath]) {
         SABLogError(@"%@ unable to archive %@", self, key);

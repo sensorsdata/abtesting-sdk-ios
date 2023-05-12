@@ -93,3 +93,9 @@ extern NSNotificationName const kSABSAResetAnonymousIdNotification;
 
 // 监听 SA 的生命周期通知，依赖版本 v2.6.3 及以上
 extern NSNotificationName const kSABSAAppLifecycleStateDidChangeNotification;
+
+#pragma mark 工具函数
+
+void sabtest_dispatch_safe_sync(dispatch_queue_t queue,DISPATCH_NOESCAPE dispatch_block_t block);
+
+void sabtest_dispatch_safe_async(dispatch_queue_t queue,DISPATCH_NOESCAPE dispatch_block_t block);

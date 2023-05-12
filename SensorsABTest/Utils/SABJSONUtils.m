@@ -30,7 +30,7 @@
 
 /// json 数据解析
 + (nullable id)JSONObjectWithData:(NSData *)data {
-    if (!data) {
+    if (![SABValidUtils isValidData:data]) {
         SABLogInfo(@"json data is nil");
         return nil;
     }
@@ -85,4 +85,39 @@
     return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
 }
 
++ (id)JSONObjectByRemovingKeysWithNullValues:(id)object {
+    if (!object) {
+        return nil;
+    }
+    return [self JSONObjectByRemovingKeysWithNullValues:object options:0];
+}
+
+/// 移除 json 中的 null
+/// 已有合法性判断，暂未使用
++ (id)JSONObjectByRemovingKeysWithNullValues:(id)object options:(NSJSONReadingOptions)readingOptions {
+    if ([object isKindOfClass:[NSArray class]]) {
+        NSMutableArray *mutableArray = [NSMutableArray arrayWithCapacity:[(NSArray *)object count]];
+        for (id value in (NSArray *)object) {
+            if (![value isEqual:[NSNull null]]) {
+                [mutableArray addObject:[SABJSONUtils JSONObjectByRemovingKeysWithNullValues:value options:readingOptions]];
+            }
+        }
+
+        return (readingOptions & NSJSONReadingMutableContainers) ? mutableArray : [NSArray arrayWithArray:mutableArray];
+    } else if ([object isKindOfClass:[NSDictionary class]]) {
+        NSMutableDictionary *mutableDictionary = [NSMutableDictionary dictionaryWithDictionary:object];
+        for (id <NSCopying> key in [(NSDictionary *)object allKeys]) {
+            id value = (NSDictionary *)object[key];
+            if (!value || [value isEqual:[NSNull null]]) {
+                [mutableDictionary removeObjectForKey:key];
+            } else if ([value isKindOfClass:[NSArray class]] || [value isKindOfClass:[NSDictionary class]]) {
+                mutableDictionary[key] = [SABJSONUtils JSONObjectByRemovingKeysWithNullValues:value options:readingOptions];
+            }
+        }
+
+        return (readingOptions & NSJSONReadingMutableContainers) ? mutableDictionary : [NSDictionary dictionaryWithDictionary:mutableDictionary];
+    }
+
+    return object;
+}
 @end
