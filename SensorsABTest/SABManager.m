@@ -373,7 +373,9 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
         return;
     }
 
-    [self.requestManager addRequestTask:requestData experiment:experiment];
+    if (experiment.modeType == SABFetchABTestModeTypeFast) {
+        [self.requestManager addRequestTask:requestData experiment:experiment];
+    }
 
     __weak typeof(self) weakSelf = self;
     [self.dataManager asyncFetchAllExperimentWithRequest:requestData completionHandler:^(SABFetchResultResponse *_Nullable responseData, NSError *_Nullable error) {
@@ -383,6 +385,13 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
             SABLogError(@"asyncFetchAllExperimentWithRequest failure，error: %@", error);
             // 请求失败，主线程回调结果
             dispatch_async(dispatch_get_main_queue(), ^{
+                
+                if (experiment.modeType == SABFetchABTestModeTypeAsync) {
+                    experiment.handler(experiment.defaultValue);
+                    return;
+                }
+
+                // 请求合并，只针对 fast 调用
                 [strongSelf.requestManager excuteExperimentsWithRequest:requestData completion:^(SensorsABTestExperiment *obj) {
                     obj.handler(obj.defaultValue);
                 }];
@@ -392,10 +401,17 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
 
         // 通过请求管理器统一回调试验结果，切到主线程回调结果
         dispatch_async(dispatch_get_main_queue(), ^{
+            if (experiment.modeType == SABFetchABTestModeTypeAsync) {
+                id cacheValue = [strongSelf fetchCacheABTestWithExperiment:experiment];
+                experiment.handler(cacheValue ?: experiment.defaultValue);
+                return;
+            }
+
+            // 请求合并，只针对 fast 调用
             [strongSelf.requestManager excuteExperimentsWithRequest:requestData completion:^(SensorsABTestExperiment *obj) {
                 // 获取缓存并触发 $ABTestTrigger 事件
                 id cacheValue = [strongSelf fetchCacheABTestWithExperiment:obj];
-                obj.handler(cacheValue ? : obj.defaultValue);
+                obj.handler(cacheValue ?: obj.defaultValue);
             }];
         });
     }];

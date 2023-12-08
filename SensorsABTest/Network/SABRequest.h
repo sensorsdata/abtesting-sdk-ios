@@ -35,6 +35,7 @@ extern NSString *const kSABRequestBodyParamName;
 
 @end
 
+/// 分流试验请求
 @interface SABExperimentRequest : NSObject <SABRequestProtocol>
 
 @property (nonatomic, assign) NSTimeInterval timeoutInterval;
@@ -74,6 +75,7 @@ extern NSString *const kSABRequestBodyParamName;
 
 @end
 
+/// 上传白名单请求
 @interface SABWhiteListRequest : NSObject <SABRequestProtocol>
 
 @property (nonatomic, copy) NSURL *openURL;

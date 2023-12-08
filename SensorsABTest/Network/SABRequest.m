@@ -51,6 +51,17 @@ NSString *const kSABRequestBodyParamName = @"param_name";
 
 @implementation SABExperimentRequest
 
+// 初始化 App 原生分流请求
+- (instancetype)initWithBaseURL:(NSURL *)url projectKey:(NSString *)key userIdenty:(SABUserIdenty *)userIdenty {
+    self = [[SABExperimentRequest alloc] initWebRequestWithBaseURL:url projectKey:key userIdenty:userIdenty];
+    if (self) {
+        // 拼接自定义主体 ID
+        [self appendCustomIDs:userIdenty.customIDs];
+    }
+    return self;
+}
+
+// 初始化 App 内嵌 H5 分流请求
 - (instancetype)initWebRequestWithBaseURL:(NSURL *)url projectKey:(NSString *)key userIdenty:(SABUserIdenty *)userIdenty {
     self = [super init];
     if (self) {
@@ -88,16 +99,6 @@ NSString *const kSABRequestBodyParamName = @"param_name";
             parametersBody[@"properties"] = properties;
         }
         _body = parametersBody;
-
-    }
-    return self;
-}
-
-- (instancetype)initWithBaseURL:(NSURL *)url projectKey:(NSString *)key userIdenty:(SABUserIdenty *)userIdenty {
-    self = [[SABExperimentRequest alloc] initWebRequestWithBaseURL:url projectKey:key userIdenty:userIdenty];
-    if (self) {
-        // 拼接自定义主体 ID
-        [self appendCustomIDs:userIdenty.customIDs];
 
     }
     return self;
