@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'SensorsABTesting'
-  s.version      = "1.0.2"
+  s.version      = "1.0.3"
   s.summary      = 'The official iOS/macOS SDK of Sensors A/B Testing.'
   s.homepage     = 'http://www.sensorsdata.cn'
   s.license      = { :type => 'Apache 2.0', :file => 'LICENSE' }
@@ -18,5 +18,7 @@ Pod::Spec.new do |s|
 
   s.source_files = 'SensorsABTest/**/*.{h,m}'
   s.public_header_files = 'SensorsABTest/**/SensorsABTestConfigOptions.h', 'SensorsABTest/**/SensorsABTest.h', 'SensorsABTest/**/SensorsABTestExperiment.h'
+  s.resource_bundle = { 'SensorsABTesting' => 'SensorsABTest/Resources/**/*'}
+
 
 end
