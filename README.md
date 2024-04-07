@@ -1,5 +1,4 @@
-![logo](https://opensource.sensorsdata.cn/wp-content/uploads/logo.png)
-<br><br>
+<img src="https://ow-file.sensorsdata.cn/www/home/header/sensors_header_icon.svg" width="200" >
 [![License](https://img.shields.io/github/license/sensorsdata/abtesting-sdk-ios.svg)](https://github.com/sensorsdata/abtesting-sdk-ios/blob/master/LICENSE) [![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/sensorsdata/abtesting-sdk-ios.svg)](http://isitmaintained.com/project/sensorsdata/abtesting-sdk-ios) [![Percentage of issues still open](http://isitmaintained.com/badge/open/sensorsdata/abtesting-sdk-ios.svg)](http://isitmaintained.com/project/sensorsdata/abtesting-sdk-ios) [![GitHub release](https://img.shields.io/github/tag/sensorsdata/abtesting-sdk-ios.svg?label=release)](https://github.com/sensorsdata/abtesting-sdk-ios/releases) [![GitHub release date](https://img.shields.io/github/release-date/sensorsdata/abtesting-sdk-ios.svg)](https://github.com/sensorsdata/sabtesting-sdk-ios/releases) [![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage) [![CocoaPods Compatible](https://img.shields.io/cocoapods/v/SensorsABTesting.svg)](https://img.shields.io/cocoapods/v/SensorsABTesting.svg) [![Platform](https://img.shields.io/cocoapods/p/SensorsAnalyticsSDK.svg?style=flat)](http://cocoadocs.org/docsets/SensorsABTesting)
 
 ## 神策简介
@@ -18,14 +17,13 @@ A/B Testing SDK 是一款用于 A/B 测试的 SDK。
 
 ## 新书推荐
 
-| 《数据驱动：从方法到实践》 | 《Android 全埋点解决方案》 | 《iOS 全埋点解决方案》
+| [《数据驱动：从方法到实践》](https://item.jd.com/12322322.html) | [《Android 全埋点解决方案》](https://item.jd.com/12574672.html) | [《iOS 全埋点解决方案》](https://item.jd.com/12867068.html)
 | ------ | ------ | ------ |
-| [![《数据驱动：从方法到实践》](https://opensource.sensorsdata.cn/wp-content/uploads/data_driven_book_1.jpg)](https://item.jd.com/12322322.html) | [![《Android 全埋点解决方案》](https://opensource.sensorsdata.cn/wp-content/uploads/Android-全埋点thumbnail_1.png)](https://item.jd.com/12574672.html) | [![《iOS 全埋点解决方案》](https://opensource.sensorsdata.cn/wp-content/uploads/iOS-全埋点thumbnail_1.png)](https://item.jd.com/12867068.html)
 
 
 ## License
 
-Copyright 2015－2022 Sensors Data Inc.
+Copyright 2015－2024 Sensors Data Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
