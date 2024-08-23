@@ -23,7 +23,7 @@
 #import <SensorsABTest.h>
 
 /// 测试环境，获取试验地址
-static NSString* kSABResultsTestURL = @"http://10.129.29.10:8202/api/v2/abtest/online/results?project-key=130EB9E0EE57A09D91AC167C6CE63F7723CE0B22";
+static NSString* kSABResultsTestURL = @"http://10.1.131.245:8202/api/v2/abtest/online/results?project-key=D9493739E8353F0917275C992F0C605A31D120AB";
 
 // 测试环境，数据接收地址
 static NSString* kSABTestServerURL = @"http://10.129.28.106:8106/sa?project=default";
@@ -58,7 +58,6 @@ static NSString* kSABTestServerURL = @"http://10.129.28.106:8106/sa?project=defa
     options.flushNetworkPolicy = SensorsAnalyticsNetworkTypeNONE;
 #endif
 
-
     [SensorsAnalyticsSDK startWithConfigOptions:options];
 
 }
@@ -67,8 +66,7 @@ static NSString* kSABTestServerURL = @"http://10.129.28.106:8106/sa?project=defa
     SensorsABTestConfigOptions *abtestConfigOptions = [[SensorsABTestConfigOptions alloc] initWithURL:kSABResultsTestURL];
     [SensorsABTest startWithConfigOptions:abtestConfigOptions];
 
-    [SensorsABTest.sharedInstance setCustomIDs:@{@"custom_subject_id":@"iOS自定义主体333"}];
-
+//    [SensorsABTest.sharedInstance setCustomIDs:@{@"custom_subject_id":@"iOS自定义主体333"}];
 }
 
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {

@@ -77,8 +77,18 @@
         case 1: { // asyncFetch
             switch (row) {
                 case 0: { // INTEGER
+
+                    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+                    [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss.SSS"];
+
+                    NSString *currentDateString = [dateFormatter stringFromDate:[NSDate date]];
+        NSLog(@"\n asyncFetchAllExperimentWithRequest 开始 %@\n",currentDateString);
+                    
                     [[SensorsABTest sharedInstance] asyncFetchABTestWithParamName:@"color1" defaultValue:@(1111) completionHandler:^(id _Nullable result) {
                         NSLog(@"asyncFetchABTest，paramName：%@ - result:%@\n", @"color1", result);
+
+                        NSString *currentDateString1 = [dateFormatter stringFromDate:[NSDate date]];
+                NSLog(@"\nasyncFetchAllExperimentWithRequest 结束 %@\n",currentDateString1);
                     }];
                 }
                     break;
