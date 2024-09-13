@@ -30,10 +30,16 @@ static NSString * const kSABFileStorePluginType = @"cn.sensorsdata.ABTesting.Fil
 @implementation SABFileStorePlugin
 
 - (NSString *)filePath:(NSString *)key {
-    NSString *newKey = [key stringByReplacingOccurrencesOfString:self.type withString:@""];
-    NSString *filename = [NSString stringWithFormat:@"sensorsanalytics-abtest-%@.plist", newKey];
-    NSString *filepath = [[NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:filename];
-    return filepath;
+    NSString *newKey = [key stringByReplacingOccurrencesOfString:kSABFileStorePluginType withString:@""];
+
+#if TARGET_OS_OSX
+    NSString *appId = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleIdentifier"];
+    NSString *fileName = [NSString stringWithFormat:@"sensorsanalytics-abtest-%@-%@.plist", appId, newKey];
+#else
+    NSString *fileName = [NSString stringWithFormat:@"sensorsanalytics-abtest-%@.plist", newKey];
+#endif
+    NSString *filePath = [[NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:fileName];
+    return filePath;
 }
 
 #pragma mark - SAStorePlugin

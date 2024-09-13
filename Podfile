@@ -18,7 +18,7 @@ end
 
 
 target 'Example-macOS' do
-  platform :osx, '10.10'
+  platform :osx, '10.13'
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
 

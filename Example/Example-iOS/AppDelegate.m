@@ -26,7 +26,7 @@
 static NSString* kSABResultsTestURL = @"http://10.1.131.245:8202/api/v2/abtest/online/results?project-key=D9493739E8353F0917275C992F0C605A31D120AB";
 
 // 测试环境，数据接收地址
-static NSString* kSABTestServerURL = @"http://10.129.28.106:8106/sa?project=default";
+static NSString* kSABTestServerURL = @"http://10.1.137.85:8106/sa?project=default";
 
 @interface AppDelegate ()
 

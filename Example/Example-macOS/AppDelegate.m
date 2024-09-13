@@ -23,10 +23,12 @@
 #import <SensorsABTest.h>
 
 
-static NSString *const SADefaultServerURL = @"http://10.130.6.4:8106/sa?project=default";
-
 /// 测试环境，获取试验地址
-static NSString* kSABResultsTestURL = @"http://10.129.29.10:8202/api/v2/abtest/online/results?project-key=130EB9E0EE57A09D91AC167C6CE63F7723CE0B22";
+static NSString* kSABResultsTestURL = @"http://10.1.131.245:8202/api/v2/abtest/online/results?project-key=D9493739E8353F0917275C992F0C605A31D120AB";
+
+// 测试环境，数据接收地址
+static NSString* SADefaultServerURL = @"http://10.1.137.85:8106/sa?project=default";
+
 
 @interface AppDelegate ()
 
@@ -46,8 +48,11 @@ static NSString* kSABResultsTestURL = @"http://10.129.29.10:8202/api/v2/abtest/o
 -  (void)startSensorsAnalyticsSDKWithLaunching:(NSNotification *)aNotification {
     SAConfigOptions *options = [[SAConfigOptions alloc] initWithServerURL:SADefaultServerURL launchOptions:nil];
     options.enableJavaScriptBridge = YES;
+
+#ifdef DEBUG
     options.enableLog = YES;
-    options.flushNetworkPolicy = SensorsAnalyticsNetworkTypeALL;
+    options.flushNetworkPolicy = SensorsAnalyticsNetworkTypeNONE;
+#endif
     
     [SensorsAnalyticsSDK startWithConfigOptions:options];
 }

@@ -33,8 +33,8 @@
 #pragma mark - fetchABTest
 #pragma mark STRING
 - (IBAction)stringFetchCache:(NSButton *)sender {
-   NSString *result = [SensorsABTest.sharedInstance fetchCacheABTestWithParamName:@"sringId" defaultValue:@"默认值"];
-    NSLog(@"fetchCacheABTest STRING experiment，paramName：%@ - result:%@\n", @"sringId", result);
+   NSString *result = [SensorsABTest.sharedInstance fetchCacheABTestWithParamName:@"device_color" defaultValue:@"默认值"];
+    NSLog(@"fetchCacheABTest STRING experiment，paramName：%@ - result:%@\n", @"device_color", result);
 }
 
 - (IBAction)stringAsyncFetch:(NSButton *)sender {
