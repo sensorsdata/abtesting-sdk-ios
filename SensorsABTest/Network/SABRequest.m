@@ -39,7 +39,6 @@ NSString *const kSABRequestBodyCustomProperties = @"custom_properties";
 NSString *const kSABRequestBodyLoginID = @"login_id";
 NSString *const kSABRequestBodyAnonymousID = @"anonymous_id";
 NSString *const kSABRequestBodyTimeoutInterval = @"timeout_interval";
-NSString *const kSABRequestBodyParamName = @"param_name";
 
 @interface SABExperimentRequest()
 
@@ -123,7 +122,6 @@ NSString *const kSABRequestBodyParamName = @"param_name";
     params[kSABRequestBodyLoginID] = self.body[kSABRequestBodyLoginID];
     params[kSABRequestBodyAnonymousID] = self.body[kSABRequestBodyAnonymousID];
     params[kSABRequestBodyTimeoutInterval] = @(self.timeoutInterval);
-    params[kSABRequestBodyParamName] = self.body[kSABRequestBodyParamName];
     params[kSABRequestBodyCustomProperties] = self.body[kSABRequestBodyCustomProperties];
     params[kSABRequestBodyCustomIDs] = self.body[kSABRequestBodyCustomIDs];
     return params;

@@ -157,6 +157,16 @@ static SensorsABTest *sharedABTest = nil;
     [self.manager setCustomIDs:customIDs];
 }
 
+// 设置自定义属性
+- (void)setCustomProperties:(NSDictionary <NSString*, id>*)customProperties {
+    [self.manager setCustomProperties:customProperties];
+}
+
+// 获取当前的自定义属性
+- (NSDictionary *)customProperties {
+    return [self.manager customProperties];
+}
+
 + (BOOL)isSupportedSAVersion {
     return [SABBridge.libVersion sensorsabtest_compareVersion:kSABMinSupportedSALibVersion] != NSOrderedAscending ;
 }

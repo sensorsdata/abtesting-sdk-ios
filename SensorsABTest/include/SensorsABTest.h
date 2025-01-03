@@ -84,6 +84,18 @@ NS_ASSUME_NONNULL_BEGIN
 /// @param customIDs 自定义主体 ID
 - (void)setCustomIDs:(NSDictionary <NSString*, NSString*> *)customIDs;
 
+/**
+ 设置自定义属性
+ 设置多次时以后次为准，会直接覆盖前次设置内容
+ 设置自定义属性，下次 SDK 初始化后重置
+ @param customProperties 设置的自定义属性内容
+ */
+- (void)setCustomProperties:(nullable NSDictionary <NSString*, id>*)customProperties;
+
+/// 获取当前的自定义属性
+/// @return 当前的 customProperties 的副本
+- (nullable NSDictionary *)customProperties;
+
 @end
 
 NS_ASSUME_NONNULL_END

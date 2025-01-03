@@ -25,7 +25,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 extern NSString *const kSABRequestBodyCustomIDs;
 extern NSString *const kSABRequestBodyCustomProperties;
-extern NSString *const kSABRequestBodyParamName;
 
 @protocol SABRequestProtocol <NSObject>
 

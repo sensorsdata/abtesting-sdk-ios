@@ -23,10 +23,10 @@
 #import <SensorsABTest.h>
 
 /// 测试环境，获取试验地址
-static NSString* kSABResultsTestURL = @"http://10.1.131.245:8202/api/v2/abtest/online/results?project-key=D9493739E8353F0917275C992F0C605A31D120AB";
+static NSString* kSABResultsTestURL = @"http://10.1.132.85:8202/api/v2/abtest/online/results?project-key=CDF5B1BE9CDCBEB289EA0589066A263D741742BD";
 
 // 测试环境，数据接收地址
-static NSString* kSABTestServerURL = @"http://10.1.137.85:8106/sa?project=default";
+static NSString* kSABTestServerURL =  @"http://10.1.132.86:8106/sa?project=default";
 
 @interface AppDelegate ()
 
@@ -48,7 +48,7 @@ static NSString* kSABTestServerURL = @"http://10.1.137.85:8106/sa?project=defaul
 - (void)startSensorsAnalyticsSDKWithConfigOptions:(NSDictionary *)launchOptions {
     SAConfigOptions *options = [[SAConfigOptions alloc] initWithServerURL:kSABTestServerURL launchOptions:launchOptions];
 //    options.autoTrackEventType = SensorsAnalyticsEventTypeAppStart | SensorsAnalyticsEventTypeAppEnd | SensorsAnalyticsEventTypeAppClick | SensorsAnalyticsEventTypeAppViewScreen;
-    options.autoTrackEventType = SensorsAnalyticsEventTypeAppStart | SensorsAnalyticsEventTypeAppEnd | SensorsAnalyticsEventTypeAppViewScreen;
+//    options.autoTrackEventType = SensorsAnalyticsEventTypeAppStart | SensorsAnalyticsEventTypeAppEnd | SensorsAnalyticsEventTypeAppViewScreen;
 
     options.enableHeatMap = YES;
     options.enableVisualizedAutoTrack = YES;
@@ -60,10 +60,15 @@ static NSString* kSABTestServerURL = @"http://10.1.137.85:8106/sa?project=defaul
 
     [SensorsAnalyticsSDK startWithConfigOptions:options];
 
+//    [SensorsAnalyticsSDK.sharedInstance identify:@"cqs_identify_20241230001"];
+
+    [[SensorsAnalyticsSDK sharedInstance] track:@"test_track" withProperties:@{@"city": @"beijing"}];
+
 }
 
 - (void)startSensorsABTest {
     SensorsABTestConfigOptions *abtestConfigOptions = [[SensorsABTestConfigOptions alloc] initWithURL:kSABResultsTestURL];
+//    abtestConfigOptions.customProperties = @{@"ab_city": @"beijing"};
     [SensorsABTest startWithConfigOptions:abtestConfigOptions];
 
 //    [SensorsABTest.sharedInstance setCustomIDs:@{@"custom_subject_id":@"iOS自定义主体333"}];

@@ -58,8 +58,8 @@
                     break;
                     
                 case 2: { // STRING
-                    id result = [[SensorsABTest sharedInstance] fetchCacheABTestWithParamName:@"hef_tes" defaultValue:@"默认值字符串"];
-                    NSLog(@"fetchCacheABTest，paramName：%@ - result:%@\n", @"hef_tes", result);
+                    id result = [[SensorsABTest sharedInstance] fetchCacheABTestWithParamName:@"shiyan1" defaultValue:@"默认值字符串"];
+                    NSLog(@"fetchCacheABTest，paramName：%@ - result:%@\n", @"shiyan1", result);
                 }
                     break;
                     
@@ -137,8 +137,8 @@
                     break;
                     
                 case 2: { // STRING
-                    [[SensorsABTest sharedInstance] fastFetchABTestWithParamName:@"color2" defaultValue:@"默认值字符串" completionHandler:^(id _Nullable result) {
-                        NSLog(@"fastFetchABTest，paramName：%@ - result:%@\n", @"color2", result);
+                    [[SensorsABTest sharedInstance] fastFetchABTestWithParamName:@"shiyan1" defaultValue:@"默认值字符串" completionHandler:^(id _Nullable result) {
+                        NSLog(@"fastFetchABTest，paramName：%@ - result:%@\n", @"shiyan1", result);
                     }];
                 }
                     break;
@@ -174,12 +174,24 @@
                 }
                     break;
                 case 3: { // 自定义属性试验
-                    SensorsABTestExperiment *experiment = [[SensorsABTestExperiment alloc] initWithParamName:@"cqs_device" defaultValue:@"设备默认值"];
-                    experiment.properties = @{@"device": @"iPhone"};
+                    SensorsABTestExperiment *experiment = [[SensorsABTestExperiment alloc] initWithParamName:@"shiyan1" defaultValue:@"设备默认值"];
+//                    experiment.properties = @{@"device": @"iPhone"};
+                    experiment.properties = @{@"ab_city": @"beijing002", @"ab_lv": @"iPhone"};
                     [[SensorsABTest sharedInstance] fastFetchABTestWithExperiment:experiment completionHandler:^(id  _Nullable result) {
 
-                        NSLog(@"fastFetchABTestWithExperiment，自定义属性 device 试验，paramName：%@ - result:%@\n", @"cqs_device", result);
+                        NSLog(@"fastFetchABTestWithExperiment，自定义属性 shiyan1 试验，paramName：%@ - result:%@\n", @"shiyan1", result);
                     }];
+//                    [[SensorsABTest sharedInstance] asyncFetchABTestWithExperiment:experiment completionHandler:^(id  _Nullable result) {
+//
+//                        NSLog(@"asyncFetchABTestWithExperiment，自定义属性 shiyan1 试验，paramName：%@ - result:%@\n", @"shiyan1", result);
+//
+//                    }];
+
+                }
+                    break;
+                case 4: { // 重置自定义属性
+                    [SensorsABTest.sharedInstance setCustomProperties:@{@"ab_city": @"beijing"}];
+
                 }
                     break;
                 default:

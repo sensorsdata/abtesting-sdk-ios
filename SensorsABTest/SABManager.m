@@ -191,8 +191,12 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
         "timeout":XXXXX     //H5 的 timeout
         "properties":{},    //App 端 A/B Testing 特定的属性，暂未添加
         "request_body": {   // H5 请求需要增加的参数
-                  "origin_platform": 'H5'
-               }
+            "origin_platform": 'H5', // 原始平台
+            "custom_properties":  { // 新增字段：H5 端的自定义属性内容
+                custom1: xxx,
+                custom2： xxx
+                }
+            }
         }
      }")
      */
@@ -242,6 +246,9 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
 - (void)changeUserIdentyAction:(NSNotification *)notification {
     /// 更新用户信息
     [self.dataManager updateUserIdenty];
+
+    // 切换用户，清除自定义属性
+    self.configOptions.customProperties = nil;
 
     SABLogDebug(@"Receive notification: %@ and reload ABTest results", notification.name);
     [self reloadAllABTestResult];
@@ -362,9 +369,14 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
     // 异步请求
     SABExperimentRequest *requestData = [[SABExperimentRequest alloc] initWithBaseURL:self.configOptions.baseURL projectKey:self.configOptions.projectKey userIdenty:self.dataManager.currentUserIndenty];
     requestData.timeoutInterval = experiment.timeoutInterval;
+
     // 包含自定义属性
-    if (properties.count > 0 && experiment.paramName) {
-        [requestData appendRequestBody:@{kSABRequestBodyCustomProperties: properties, kSABRequestBodyParamName: experiment.paramName}];
+    if (self.configOptions.customProperties.count > 0) {
+        [requestData appendRequestBody:@{kSABRequestBodyCustomProperties: self.configOptions.customProperties}];
+    }
+    // 接口设置自定义属性，优先级更高，并且不影响全局设置
+    if (properties.count) {
+        [requestData appendRequestBody:@{kSABRequestBodyCustomProperties: properties}];
     }
 
     // 检查当前请求是否已存在相同的请求任务，当前只针对 Fast 模式下的请求生效
@@ -428,6 +440,11 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
     NSInteger fetchIndex = times - 1;
 
     SABExperimentRequest *requestData = [[SABExperimentRequest alloc] initWithBaseURL:self.configOptions.baseURL projectKey:self.configOptions.projectKey userIdenty:self.dataManager.currentUserIndenty];
+
+    // 包含自定义属性
+    if (self.configOptions.customProperties.count > 0) {
+        [requestData appendRequestBody:@{kSABRequestBodyCustomProperties: self.configOptions.customProperties}];
+    }
 
     [self.dataManager asyncFetchAllExperimentWithRequest:requestData completionHandler:^(SABFetchResultResponse *_Nullable responseData, NSError *_Nullable error) {
         if (fetchIndex <= 0 || !error) {
@@ -539,6 +556,36 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
     [self.dataManager updateCustomIDs:tempCustomIDs];
 
     [self reloadAllABTestResult];
+}
+
+// 设置自定义属性
+- (void)setCustomProperties:(NSDictionary <NSString*, id>*)customProperties {
+    NSError *error;
+    // 验证自定义属性合法性，并统一修改自定义属性值为 String 类型
+    NSDictionary *properties = [SABPropertyValidator validateProperties:customProperties error:&error];
+    if (error) {
+        SABLogError(@"setCustomProperties error，%@", error.localizedDescription);
+        return;
+    }
+    // 自定义属性未发生变更
+    if ([properties isEqualToDictionary:self.configOptions.customProperties]) {
+        SABLogDebug(@"setCustomProperties to match the current customProperties and do not process");
+        return;
+    }
+    // 自定义属性无效
+    if (properties.count == 0 && self.configOptions.customProperties.count == 0) {
+        return;
+    }
+
+    SABLogDebug(@"setCustomProperties，reloadAllABTestResult");
+
+    self.configOptions.customProperties = customProperties;
+    [self reloadAllABTestResult];
+}
+
+// 获取当前的自定义属性
+- (NSDictionary *)customProperties {
+    return [self.configOptions.customProperties copy];
 }
 
 - (void)dealloc {

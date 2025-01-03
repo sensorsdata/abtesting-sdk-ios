@@ -24,6 +24,8 @@
 
 #import "SensorsABTestConfigOptions.h"
 #import "SABURLUtils.h"
+#import "SABPropertyValidator.h"
+#import "SABLogBridge.h"
 
 @interface SensorsABTestConfigOptions ()
 
@@ -54,6 +56,20 @@
     SensorsABTestConfigOptions *options = [[[self class] allocWithZone:zone] init];
     options.baseURL = self.baseURL;
     options.projectKey = self.projectKey;
+    options.customProperties = self.customProperties;
+    
     return options;
 }
+
+- (void)setCustomProperties:(NSDictionary *)customProperties {
+    NSError *error;
+    // 验证自定义属性合法性，并统一修改自定义属性值为 String 类型
+    NSDictionary *properties = [SABPropertyValidator validateProperties:customProperties error:&error];
+    if (error) {
+        SABLogError(@"%@", error.localizedDescription);
+        return;
+    }
+    _customProperties = properties;
+}
+
 @end

@@ -33,6 +33,8 @@ NS_ASSUME_NONNULL_BEGIN
 /// @return 实例对象
 - (instancetype)initWithURL:(NSString *)urlString NS_DESIGNATED_INITIALIZER;
 
+// 设置自定义属性
+@property (nonatomic, copy) NSDictionary * _Nullable customProperties;
 @end
 
 NS_ASSUME_NONNULL_END
