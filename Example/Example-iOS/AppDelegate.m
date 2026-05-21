@@ -23,10 +23,10 @@
 #import <SensorsABTest.h>
 
 /// 测试环境，获取试验地址
-static NSString* kSABResultsTestURL = @"http://10.1.132.85:8202/api/v2/abtest/online/results?project-key=CDF5B1BE9CDCBEB289EA0589066A263D741742BD";
+static NSString* kSABResultsTestURL = @"http://10.1.128.54:8203/api/v2/abtest/online/results?project-key=2EE10DF17668F0A1ABA5D6EB1473700177029B7C";
 
 // 测试环境，数据接收地址
-static NSString* kSABTestServerURL =  @"http://10.1.132.86:8106/sa?project=default";
+static NSString* kSABTestServerURL =  @"http://10.1.137.85:8106/sa?project=default";
 
 @interface AppDelegate ()
 
@@ -48,7 +48,7 @@ static NSString* kSABTestServerURL =  @"http://10.1.132.86:8106/sa?project=defau
 - (void)startSensorsAnalyticsSDKWithConfigOptions:(NSDictionary *)launchOptions {
     SAConfigOptions *options = [[SAConfigOptions alloc] initWithServerURL:kSABTestServerURL launchOptions:launchOptions];
 //    options.autoTrackEventType = SensorsAnalyticsEventTypeAppStart | SensorsAnalyticsEventTypeAppEnd | SensorsAnalyticsEventTypeAppClick | SensorsAnalyticsEventTypeAppViewScreen;
-//    options.autoTrackEventType = SensorsAnalyticsEventTypeAppStart | SensorsAnalyticsEventTypeAppEnd | SensorsAnalyticsEventTypeAppViewScreen;
+    options.autoTrackEventType = SensorsAnalyticsEventTypeAppStart | SensorsAnalyticsEventTypeAppEnd | SensorsAnalyticsEventTypeAppViewScreen;
 
     options.enableHeatMap = YES;
     options.enableVisualizedAutoTrack = YES;
@@ -68,7 +68,7 @@ static NSString* kSABTestServerURL =  @"http://10.1.132.86:8106/sa?project=defau
 
 - (void)startSensorsABTest {
     SensorsABTestConfigOptions *abtestConfigOptions = [[SensorsABTestConfigOptions alloc] initWithURL:kSABResultsTestURL];
-//    abtestConfigOptions.customProperties = @{@"ab_city": @"beijing"};
+    abtestConfigOptions.customProperties = @{@"ab_city": @"beijing"};
     [SensorsABTest startWithConfigOptions:abtestConfigOptions];
 
 //    [SensorsABTest.sharedInstance setCustomIDs:@{@"custom_subject_id":@"iOS自定义主体333"}];

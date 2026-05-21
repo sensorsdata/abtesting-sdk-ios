@@ -1,6 +1,6 @@
 <img src="https://ow-file.sensorsdata.cn/www/home/header/sensors_header_icon.svg" width="200" >
 
-[![License](https://img.shields.io/github/license/sensorsdata/abtesting-sdk-ios.svg)](https://github.com/sensorsdata/abtesting-sdk-ios/blob/master/LICENSE) [![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/sensorsdata/abtesting-sdk-ios.svg)](http://isitmaintained.com/project/sensorsdata/abtesting-sdk-ios) [![Percentage of issues still open](http://isitmaintained.com/badge/open/sensorsdata/abtesting-sdk-ios.svg)](http://isitmaintained.com/project/sensorsdata/abtesting-sdk-ios) [![GitHub release](https://img.shields.io/github/tag/sensorsdata/abtesting-sdk-ios.svg?label=release)](https://github.com/sensorsdata/abtesting-sdk-ios/releases) [![GitHub release date](https://img.shields.io/github/release-date/sensorsdata/abtesting-sdk-ios.svg)](https://github.com/sensorsdata/sabtesting-sdk-ios/releases) [![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage) [![CocoaPods Compatible](https://img.shields.io/cocoapods/v/SensorsABTesting.svg)](https://img.shields.io/cocoapods/v/SensorsABTesting.svg) [![Platform](https://img.shields.io/cocoapods/p/SensorsABTesting.svg?style=flat)](http://cocoadocs.org/docsets/SensorsABTesting)
+[![License](https://img.shields.io/github/license/sensorsdata/abtesting-sdk-ios.svg)](https://github.com/sensorsdata/abtesting-sdk-ios/blob/master/LICENSE) [![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/sensorsdata/abtesting-sdk-ios.svg)](http://isitmaintained.com/project/sensorsdata/abtesting-sdk-ios) [![Percentage of issues still open](http://isitmaintained.com/badge/open/sensorsdata/abtesting-sdk-ios.svg)](http://isitmaintained.com/project/sensorsdata/abtesting-sdk-ios) [![GitHub release](https://img.shields.io/github/tag/sensorsdata/abtesting-sdk-ios.svg?label=release)](https://github.com/sensorsdata/abtesting-sdk-ios/releases) [![GitHub release date](https://img.shields.io/github/release-date/sensorsdata/abtesting-sdk-ios.svg)](https://github.com/sensorsdata/sabtesting-sdk-ios/releases) [![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage) [![CocoaPods Compatible](https://img.shields.io/cocoapods/v/SensorsABTesting.svg)](https://img.shields.io/cocoapods/v/SensorsABTesting.svg) [![Platform](https://img.shields.io/cocoapods/p/SensorsAnalyticsSDK.svg?style=flat)](http://cocoadocs.org/docsets/SensorsABTesting)
 
 ## 神策简介
 
@@ -11,15 +11,6 @@
 ## SDK 简介
 
 A/B Testing SDK 是一款用于 A/B 测试的 SDK。
-
-## 神策埋点 SDK 官网
-如需了解神策埋点 SDK 的更多商业授权信息，请访问[神策埋点 SDK 官网](https://jssdk.debugbox.sensorsdata.cn/)获取更多详细信息。
-
-## 联系我们
-若您有商业合作或产品集成需求，请通过下面的渠道联系我们获取专业服务与支持。
-
-| 加微信号：skycode008，或扫码添加联系人 <img src="https://github.com/sensorsdata/sa-sdk-android/blob/master/WechatIMG180.jpg" width="300" height="450" /> | 扫码关注「神策埋点 SDK」公众号 ![gzh](https://github.com/sensorsdata/sa-sdk-android/blob/master/gzh.jpeg) |
-| ------ | ------ |
 
 ## 集成文档
 

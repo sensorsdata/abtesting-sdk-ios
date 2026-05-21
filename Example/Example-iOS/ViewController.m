@@ -137,8 +137,8 @@
                     break;
                     
                 case 2: { // STRING
-                    [[SensorsABTest sharedInstance] fastFetchABTestWithParamName:@"shiyan1" defaultValue:@"默认值字符串" completionHandler:^(id _Nullable result) {
-                        NSLog(@"fastFetchABTest，paramName：%@ - result:%@\n", @"shiyan1", result);
+                    [[SensorsABTest sharedInstance] fastFetchABTestWithParamName:@"color_cqs" defaultValue:@"默认值字符串" completionHandler:^(id _Nullable result) {
+                        NSLog(@"fastFetchABTest，paramName：%@ - result:%@\n", @"color_cqs", result);
                     }];
                 }
                     break;

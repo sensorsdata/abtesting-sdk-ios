@@ -200,7 +200,7 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
         }
      }")
      */
-    SABExperimentRequest *requestData = [[SABExperimentRequest alloc] initWebRequestWithBaseURL:self.configOptions.baseURL projectKey:self.configOptions.projectKey userIdenty:self.dataManager.currentUserIndenty];
+    SABExperimentRequest *requestData = [[SABExperimentRequest alloc] initRequestWithBaseURL:self.configOptions.baseURL projectKey:self.configOptions.projectKey userIdenty:self.dataManager.currentUserIndenty];
 
     requestData.timeoutInterval = [dataDic[@"timeout"] integerValue] / 1000.0;
     // 拼接 H5 请求参数
@@ -367,7 +367,7 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
     }
 
     // 异步请求
-    SABExperimentRequest *requestData = [[SABExperimentRequest alloc] initWithBaseURL:self.configOptions.baseURL projectKey:self.configOptions.projectKey userIdenty:self.dataManager.currentUserIndenty];
+    SABExperimentRequest *requestData = [[SABExperimentRequest alloc] initAppRequestWithBaseURL:self.configOptions.baseURL projectKey:self.configOptions.projectKey userIdenty:self.dataManager.currentUserIndenty];
     requestData.timeoutInterval = experiment.timeoutInterval;
 
     // 包含自定义属性
@@ -439,7 +439,7 @@ typedef NS_ENUM(NSUInteger, SABAppLifecycleState) {
 - (void)fetchAllABTestResultWithTimes:(NSInteger)times {
     NSInteger fetchIndex = times - 1;
 
-    SABExperimentRequest *requestData = [[SABExperimentRequest alloc] initWithBaseURL:self.configOptions.baseURL projectKey:self.configOptions.projectKey userIdenty:self.dataManager.currentUserIndenty];
+    SABExperimentRequest *requestData = [[SABExperimentRequest alloc] initAppRequestWithBaseURL:self.configOptions.baseURL projectKey:self.configOptions.projectKey userIdenty:self.dataManager.currentUserIndenty];
 
     // 包含自定义属性
     if (self.configOptions.customProperties.count > 0) {

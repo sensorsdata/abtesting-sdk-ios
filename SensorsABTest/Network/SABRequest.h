@@ -40,7 +40,7 @@ extern NSString *const kSABRequestBodyCustomProperties;
 @property (nonatomic, assign) NSTimeInterval timeoutInterval;
 
 /// 请求时刻的用户标识
-@property (nonatomic, strong) SABUserIdenty *userIdenty;
+@property (nonatomic, copy) SABUserIdenty *userIdenty;
 
 - (instancetype)init NS_UNAVAILABLE;
 
@@ -48,14 +48,14 @@ extern NSString *const kSABRequestBodyCustomProperties;
 /// @param url 分流 Base url
 /// @param key SaaS 的项目 key
 /// @param userIdenty 用户信息
-- (instancetype)initWithBaseURL:(NSURL *)url projectKey:(NSString *)key userIdenty:(SABUserIdenty *)userIdenty NS_DESIGNATED_INITIALIZER;
+- (instancetype)initAppRequestWithBaseURL:(NSURL *)url projectKey:(NSString *)key userIdenty:(SABUserIdenty *)userIdenty;
 
 
-/// 初始化 App 内嵌 H5 分流请求
+/// 初始化公共基础分流请求
 /// @param url 分流 Base url
 /// @param key SaaS 的项目 key
 /// @param userIdenty 用户信息
-- (instancetype)initWebRequestWithBaseURL:(NSURL *)url projectKey:(NSString *)key userIdenty:(SABUserIdenty *)userIdenty NS_DESIGNATED_INITIALIZER;
+- (instancetype)initRequestWithBaseURL:(NSURL *)url projectKey:(NSString *)key userIdenty:(SABUserIdenty *)userIdenty NS_DESIGNATED_INITIALIZER;
 
 /// 增加请求参数
 /// @param body 需要增加的参数 body

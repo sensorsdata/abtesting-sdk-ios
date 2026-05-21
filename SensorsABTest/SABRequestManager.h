@@ -25,7 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// 请求任务管理
 ///
-/// 考虑到 asyncFetch 请求，都是直接触发，所以此处只针对 fastFetch 触发的请求
+/// 考虑到 asyncFetch 请求，都是直接触发，所以此处只针对 fastFetch 触发的请求进行合并优化
 @interface SABRequestManager : NSObject
 
 /// 检查当前是否已存在相同的请求任务

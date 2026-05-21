@@ -51,24 +51,25 @@ NSString *const kSABRequestBodyTimeoutInterval = @"timeout_interval";
 @implementation SABExperimentRequest
 
 // 初始化 App 原生分流请求
-- (instancetype)initWithBaseURL:(NSURL *)url projectKey:(NSString *)key userIdenty:(SABUserIdenty *)userIdenty {
-    self = [[SABExperimentRequest alloc] initWebRequestWithBaseURL:url projectKey:key userIdenty:userIdenty];
+- (instancetype)initAppRequestWithBaseURL:(NSURL *)url projectKey:(NSString *)key userIdenty:(SABUserIdenty *)userIdenty {
+    self = [[SABExperimentRequest alloc] initRequestWithBaseURL:url projectKey:key userIdenty:userIdenty];
     if (self) {
         // 拼接自定义主体 ID
-        [self appendCustomIDs:userIdenty.customIDs];
+        [self appendCustomIDs:self.userIdenty.customIDs];
     }
     return self;
 }
 
-// 初始化 App 内嵌 H5 分流请求
-- (instancetype)initWebRequestWithBaseURL:(NSURL *)url projectKey:(NSString *)key userIdenty:(SABUserIdenty *)userIdenty {
+// 初始化公共基础分流请求
+// App 内嵌 H5 分流请求直接使用
+- (instancetype)initRequestWithBaseURL:(NSURL *)url projectKey:(NSString *)key userIdenty:(SABUserIdenty *)userIdenty {
     self = [super init];
     if (self) {
         _baseURL = url;
         _projectKey = key;
         _timeoutInterval = kSABFetchABTestResultDefaultTimeoutInterval;
 
-        _userIdenty = userIdenty;
+        _userIdenty = [userIdenty copy];
 
         NSMutableDictionary *parametersBody = [NSMutableDictionary dictionary];
 
@@ -77,8 +78,8 @@ NSString *const kSABRequestBodyTimeoutInterval = @"timeout_interval";
 #else
         parametersBody[@"platform"] = @"iOS";
 #endif
-        parametersBody[kSABRequestBodyLoginID] = userIdenty.loginId;
-        parametersBody[kSABRequestBodyAnonymousID] = userIdenty.anonymousId;
+        parametersBody[kSABRequestBodyLoginID] = _userIdenty.loginId;
+        parametersBody[kSABRequestBodyAnonymousID] = _userIdenty.anonymousId;
         // abtest sdk 版本号
         parametersBody[@"abtest_lib_version"] = kSABLibVersion;
 

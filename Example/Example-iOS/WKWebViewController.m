@@ -40,6 +40,7 @@
 
     // js 测试页面
     NSString *httpStr = @"http://jssdk.debugbox.sensorsdata.cn/js/ls/app/sa-sdk-abtest/index.html";
+
     // 多链接试验
 //   httpStr = @"http://jssdk.debugbox.sensorsdata.cn/js/ls/ab/index.html";
 
@@ -48,6 +49,12 @@
 
     // 配置化测试
 //    httpStr = @"http://10.120.195.209/js/zyf/abtest_regex/index.html";
+
+    // sa 测试调用
+//    httpStr = @"https://jssdk.debugbox.sensorsdata.cn/js/cqs/sa-demo/callJS.html";
+
+    // syg 全局自定义属性测试
+    httpStr = @"https://jssdk.debugbox.sensorsdata.cn/js/syg/abprop/index1.html";
 
     NSURL *httpUrl = [NSURL URLWithString:httpStr];
     NSURLRequest *request = [NSURLRequest requestWithURL:httpUrl];
